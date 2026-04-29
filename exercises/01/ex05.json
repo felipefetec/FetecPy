@@ -1,0 +1,21 @@
+{
+  "id": "01-ex05",
+  "modulo": "01",
+  "ordem": 5,
+  "titulo": "Classificador de idades",
+  "dificuldade": "desafio",
+  "xp": 30,
+  "conceitos": ["algoritmo", "pseudocódigo", "repetição", "condicionais aninhadas", "faixas de valor"],
+  "antes_de_codar": [
+    "Quantas faixas de classificação existem? Liste cada uma com seus limites.",
+    "Como você vai repetir a leitura 5 vezes? Qual estrutura de repetição usar?",
+    "As condicionais precisam ser testadas em alguma ordem específica? Por quê?"
+  ],
+  "enunciado": "## Classificador de idades\n\nEscreva em **pseudocódigo** um algoritmo que:\n1. Lê **5 idades** do usuário (uma por vez)\n2. Para cada idade, classifica e exibe a categoria:\n   - **Criança**: menos de 12 anos\n   - **Adolescente**: de 12 a 17 anos\n   - **Adulto**: de 18 a 59 anos\n   - **Idoso**: 60 anos ou mais\n\nExemplo de saída para a idade 15: `Adolescente`",
+  "dica": "Você vai precisar de um loop que repete 5 vezes e, dentro dele, um bloco SE/SENÃO SE/SENÃO para testar as faixas. A ordem das verificações importa!",
+  "validacao": {
+    "tipo": "texto_livre",
+    "minimo_caracteres": 120,
+    "instrucao": "Escreva o pseudocódigo completo para as 5 leituras e classificações. Detalhe bem os limites de cada faixa."
+  }
+}

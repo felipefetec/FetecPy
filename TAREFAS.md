@@ -86,15 +86,17 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 
 ---
 
-## Fase 5 — Exercícios (PRÓXIMO)
+## Fase 5 — Exercícios
 
-### Prompt 5.1 — Schema, exercícios e validadores
-- [ ] exercises/SCHEMA.md
-- [ ] exercises/01/ (5 exercícios — pseudocódigo, validação por texto livre)
-- [ ] exercises/02/ (5 exercícios — Python, saida_exata)
-- [ ] ExerciseController: GET /api/modules/:id/exercises/:exId, POST .../submit
-- [ ] validator.js: validateOutput, validateFunction, validateAst
-- [ ] Modal de exercício no module.html
+### Prompt 5.1 — Schema, exercícios e validadores ✅
+- [x] exercises/SCHEMA.md
+- [x] exercises/01/ (5 exercícios — pseudocódigo, validação por texto livre)
+- [x] exercises/02/ (5 exercícios — Python, saida_exata)
+- [x] ExerciseController: GET /api/modules/:id/exercises/:exId, POST .../submit
+- [x] validator.js: validateOutput, validateFunction, validateAst, validateTextLivre, validar()
+- [x] Modal de exercício no module.html (3 fases: reflexão → editor → conclusão)
+- [x] Rotas registradas no index.php
+- [x] 26 testes PHP + 3 JS passando
 
 ### Prompt 5.2 — Validadores B e C
 ### Prompt 5.3 — Testes dos validadores
@@ -103,3 +105,20 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 
 ## Fase 6+ — Gamificação, Conteúdo, Deploy
 (Prompts 6.x, 7.x, 8.x — ainda não iniciados)
+
+---
+
+## ⚠️ Módulo 9 — Boas Práticas e Profissionalização (BLOQUEADO até Prompt 7.4)
+
+> Arquivos `PLANO_ESTUDOS_M9.md` e `PROMPTS_M9.md` já estão na raiz do projeto.
+> **NÃO executar antes de concluir o Prompt 7.4 do PROMPTS.md original.**
+
+Pré-requisitos para desbloquear:
+- [ ] Prompts 1.1 a 7.4 concluídos
+- [ ] `./scripts/test.sh` passando sem erros
+- [ ] Conteúdo dos módulos 1–8 completo
+- [ ] Sistema de gamificação funcionando
+- [ ] Validadores A, B, C funcionando
+- [ ] Pelo menos 1 deploy de teste validado
+
+Quando todos os itens acima estiverem `[x]`, iniciar pelo `PROMPTS_M9.md` → Prompt 7.5.1.

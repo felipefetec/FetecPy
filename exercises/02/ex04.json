@@ -1,0 +1,27 @@
+{
+  "id": "02-ex04",
+  "modulo": "02",
+  "ordem": 4,
+  "titulo": "Troco",
+  "dificuldade": "medio",
+  "xp": 20,
+  "conceitos": ["input", "float", "subtração", "arredondamento"],
+  "antes_de_codar": [
+    "Qual operação matemática calcula o troco?",
+    "O que acontece se o valor pago for exatamente igual ao valor da compra?",
+    "Por que usar `round()` com valores monetários?"
+  ],
+  "enunciado": "Leia o valor da compra e o valor pago pelo cliente. Imprima o troco.\n\n**Saída:** `Troco: R$ <valor>` com **2 casas decimais**.\n\nExemplo:\n```\nEntrada: 15.50 (compra) e 20.00 (pago)\nSaída:   Troco: R$ 4.50\n```",
+  "dica": "Valores decimais em ponto flutuante podem ter pequenos erros de arredondamento. Use `round(troco, 2)` antes de exibir.",
+  "codigo_inicial": "# Leia o valor da compra e o valor pago\ncompra = float(input())\npago = float(input())\n# Calcule e exiba o troco\n",
+  "validacao": {
+    "tipo": "saida_exata",
+    "casos": [
+      { "input": "15.50\n20.00\n",  "esperado": "Troco: R$ 4.50\n" },
+      { "input": "99.99\n100.00\n", "esperado": "Troco: R$ 0.01\n" },
+      { "input": "10.00\n10.00\n",  "esperado": "Troco: R$ 0.00\n" },
+      { "input": "7.30\n50.00\n",   "esperado": "Troco: R$ 42.70\n" }
+    ]
+  },
+  "solucao": "compra = float(input())\npago = float(input())\ntroco = round(pago - compra, 2)\nprint(f'Troco: R$ {troco:.2f}')"
+}

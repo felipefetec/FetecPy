@@ -1,0 +1,28 @@
+{
+  "id": "02-ex05",
+  "modulo": "02",
+  "ordem": 5,
+  "titulo": "Conversor de tempo",
+  "dificuldade": "desafio",
+  "xp": 30,
+  "conceitos": ["input", "int", "divisão inteira", "módulo", "operadores aritméticos"],
+  "antes_de_codar": [
+    "Quantos segundos tem uma hora? E um minuto?",
+    "Qual operador Python retorna a parte inteira da divisão? (Dica: //)",
+    "Qual operador retorna o resto da divisão? (Dica: %) — por que ele é útil aqui?"
+  ],
+  "enunciado": "Leia um número de segundos e converta para horas, minutos e segundos restantes.\n\n**Saída:** `<h>h <m>m <s>s` (sem zeros à esquerda)\n\nExemplo:\n```\nEntrada: 3661\nSaída:   1h 1m 1s\n```\n\nOutro exemplo:\n```\nEntrada: 7384\nSaída:   2h 3m 4s\n```",
+  "dica": "Use `//` para pegar a parte inteira e `%` para o resto. Horas = segundos // 3600. Minutos restantes = (segundos % 3600) // 60. Segundos restantes = segundos % 60.",
+  "codigo_inicial": "# Leia o total de segundos\ntotal = int(input())\n# Calcule horas, minutos e segundos\n",
+  "validacao": {
+    "tipo": "saida_exata",
+    "casos": [
+      { "input": "3661\n",   "esperado": "1h 1m 1s\n" },
+      { "input": "7384\n",   "esperado": "2h 3m 4s\n" },
+      { "input": "60\n",     "esperado": "0h 1m 0s\n" },
+      { "input": "3600\n",   "esperado": "1h 0m 0s\n" },
+      { "input": "86399\n",  "esperado": "23h 59m 59s\n" }
+    ]
+  },
+  "solucao": "total = int(input())\nhoras = total // 3600\nminutos = (total % 3600) // 60\nsegundos = total % 60\nprint(f'{horas}h {minutos}m {segundos}s')"
+}

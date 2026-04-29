@@ -1,0 +1,27 @@
+{
+  "id": "02-ex01",
+  "modulo": "02",
+  "ordem": 1,
+  "titulo": "Olá pessoal",
+  "dificuldade": "facil",
+  "xp": 10,
+  "conceitos": ["input", "print", "f-string", "variável"],
+  "antes_de_codar": [
+    "Qual função Python usamos para ler o que o usuário digita?",
+    "Qual função Python usamos para exibir texto na tela?",
+    "Como incluímos o valor de uma variável dentro de uma string? (Dica: f-string)"
+  ],
+  "enunciado": "Pergunte o nome do usuário e cumprimente-o pelo nome.\n\n**Entrada:** uma linha com o nome do usuário\n**Saída:** `Olá, <nome>!` (exatamente assim, com a vírgula e o ponto de exclamação)\n\nExemplo:\n```\nEntrada: Maria\nSaída:   Olá, Maria!\n```",
+  "dica": "Use `input()` para ler o nome. Depois, monte a saudação com uma f-string: `f'Olá, {nome}!'`.",
+  "codigo_inicial": "# Leia o nome do usuário\nnome = input()\n# Exiba a saudação\n",
+  "validacao": {
+    "tipo": "saida_exata",
+    "casos": [
+      { "input": "Maria\n",   "esperado": "Olá, Maria!\n" },
+      { "input": "João\n",    "esperado": "Olá, João!\n" },
+      { "input": "Ana\n",     "esperado": "Olá, Ana!\n" },
+      { "input": "Carlos\n",  "esperado": "Olá, Carlos!\n" }
+    ]
+  },
+  "solucao": "nome = input()\nprint(f'Olá, {nome}!')"
+}

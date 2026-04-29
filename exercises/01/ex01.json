@@ -1,0 +1,21 @@
+{
+  "id": "01-ex01",
+  "modulo": "01",
+  "ordem": 1,
+  "titulo": "Algoritmo da troca de pneu",
+  "dificuldade": "facil",
+  "xp": 10,
+  "conceitos": ["algoritmo", "pseudocódigo", "sequência"],
+  "antes_de_codar": [
+    "Quais são as etapas necessárias antes de remover o pneu furado?",
+    "O que precisa acontecer antes de colocar o pneu reserva?",
+    "Existe alguma etapa de segurança que não pode ser ignorada?"
+  ],
+  "enunciado": "## Algoritmo da troca de pneu\n\nEscreva em **pseudocódigo** os passos para trocar um pneu furado.\n\nLembre-se de incluir:\n- Etapas de segurança (acostamento, freio de mão, pisca-alerta)\n- A ordem correta das ações\n- O que fazer ao terminar\n\nNão existe uma resposta única certa — o que importa é que a sequência faça sentido e não pule etapas essenciais.",
+  "dica": "Pense na sequência como uma receita. O que acontece se você tentar afrouxar os parafusos DEPOIS de levantar o carro com o macaco? E ANTES?",
+  "validacao": {
+    "tipo": "texto_livre",
+    "minimo_caracteres": 80,
+    "instrucao": "Escreva seu pseudocódigo abaixo. Use numeração (1., 2., 3…) para deixar a sequência clara."
+  }
+}

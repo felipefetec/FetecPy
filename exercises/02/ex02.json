@@ -1,0 +1,26 @@
+{
+  "id": "02-ex02",
+  "modulo": "02",
+  "ordem": 2,
+  "titulo": "Calculadora de IMC",
+  "dificuldade": "facil",
+  "xp": 10,
+  "conceitos": ["input", "float", "operadores aritméticos", "print", "f-string"],
+  "antes_de_codar": [
+    "Qual é a fórmula do IMC? (peso em kg ÷ altura em metros ao quadrado)",
+    "O que `input()` retorna? Precisamos converter o valor para outro tipo?",
+    "Como arredondamos um número para 2 casas decimais em Python?"
+  ],
+  "enunciado": "Leia o peso (kg) e a altura (m) do usuário e calcule o IMC.\n\n**Fórmula:** `IMC = peso / (altura ** 2)`\n\n**Saída:** imprima `IMC: <valor>` com **2 casas decimais**.\n\nExemplo:\n```\nEntrada: 70 (peso) e 1.75 (altura)\nSaída:   IMC: 22.86\n```",
+  "dica": "Use `float(input())` para converter a entrada. Para formatar com 2 casas decimais use `f'{imc:.2f}'`.",
+  "codigo_inicial": "# Leia peso e altura\npeso = float(input())\naltura = float(input())\n# Calcule o IMC\n",
+  "validacao": {
+    "tipo": "saida_exata",
+    "casos": [
+      { "input": "70\n1.75\n",  "esperado": "IMC: 22.86\n" },
+      { "input": "90\n1.80\n",  "esperado": "IMC: 27.78\n" },
+      { "input": "55\n1.60\n",  "esperado": "IMC: 21.48\n" }
+    ]
+  },
+  "solucao": "peso = float(input())\naltura = float(input())\nimc = peso / (altura ** 2)\nprint(f'IMC: {imc:.2f}')"
+}

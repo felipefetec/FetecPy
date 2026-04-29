@@ -1,0 +1,21 @@
+{
+  "id": "01-ex04",
+  "modulo": "01",
+  "ordem": 4,
+  "titulo": "Adivinha o número",
+  "dificuldade": "medio",
+  "xp": 20,
+  "conceitos": ["algoritmo", "pseudocódigo", "repetição", "condicionais", "interação"],
+  "antes_de_codar": [
+    "Quando o loop deve parar? Ou seja, qual é a condição de saída?",
+    "Quantas informações o computador precisa 'lembrar' durante o jogo?",
+    "Quais são as três situações possíveis a cada tentativa do usuário?"
+  ],
+  "enunciado": "## Adivinha o número\n\nEscreva em **pseudocódigo** um jogo onde:\n1. O computador 'pensa' em um número entre 1 e 100\n2. O usuário tenta adivinhar\n3. A cada tentativa, o computador diz: 'maior', 'menor' ou 'acertou!'\n4. O jogo continua até o usuário acertar\n5. Ao final, informa quantas tentativas foram necessárias\n\nNão precisa explicar como o computador 'pensa' no número — só escreva `numero_secreto = NUMERO_ALEATORIO(1, 100)`.",
+  "dica": "Você precisa de: uma variável pro número secreto, uma pro chute atual, um contador de tentativas e um loop que só para quando o chute for igual ao secreto.",
+  "validacao": {
+    "tipo": "texto_livre",
+    "minimo_caracteres": 100,
+    "instrucao": "Escreva o pseudocódigo completo. Use ENQUANTO, SE/ENTÃO/SENÃO e LEIA/ESCREVA."
+  }
+}

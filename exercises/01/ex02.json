@@ -1,0 +1,21 @@
+{
+  "id": "01-ex02",
+  "modulo": "01",
+  "ordem": 2,
+  "titulo": "Maior de dois números",
+  "dificuldade": "facil",
+  "xp": 10,
+  "conceitos": ["algoritmo", "pseudocódigo", "condicionais", "comparação"],
+  "antes_de_codar": [
+    "Quais são as entradas do problema? (o que o 'usuário' vai fornecer?)",
+    "Quais são os possíveis resultados? Pense em todos os casos possíveis.",
+    "O que acontece se os dois números forem iguais?"
+  ],
+  "enunciado": "## Maior de dois números\n\nEscreva em **pseudocódigo** um algoritmo que:\n1. Recebe dois números do usuário\n2. Determina qual é o maior\n3. Informa o resultado\n\nLembre-se de tratar o caso em que os dois números são iguais.",
+  "dica": "Use a estrutura 'SE ... ENTÃO ... SENÃO'. Quantas comparações você precisa fazer para cobrir todos os casos?",
+  "validacao": {
+    "tipo": "texto_livre",
+    "minimo_caracteres": 60,
+    "instrucao": "Escreva seu pseudocódigo. Pode usar português estruturado: SE, ENTÃO, SENÃO, LEIA, ESCREVA."
+  }
+}

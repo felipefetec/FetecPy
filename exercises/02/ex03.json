@@ -1,0 +1,27 @@
+{
+  "id": "02-ex03",
+  "modulo": "02",
+  "ordem": 3,
+  "titulo": "Conversor de temperatura",
+  "dificuldade": "medio",
+  "xp": 20,
+  "conceitos": ["input", "float", "operadores aritméticos", "fórmula"],
+  "antes_de_codar": [
+    "Qual é a fórmula para converter Celsius para Fahrenheit?",
+    "A entrada é um número inteiro ou decimal? Qual tipo Python usar?",
+    "Quantas casas decimais o resultado deve ter?"
+  ],
+  "enunciado": "Leia uma temperatura em Celsius e converta para Fahrenheit.\n\n**Fórmula:** `F = C * 9/5 + 32`\n\n**Saída:** imprima `<valor>°F` com **1 casa decimal**.\n\nExemplo:\n```\nEntrada: 100\nSaída:   212.0°F\n```",
+  "dica": "A divisão `9/5` em Python 3 retorna float automaticamente. Para formatar com 1 casa decimal use `f'{f:.1f}'`.",
+  "codigo_inicial": "# Leia a temperatura em Celsius\nc = float(input())\n# Converta para Fahrenheit\n",
+  "validacao": {
+    "tipo": "saida_exata",
+    "casos": [
+      { "input": "100\n",  "esperado": "212.0°F\n" },
+      { "input": "0\n",    "esperado": "32.0°F\n" },
+      { "input": "37\n",   "esperado": "98.6°F\n" },
+      { "input": "-10\n",  "esperado": "14.0°F\n" }
+    ]
+  },
+  "solucao": "c = float(input())\nf = c * 9/5 + 32\nprint(f'{f:.1f}°F')"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "01-ex03",
+  "modulo": "01",
+  "ordem": 3,
+  "titulo": "Soma de 1 a 10",
+  "dificuldade": "medio",
+  "xp": 20,
+  "conceitos": ["algoritmo", "pseudocódigo", "repetição", "acumulador"],
+  "antes_de_codar": [
+    "Como você vai 'lembrar' a soma enquanto percorre os números?",
+    "Qual estrutura de repetição faz sentido aqui: 'enquanto' ou 'para cada'?",
+    "Qual é o valor inicial do acumulador? Por quê não pode ser outro valor?"
+  ],
+  "enunciado": "## Soma de 1 a 10\n\nEscreva em **pseudocódigo** um algoritmo que soma todos os números inteiros de 1 a 10 e exibe o resultado.\n\nO resultado esperado é **55**.\n\nDesafio: escreva de forma que funcione para qualquer intervalo (de 1 a N), não só de 1 a 10.",
+  "dica": "Você precisa de uma variável 'acumuladora' que começa em 0 e vai somando cada número. A estrutura PARA de 1 ATÉ 10 percorre automaticamente todos os valores.",
+  "validacao": {
+    "tipo": "texto_livre",
+    "minimo_caracteres": 70,
+    "instrucao": "Escreva o pseudocódigo. Mostre claramente onde a repetição começa e termina."
+  }
+}
