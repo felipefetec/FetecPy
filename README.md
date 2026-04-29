@@ -127,4 +127,4 @@ A definir.
 
 ## Créditos
 
-Projeto pessoal de **Felipe Tavares** — [kelvinglab.com](https://kelvinglab.com)
+Projeto pessoal de **Felipe Tavares**.
