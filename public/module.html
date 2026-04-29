@@ -845,38 +845,57 @@
               <h2 class="text-2xl font-bold text-slate-100 mb-6">Exercícios</h2>
               <div class="grid gap-4 sm:grid-cols-2">
                 <template x-for="ex in modulo.exercicios" :key="ex.id">
-                  <button
-                    @click="abrirExercicio(ex)"
-                    class="group relative overflow-hidden text-left bg-slate-900 hover:bg-slate-800 border rounded-xl p-5 transition-all"
-                    :class="ex.status_aluno ? 'border-yellow-500/40 hover:border-yellow-500/60' : 'border-slate-700 hover:border-slate-600'"
-                  >
-                    <!-- Medalha com faixa diagonal.
-                         Container w-16 (64px) com overflow-hidden recorta a faixa
-                         nas bordas do canto. Faixa w-24 (96px) > diagonal (91px)
-                         para as pontas tocarem as bordas. Emoji posicionado no
-                         centro da diagonal, maior que a faixa para "sobressair". -->
+                  <!-- Wrapper relativo para a medalha poder sair do canto do card -->
+                  <div class="relative">
+
+                    <!-- Medalha SVG posicionada fora do botão, sobrepondo o canto.
+                         Ouro (#FFD700) para concluído sem ajuda,
+                         bronze (#CD7F32) para concluído com ajuda.
+                         Fitas azuis abaixo do círculo, estilo cartoon. -->
                     <div
                       x-show="ex.status_aluno === 'concluido' || ex.status_aluno === 'concluido_com_ajuda'"
-                      class="absolute top-0 left-0 w-16 h-16 overflow-hidden rounded-tl-xl pointer-events-none"
+                      class="absolute -top-4 -left-4 z-10 pointer-events-none drop-shadow-lg"
                       :title="ex.status_aluno === 'concluido' ? 'Resolvido!' : 'Resolvido com ajuda'"
                     >
-                      <!-- Faixa: retângulo de 96×32px rotacionado -45°,
-                           centrado em (32,32) do container:
-                           top = 32 - 16 = 16px  |  left = 32 - 48 = -16px -->
-                      <div
-                        class="absolute -rotate-45 w-24 h-8"
-                        :class="ex.status_aluno === 'concluido' ? 'bg-yellow-400' : 'bg-slate-500'"
-                        style="top: 16px; left: -16px"
-                      ></div>
-                      <!-- Emoji: centralizado no diagonal, text-2xl sobressai
-                           levemente da faixa de 32px de altura -->
-                      <span
-                        class="absolute text-2xl leading-none"
-                        style="top: 10px; left: 10px"
-                        x-text="ex.status_aluno === 'concluido' ? '🥇' : '🥉'"
-                      ></span>
+                      <svg width="52" height="62" viewBox="0 0 52 62" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Fita esquerda com corte em V na ponta -->
+                        <path d="M15 33 L24 33 L21 56 L17 49 L13 56 Z"
+                          :fill="ex.status_aluno === 'concluido' ? '#1D4ED8' : '#4B5563'"/>
+                        <path d="M19 33 L24 33 L21 44 Z"
+                          :fill="ex.status_aluno === 'concluido' ? '#1E3A8A' : '#374151'" opacity="0.5"/>
+                        <!-- Fita direita com corte em V na ponta -->
+                        <path d="M28 33 L37 33 L39 56 L35 49 L31 56 Z"
+                          :fill="ex.status_aluno === 'concluido' ? '#1D4ED8' : '#4B5563'"/>
+                        <path d="M28 33 L33 33 L31 44 Z"
+                          :fill="ex.status_aluno === 'concluido' ? '#1E3A8A' : '#374151'" opacity="0.5"/>
+                        <!-- Sombra/profundidade da medalha -->
+                        <circle cx="26" cy="24" r="21"
+                          :fill="ex.status_aluno === 'concluido' ? '#B8690A' : '#7C3A0A'"/>
+                        <!-- Anel externo -->
+                        <circle cx="26" cy="23" r="21"
+                          :fill="ex.status_aluno === 'concluido' ? '#F59E0B' : '#92400E'"/>
+                        <!-- Corpo principal -->
+                        <circle cx="26" cy="23" r="19"
+                          :fill="ex.status_aluno === 'concluido' ? '#FCD34D' : '#D97706'"/>
+                        <!-- Brilho especular (highlight) -->
+                        <ellipse cx="19" cy="15" rx="6" ry="5" fill="white" opacity="0.28"/>
+                        <!-- Anel decorativo interno -->
+                        <circle cx="26" cy="23" r="14" fill="none"
+                          :stroke="ex.status_aluno === 'concluido' ? '#F59E0B' : '#92400E'"
+                          stroke-width="1.5"/>
+                        <!-- Número "1" centralizado -->
+                        <text x="26" y="30" text-anchor="middle"
+                          font-size="17" font-weight="900"
+                          font-family="Georgia,'Times New Roman',serif"
+                          :fill="ex.status_aluno === 'concluido' ? '#92400E' : '#7C2D12'">1</text>
+                      </svg>
                     </div>
 
+                  <button
+                    @click="abrirExercicio(ex)"
+                    class="w-full group text-left bg-slate-900 hover:bg-slate-800 border rounded-xl p-5 transition-all"
+                    :class="ex.status_aluno ? 'border-yellow-500/40 hover:border-yellow-500/60' : 'border-slate-700 hover:border-slate-600'"
+                  >
                     <!-- Cabeçalho: título + badge de dificuldade -->
                     <div class="flex items-start justify-between gap-3 mb-3">
                       <span class="font-semibold text-slate-200 group-hover:text-white text-[1rem] leading-snug" x-text="ex.titulo"></span>
@@ -908,6 +927,7 @@
                       <span x-text="ex.xp + ' XP'"></span>
                     </div>
                   </button>
+                  </div><!-- fim wrapper relativo -->
                 </template>
               </div>
             </section>
