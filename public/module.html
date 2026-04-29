@@ -415,14 +415,17 @@
             }
 
             // Atualiza o status_aluno local para a medalha aparecer imediatamente
-            // no card, sem precisar recarregar a página
+            // no card sem recarregar a página.
+            // Usa splice() em vez de atribuição por índice porque o Alpine v3 só
+            // detecta mutações de array em métodos como splice/push/pop — a
+            // atribuição direta (arr[i] = x) não dispara re-render.
             if (status !== 'tentado' && this.exAtual && this.modulo?.exercicios) {
               const idx = this.modulo.exercicios.findIndex(e => e.id === this.exAtual.id)
               if (idx !== -1) {
-                this.modulo.exercicios[idx] = {
+                this.modulo.exercicios.splice(idx, 1, {
                   ...this.modulo.exercicios[idx],
                   status_aluno: status,
-                }
+                })
               }
             }
           } catch { /* não bloqueia a UI por erro de rede */ }
