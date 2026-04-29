@@ -5,123 +5,101 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 
 ---
 
-## Prompt 0.1 — Setup do repositório
-- [x] Inicializar git
-- [x] Criar `.gitignore`
-- [x] Criar `TAREFAS.md`
-- [x] Criar `DECISIONS.md`
+## Fase 0 — Setup
+
+### Prompt 0.1 — Setup do repositório ✅
+- [x] Git inicializado na branch main, .gitignore, TAREFAS.md, DECISIONS.md
 - [x] Commit inicial
 
 ---
 
-## Prompt 1.1 — Estrutura inicial e setup
-- [x] Criar estrutura de diretórios completa (public/, src/, content/, exercises/, data/, migrations/)
-- [x] Criar `.gitignore` (já feito no Prompt 0.1)
-- [x] Criar `composer.json` mínimo
-- [x] Criar `install.php` (cria data/, executa migrations, ajusta permissões)
-- [x] Testar `install.php` — PHP 8.3 instalado, install.php executado com sucesso
-- [x] Commit
+## Fase 1 — Fundação ✅
+
+### Prompt 1.1 — Estrutura inicial ✅
+- [x] Diretórios: public/, src/, content/, exercises/, data/, migrations/, scripts/, tests/
+- [x] composer.json, install.php, .htaccess
+
+### Prompt 1.2 — Migrations e Database ✅
+- [x] migrations/001_initial.sql: users, sessions, progress, user_badges, rate_limits + 6 índices
+- [x] src/Database.php: singleton PDO, ERRMODE_EXCEPTION, FETCH_ASSOC, FK ON, WAL, suporte DB_PATH
+
+### Prompt 1.3 — Roteamento ✅
+- [x] src/Http/Request.php, JsonResponse.php, Router.php, ResponseException.php
+- [x] public/api/index.php: front controller com tratamento global de exceções
+- [x] GET /api/health → {status: ok, version: 0.1.0}
+- [x] scripts/dev.sh + scripts/router.php: servidor local com roteamento correto
+
+### Prompt 1.4 — Testes automatizados ✅
+- [x] PHPUnit 12.5 + Vitest 3.x configurados
+- [x] phpunit.xml, tests/bootstrap.php (banco :memory: + JsonResponse modo teste)
+- [x] scripts/test.sh: 26 testes PHP + 3 JS passando
 
 ---
 
-## Prompt 1.2 — Migrations e modelo de dados
-- [x] Criar migrations/001_initial.sql com tabelas users, progress, user_badges, sessions, rate_limits e índices
-- [x] Criar src/Database.php — singleton PDO com configurações corretas
-- [x] Testar via install.php — 5 tabelas + 6 índices criados com sucesso
-- [x] Commit
+## Fase 2 — Autenticação ✅
+
+### Prompt 2.1 — Auth service e controller ✅
+- [x] AuthService: normalizarChave (iconv), cadastrarOuLogin, bcrypt PIN, tokens 64 chars, 30 dias
+- [x] Rate limiting: tabela rate_limits, 5 tentativas/min por chave
+- [x] AuthController: POST /api/auth/login (201 novo / 200 existente), POST /api/auth/logout
+- [x] AuthMiddleware, AuthException
+
+### Prompt 2.2 — Perfil do usuário ✅
+- [x] UserController: GET /api/me com XP, streak, badges (sem pin_hash)
+
+### Prompt 2.3 — Testes de auth ✅
+- [x] Request::simular() para testes sem servidor HTTP
+- [x] AuthServiceTest (10), AuthControllerTest (8), UserControllerTest (5) — 26 testes PHP
 
 ---
 
-## Prompt 1.3 — Sistema de roteamento básico
-- [x] Criar src/Http/Request.php
-- [x] Criar src/Http/JsonResponse.php
-- [x] Criar src/Http/Router.php
-- [x] Atualizar public/api/index.php como front controller
-- [x] Endpoint GET /api/health
-- [x] Testar com curl — health 200, rota inexistente 404, método errado 405
-- [x] Commit
+## Fase 3 — Frontend inicial ✅
+
+### Prompt 3.1 — Tela de login ✅
+- [x] api.js: BASE_URL via import.meta.url, token Bearer automático
+- [x] auth.js: login/logout/verificarSessao
+- [x] index.html: dark (slate-950), verde Python, Tailwind CDN + Alpine.js, mobile-first
+- [x] Fix: autofill browser, classes Tailwind em linha única
+
+### Prompt 3.2 — Dashboard ✅
+- [x] ProgressController: GET /api/progress (8 módulos com status bloqueado/disponível/em_andamento/concluído)
+- [x] progress.js, gamification.js (15 badges)
+- [x] app.html: header XP/streak, grid de módulos, sidebar "Conquistas" desktop, drawer mobile, modal badge
 
 ---
 
-## Prompt 4.2 — Pyodide e editor
-- [ ] public/assets/js/pyodide.js — singleton, lazy load, stdout/stderr/stdin, barra de progresso
-- [ ] public/assets/js/editor.js — CodeMirror 6, tema dark, Python
-- [ ] markdown.js — :::tente adiciona slot .tente-editor-area
-- [ ] module.html — ativa editores, overlay de carregamento Pyodide, botão Rodar, saída
-- [ ] Testar: rodar print("hello") no browser
-- [ ] Commit
+## Fase 4 — Conteúdo e Pyodide ✅
+
+### Prompt 4.1 — Página de módulo ✅
+- [x] ModuleController: GET /api/modules, GET /api/modules/:id (sem solução/respostas)
+- [x] content/01-algoritmos.md: módulo 1 completo (seções 1.1–1.6, mini-projeto, quiz)
+- [x] markdown.js: markdown-it ESM, blocos :::dica/aviso/curiosidade/tente/reflexao, TOC
+- [x] module.html: sidebar TOC, x-html, Prism.js, navegação Anterior/Próximo
+- [x] Ajustes: fontes aumentadas (1.125rem base), espaçamento generoso, blocos com fundo colorido
+
+### Prompt 4.2 — Pyodide e editor ✅
+- [x] pyodide.js: singleton lazy, stdout/stderr via StringIO Python, stdin, overlay de progresso
+- [x] editor.js: CodeMirror 6 via esm.sh, tema dark, Python, Tab=4 espaços, Ctrl+Enter
+- [x] :::tente: slot .tente-editor-area com CodeMirror + Rodar + saída
+- [x] :::reflexao (EXTRA): textarea livre + contador + gabarito base64 + "Marquei como feito"
+- [x] Testado: print("Hello, FetecPy!") executando com saída correta
 
 ---
 
-## Prompt 4.1 — Renderização de conteúdo dos módulos
-- [x] ModuleController: GET /api/modules (lista front-matter), GET /api/modules/:id (conteúdo + exercícios + quiz sem respostas)
-- [x] content/01-algoritmos.md: introdução + seções 1.1-1.6 + mini-projeto + quiz
-- [x] markdown.js: markdown-it ESM + pré-processador de blocos :::tipo + extrairTOC + adicionarAncorasTitulos
-- [x] module.html: sidebar TOC sticky, x-html para conteúdo, navegação Anterior/Próximo, drawer mobile
-- [x] Corrigido: html:true no markdown-it (blocos customizados), x-html em vez de getElementById (timing Alpine)
-- [x] Testado: todos os blocos (aviso, tente, dica, curiosidade) renderizando, código com fonte mono, tabela estilizada
-- [x] Commit
+## Fase 5 — Exercícios (PRÓXIMO)
+
+### Prompt 5.1 — Schema, exercícios e validadores
+- [ ] exercises/SCHEMA.md
+- [ ] exercises/01/ (5 exercícios — pseudocódigo, validação por texto livre)
+- [ ] exercises/02/ (5 exercícios — Python, saida_exata)
+- [ ] ExerciseController: GET /api/modules/:id/exercises/:exId, POST .../submit
+- [ ] validator.js: validateOutput, validateFunction, validateAst
+- [ ] Modal de exercício no module.html
+
+### Prompt 5.2 — Validadores B e C
+### Prompt 5.3 — Testes dos validadores
 
 ---
 
-## Prompt 3.2 — Dashboard
-- [x] ProgressController: GET /api/progress com status bloqueado/disponivel/em_andamento/concluido
-- [x] progress.js: carrega progresso e encontra último módulo em andamento
-- [x] gamification.js: catálogo de 15 badges, mesclarBadges(), formatarXp()
-- [x] app.html: header sticky com XP/streak, card "continuar", grid de módulos com barra de progresso, sidebar de badges desktop, drawer mobile, modal de badge
-- [x] Testado: API retorna 8 módulos corretamente, testes não-regressão passando
-- [x] Commit
-
----
-
-## Prompt 3.1 — Tela de login
-- [x] api.js: wrapper fetch com base URL automática via import.meta.url + token Bearer
-- [x] auth.js: login (salva token), logout, verificarSessao (redireciona se logado)
-- [x] index.html: dark slate + verde Python, Tailwind CDN + Alpine.js, mobile-first, animação surgir
-- [x] scripts/dev.sh + scripts/router.php: servidor local com API funcionando
-- [x] Testado: HTML servido, API respondendo via router, testes passando
-- [x] Commit
-
----
-
-## Prompt 2.3 — Testes da camada de autenticação
-- [x] Request::simular() adicionado (fábrica para testes sem servidor HTTP)
-- [x] AuthServiceTest.php — 10 testes (normalização, cadastro, PIN, token, logout)
-- [x] AuthControllerTest.php — 8 testes (login 201/200/401/422, rate limit 429, logout 401/200)
-- [x] UserControllerTest.php — 5 testes (perfil, 401 sem token, 401 token inválido, sem pin_hash, usuário correto)
-- [x] ./scripts/test.sh — 26 testes PHP + 3 JS, todos passando
-- [x] Commit
-
----
-
-## Prompt 2.2 — Endpoint de perfil
-- [x] Criar src/Controllers/UserController.php (GET /api/me)
-- [x] Registrar rota no index.php
-- [x] Testado: autenticado 200 (sem pin_hash), sem token 401, token inválido 401
-- [x] Commit
-
----
-
-## Prompt 2.1 — Sistema de autenticação
-- [x] Criar src/Services/AuthService.php (normalizarChave, cadastrarOuLogin, criarSessao, validarToken, logout, rate limiting)
-- [x] Criar src/Controllers/AuthController.php (POST /api/auth/login, POST /api/auth/logout)
-- [x] Criar src/Http/AuthMiddleware.php
-- [x] Criar src/Exceptions/AuthException.php
-- [x] Adicionar $user ao Request e registrar rotas no index.php
-- [x] Testar com curl — cadastro 201, login 200, PIN errado 401, sem campo 422, logout 200, sem token 401
-- [x] Testes anteriores passando (não-regressão)
-- [x] Commit
-
----
-
-## Prompt 1.4 — Setup de testes automatizados
-- [x] Adicionar phpunit/phpunit ao composer.json (require-dev) e instalar
-- [x] Criar phpunit.xml
-- [x] Criar tests/bootstrap.php (banco em memória + modo teste JsonResponse)
-- [x] Criar tests/Backend/HealthCheckTest.php (2 testes passando)
-- [x] Criar package.json com vitest + npm install
-- [x] Criar vitest.config.js
-- [x] Criar tests/Frontend/sanity.test.js (3 testes passando)
-- [x] Criar scripts/test.sh e tornar executável
-- [x] ./scripts/test.sh — 5 testes passando (2 PHP + 3 JS)
-- [x] Commit
+## Fase 6+ — Gamificação, Conteúdo, Deploy
+(Prompts 6.x, 7.x, 8.x — ainda não iniciados)
