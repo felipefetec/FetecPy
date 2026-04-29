@@ -858,34 +858,34 @@
                       :title="ex.status_aluno === 'concluido' ? 'Resolvido!' : 'Resolvido com ajuda'"
                     >
                       <svg width="52" height="62" viewBox="0 0 52 62" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Fita esquerda com corte em V na ponta -->
-                        <path d="M15 33 L24 33 L21 56 L17 49 L13 56 Z"
+                        <!-- Fita esquerda (+5%: base em y=57, x=13→25) -->
+                        <path d="M14 33 L25 33 L22 57 L17 50 L12 57 Z"
                           :fill="ex.status_aluno === 'concluido' ? '#1D4ED8' : '#4B5563'"/>
-                        <path d="M19 33 L24 33 L21 44 Z"
+                        <path d="M19 33 L25 33 L22 45 Z"
                           :fill="ex.status_aluno === 'concluido' ? '#1E3A8A' : '#374151'" opacity="0.5"/>
-                        <!-- Fita direita com corte em V na ponta -->
-                        <path d="M28 33 L37 33 L39 56 L35 49 L31 56 Z"
+                        <!-- Fita direita (+5%: base em y=57, x=27→40) -->
+                        <path d="M27 33 L38 33 L40 57 L35 50 L30 57 Z"
                           :fill="ex.status_aluno === 'concluido' ? '#1D4ED8' : '#4B5563'"/>
-                        <path d="M28 33 L33 33 L31 44 Z"
+                        <path d="M27 33 L33 33 L30 45 Z"
                           :fill="ex.status_aluno === 'concluido' ? '#1E3A8A' : '#374151'" opacity="0.5"/>
-                        <!-- Sombra/profundidade da medalha -->
-                        <circle cx="26" cy="24" r="21"
+                        <!-- Sombra (-15%: r=21→18, cy sobe 2px) -->
+                        <circle cx="26" cy="22" r="18"
                           :fill="ex.status_aluno === 'concluido' ? '#B8690A' : '#7C3A0A'"/>
-                        <!-- Anel externo -->
-                        <circle cx="26" cy="23" r="21"
+                        <!-- Anel externo (-15%: r=18) -->
+                        <circle cx="26" cy="21" r="18"
                           :fill="ex.status_aluno === 'concluido' ? '#F59E0B' : '#92400E'"/>
-                        <!-- Corpo principal -->
-                        <circle cx="26" cy="23" r="19"
+                        <!-- Corpo principal (-15%: r=19→16) -->
+                        <circle cx="26" cy="21" r="16"
                           :fill="ex.status_aluno === 'concluido' ? '#FCD34D' : '#D97706'"/>
-                        <!-- Brilho especular (highlight) -->
-                        <ellipse cx="19" cy="15" rx="6" ry="5" fill="white" opacity="0.28"/>
-                        <!-- Anel decorativo interno -->
-                        <circle cx="26" cy="23" r="14" fill="none"
+                        <!-- Brilho especular (-15%: rx=6→5, ry=5→4) -->
+                        <ellipse cx="19" cy="14" rx="5" ry="4" fill="white" opacity="0.28"/>
+                        <!-- Anel decorativo interno (-15%: r=14→12) -->
+                        <circle cx="26" cy="21" r="12" fill="none"
                           :stroke="ex.status_aluno === 'concluido' ? '#F59E0B' : '#92400E'"
                           stroke-width="1.5"/>
-                        <!-- Número "1" centralizado -->
-                        <text x="26" y="30" text-anchor="middle"
-                          font-size="17" font-weight="900"
+                        <!-- Número "1" (-15%: font-size=17→15, y ajustado) -->
+                        <text x="26" y="27" text-anchor="middle"
+                          font-size="15" font-weight="900"
                           font-family="Georgia,'Times New Roman',serif"
                           :fill="ex.status_aluno === 'concluido' ? '#92400E' : '#7C2D12'">1</text>
                       </svg>
