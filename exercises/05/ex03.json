@@ -1,0 +1,41 @@
+{
+  "id": "05-ex03",
+  "modulo": "05",
+  "ordem": 3,
+  "titulo": "Fatorial com for",
+  "dificuldade": "medio",
+  "xp": 20,
+  "conceitos": ["def", "return", "for", "range", "acumulador"],
+  "antes_de_codar": [
+    "O que é fatorial? Escreva a definição matemática (ex: 5! = 5 × 4 × 3 × 2 × 1).",
+    "Qual deve ser o valor inicial do acumulador do produto? Por quê não pode ser 0?",
+    "Como `range(1, n+1)` ajuda a percorrer de 1 até n (inclusive)?"
+  ],
+  "enunciado": "Crie uma função `fatorial(n)` que recebe um inteiro não-negativo e retorna o seu fatorial.\n\n```python\nfatorial(0)  # → 1  (por definição matemática)\nfatorial(1)  # → 1\nfatorial(5)  # → 120\nfatorial(7)  # → 5040\n```\n\n**Requisitos:**\n- Use `for` com `range()` — não use recursão nem `while`\n- Implemente o loop manualmente — não use `math.factorial()`",
+  "dica": "Comece com `resultado = 1` e multiplique cada número de 1 até n: `for i in range(1, n+1): resultado *= i`. Para n=0, o loop não executa e `resultado` permanece 1 — que é exatamente o valor correto.",
+  "codigo_inicial": "def fatorial(n):\n    # Inicialize o acumulador\n    resultado = 1\n    # Percorra de 1 até n e multiplique\n    \n    return resultado\n",
+  "validacao": {
+    "tipo": "hibrido",
+    "validacoes": [
+      {
+        "tipo": "funcao",
+        "nome_funcao": "fatorial",
+        "casos": [
+          { "args": [0],  "esperado": 1    },
+          { "args": [1],  "esperado": 1    },
+          { "args": [5],  "esperado": 120  },
+          { "args": [7],  "esperado": 5040 },
+          { "args": [10], "esperado": 3628800 }
+        ]
+      },
+      {
+        "tipo": "ast",
+        "deve_conter": ["For", "FunctionDef"],
+        "nao_deve_conter": ["While"],
+        "deve_chamar": [],
+        "nao_deve_chamar": ["factorial"]
+      }
+    ]
+  },
+  "solucao": "def fatorial(n):\n    resultado = 1\n    for i in range(1, n + 1):\n        resultado *= i\n    return resultado"
+}

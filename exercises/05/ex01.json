@@ -1,0 +1,29 @@
+{
+  "id": "05-ex01",
+  "modulo": "05",
+  "ordem": 1,
+  "titulo": "Função saudação",
+  "dificuldade": "facil",
+  "xp": 10,
+  "conceitos": ["def", "return", "f-string", "parâmetro"],
+  "antes_de_codar": [
+    "O que a palavra-chave `def` faz em Python?",
+    "Qual é a diferença entre `print()` e `return` dentro de uma função?",
+    "Como a função vai receber o nome? Onde ele aparece na assinatura da função?"
+  ],
+  "enunciado": "Crie uma função chamada `saudar` que recebe um nome e **retorna** (não imprime) a saudação no formato `\"Olá, NOME!\"`.\n\n```python\n# Exemplos de chamada:\nsaudar('Maria')  # retorna 'Olá, Maria!'\nsaudar('João')   # retorna 'Olá, João!'\n```\n\n**Atenção:** use `return`, não `print`. O sistema de testes chama sua função e verifica o retorno.",
+  "dica": "A f-string `f'Olá, {nome}!'` monta a string com o valor da variável `nome` inserido no lugar de `{nome}`.",
+  "codigo_inicial": "def saudar(nome):\n    # Retorne a saudação formatada\n    pass\n",
+  "validacao": {
+    "tipo": "funcao",
+    "nome_funcao": "saudar",
+    "casos": [
+      { "args": ["Maria"],   "esperado": "Olá, Maria!"   },
+      { "args": ["João"],    "esperado": "Olá, João!"    },
+      { "args": ["Ana"],     "esperado": "Olá, Ana!"     },
+      { "args": ["Carlos"],  "esperado": "Olá, Carlos!"  },
+      { "args": [""],        "esperado": "Olá, !"        }
+    ]
+  },
+  "solucao": "def saudar(nome):\n    return f'Olá, {nome}!'"
+}

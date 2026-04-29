@@ -98,7 +98,14 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 - [x] Rotas registradas no index.php
 - [x] 26 testes PHP + 3 JS passando
 
-### Prompt 5.2 — Validadores B e C
+### Prompt 5.2 — Validadores B e C ✅
+- [x] validateFunction reescrito: execução de args/retorno 100% Python-side via JSON (sem bugs JS↔Python)
+- [x] validateAst melhorado: nao_deve_chamar adicionado, detecção de chamadas diretas e de método
+- [x] exercises/05/ex01.json — saudar(nome): validação B (funcao)
+- [x] exercises/05/ex02.json — contagem 1-5 sem while: validação A+C (hibrido saida_exata + ast)
+- [x] exercises/05/ex03.json — fatorial(n) com for: validação B+C (hibrido funcao + ast)
+- [x] 26 testes PHP + 3 JS passando
+
 ### Prompt 5.3 — Testes dos validadores
 
 ---

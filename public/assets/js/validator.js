@@ -88,11 +88,16 @@ export async function validateOutput(codigo, casos) {
 // ----------------------------------------------------------------
 
 /**
- * Executa o código do aluno para definir a função, depois chama cada
- * caso com os argumentos fornecidos e compara o retorno.
+ * Executa o código do aluno para definir a função e testa cada caso
+ * inteiramente dentro do Pyodide (sem cruzar a fronteira JS↔Python nos args).
  *
- * O aluno precisa definir uma função com o nome exato passado em `nomeFuncao`.
- * O sistema chama via pyodide.globals e captura o retorno.
+ * Por que Python-side? Chamar funcao(...args) via proxy JS tem problemas:
+ *   - int/float do Python são convertidos para number JS (perde precisão)
+ *   - listas/dicionários retornados precisam de .toJs() mas perdem tipo
+ *   - comparação com JSON.stringify pode falhar para None, True, False
+ *
+ * Solução: passamos args e esperado como JSON, executamos tudo em Python
+ * e recebemos o resultado como JSON. Zero conversão de tipo.
  *
  * @param {string}   codigo       Código Python que define a função
  * @param {string}   nomeFuncao   Nome da função a ser chamada
@@ -100,24 +105,23 @@ export async function validateOutput(codigo, casos) {
  * @returns {Promise<ResultadoValidacao>}
  */
 export async function validateFunction(codigo, nomeFuncao, casos) {
-  // Precisa da instância diretamente para acessar globals e chamar a função
   const py = await carregarPyodide()
 
-  // Executa o código do aluno para definir a função no namespace global do Pyodide
+  // Carrega o código do aluno para definir a função no namespace Python
   try {
     await py.runPythonAsync(codigo)
   } catch (e) {
-    // Erro de sintaxe ou exceção na definição da função
     return {
       passou: false,
       casos:  [],
-      erro:   `Erro ao carregar o código: ${e.message}`,
+      erro:   `Erro de sintaxe ou execução ao carregar o código: ${e.message}`,
     }
   }
 
-  // Verifica se a função foi de fato definida
-  const funcaoExiste = py.globals.has(nomeFuncao)
-  if (!funcaoExiste) {
+  // Verifica se a função foi definida com o nome correto
+  const nomeEscapado = nomeFuncao.replace(/'/g, "\\'")
+  const existeStr    = await py.runPythonAsync(`'${nomeEscapado}' in dir()`)
+  if (!existeStr) {
     return {
       passou: false,
       casos:  [],
@@ -125,31 +129,62 @@ export async function validateFunction(codigo, nomeFuncao, casos) {
     }
   }
 
-  const funcao          = py.globals.get(nomeFuncao)
   const resultadosCasos = []
 
   for (const caso of casos) {
-    let obtido    = null
-    let erroExec  = null
-    let passou    = false
+    // Serializa args e esperado em JSON para passar ao Python sem risco de tipo
+    const argsJson     = JSON.stringify(caso.args)
+    const esperadoJson = JSON.stringify(caso.esperado)
 
+    // Script que executa a chamada e serializa o retorno para JSON.
+    // Tudo em Python: sem conversão JS↔Python nos valores.
+    const script = `
+import json as _json
+
+_args     = _json.loads(${JSON.stringify(argsJson)})
+_esperado = _json.loads(${JSON.stringify(esperadoJson)})
+_erro_msg = None
+_obtido   = None
+_passou   = False
+
+try:
+    _ret    = ${nomeFuncao}(*_args)
+    _obtido = _ret
+    # Compara via JSON para tratar None/True/False/int vs float igualmente
+    _passou = _json.dumps(_ret, ensure_ascii=False) == _json.dumps(_esperado, ensure_ascii=False)
+except Exception as _e:
+    _erro_msg = str(_e)
+
+_json.dumps({
+    'passou':   _passou,
+    'obtido':   _json.dumps(_obtido, ensure_ascii=False) if _erro_msg is None else None,
+    'erro':     _erro_msg,
+})
+`
+
+    let resultStr
     try {
-      // Chama a função com os argumentos do caso
-      const resultado = funcao(...caso.args)
-      // Pyodide pode retornar tipos Python — converte para JS
-      obtido = resultado?.toJs ? resultado.toJs() : resultado
-      passou = JSON.stringify(obtido) === JSON.stringify(caso.esperado)
+      resultStr = await py.runPythonAsync(script)
     } catch (e) {
-      erroExec = e.message
-      obtido   = `ERRO: ${e.message}`
+      // Erro inesperado no próprio script de teste (não no código do aluno)
+      resultadosCasos.push({
+        passou:   false,
+        input:    `${nomeFuncao}(${caso.args.map(a => JSON.stringify(a)).join(', ')})`,
+        esperado: JSON.stringify(caso.esperado),
+        obtido:   '',
+        erro:     `Erro interno: ${e.message}`,
+      })
+      continue
     }
 
+    const res = JSON.parse(resultStr)
+
     resultadosCasos.push({
-      passou,
-      input:    `f(${caso.args.map(a => JSON.stringify(a)).join(', ')})`,
+      passou:   res.passou,
+      input:    `${nomeFuncao}(${caso.args.map(a => JSON.stringify(a)).join(', ')})`,
       esperado: JSON.stringify(caso.esperado),
-      obtido:   JSON.stringify(obtido),
-      erro:     erroExec,
+      obtido:   res.obtido ?? `ERRO: ${res.erro}`,
+      erro:     res.erro ?? null,
     })
   }
 
@@ -170,37 +205,43 @@ export async function validateFunction(codigo, nomeFuncao, casos) {
  * Verifica a estrutura do código Python via `ast.parse` rodando dentro do Pyodide.
  *
  * Regras suportadas:
- *   deve_conter:    array de nomes de nós AST que DEVEM estar presentes
- *   nao_deve_conter: array de nomes de nós AST que NÃO podem estar presentes
- *   deve_chamar:    array de nomes de funções que devem ser chamadas
+ *   deve_conter:     nós AST que DEVEM estar presentes (ex: "For", "FunctionDef")
+ *   nao_deve_conter: nós AST que NÃO podem aparecer (ex: "While", "Recursion")
+ *   deve_chamar:     funções que devem ser chamadas (ex: "print", "append")
+ *   nao_deve_chamar: funções que NÃO devem ser chamadas (ex: "sum", "max", "min")
  *
- * Cada violação gera uma entrada em `casos` com passou=false e a descrição do problema.
+ * Detecta chamadas diretas (`sum(x)`) e chamadas de método (`lista.sort()`).
+ * Cada regra gera uma entrada em `casos` — viola → passou=false, ok → passou=true.
  *
  * @param {string} codigo
- * @param {{deve_conter?: string[], nao_deve_conter?: string[], deve_chamar?: string[]}} regras
+ * @param {{
+ *   deve_conter?:     string[],
+ *   nao_deve_conter?: string[],
+ *   deve_chamar?:     string[],
+ *   nao_deve_chamar?: string[]
+ * }} regras
  * @returns {Promise<ResultadoValidacao>}
  */
 export async function validateAst(codigo, regras) {
-  // Serializa as regras para passar ao Python via JSON
+  // Serializa regras via JSON para passar ao Python sem risco de escapes quebrados
   const regrasJson = JSON.stringify({
     deve_conter:     regras.deve_conter     ?? [],
     nao_deve_conter: regras.nao_deve_conter ?? [],
     deve_chamar:     regras.deve_chamar     ?? [],
+    nao_deve_chamar: regras.nao_deve_chamar ?? [],
   })
 
-  // Escapa o código do aluno para passar como string Python
-  // Usamos base64 para evitar problemas com aspas e caracteres especiais
+  // Código do aluno em base64 para evitar qualquer problema com aspas/escapes
   const codigoB64 = btoa(unescape(encodeURIComponent(codigo)))
 
-  // Script Python que roda dentro do Pyodide para analisar o AST
+  // Script Python que analisa o AST e retorna resultado JSON
   const scriptAst = `
 import ast
 import json
 import base64
 
-# Decodifica o código do aluno (base64 para evitar escapes)
 _codigo = base64.b64decode('${codigoB64}').decode('utf-8')
-_regras = json.loads('${regrasJson.replace(/'/g, "\\'")}')
+_regras = json.loads(${JSON.stringify(regrasJson)})
 
 _violacoes = []
 _passou    = True
@@ -213,34 +254,51 @@ except SyntaxError as e:
     _tree   = None
 
 if _tree is not None:
-    # Coleta todos os tipos de nós e chamadas de função presentes
-    _nos_presentes    = {type(n).__name__ for n in ast.walk(_tree)}
-    _chamadas         = {
-        n.func.id
-        for n in ast.walk(_tree)
-        if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
-    }
+    # Coleta todos os tipos de nós AST presentes na árvore
+    _nos_presentes = {type(n).__name__ for n in ast.walk(_tree)}
 
-    for no in _regras['deve_conter']:
-        if no not in _nos_presentes:
-            _violacoes.append({'passou': False, 'descricao': f"O código deve usar '{no}', mas não foi encontrado."})
+    # Coleta chamadas diretas (sum(...)) e de método (lista.sort())
+    # — ambas são ast.Call, mas com func diferente
+    _chamadas = set()
+    for _n in ast.walk(_tree):
+        if not isinstance(_n, ast.Call):
+            continue
+        if isinstance(_n.func, ast.Name):
+            # Chamada direta: sum(), print(), min()
+            _chamadas.add(_n.func.id)
+        elif isinstance(_n.func, ast.Attribute):
+            # Chamada de método: lista.append(), obj.sort()
+            _chamadas.add(_n.func.attr)
+
+    # ── Verifica cada regra ──────────────────────────────────────────
+
+    for _no in _regras['deve_conter']:
+        if _no not in _nos_presentes:
+            _violacoes.append({'passou': False, 'descricao': f"O código deve usar '{_no}', mas não foi encontrado."})
             _passou = False
         else:
-            _violacoes.append({'passou': True, 'descricao': f"'{no}' encontrado. ✓"})
+            _violacoes.append({'passou': True, 'descricao': f"'{_no}' encontrado no código. ✓"})
 
-    for no in _regras['nao_deve_conter']:
-        if no in _nos_presentes:
-            _violacoes.append({'passou': False, 'descricao': f"O código não deve usar '{no}', mas foi encontrado."})
+    for _no in _regras['nao_deve_conter']:
+        if _no in _nos_presentes:
+            _violacoes.append({'passou': False, 'descricao': f"O código não deve usar '{_no}', mas foi encontrado."})
             _passou = False
         else:
-            _violacoes.append({'passou': True, 'descricao': f"'{no}' não está presente. ✓"})
+            _violacoes.append({'passou': True, 'descricao': f"'{_no}' não utilizado. ✓"})
 
-    for fn in _regras['deve_chamar']:
-        if fn not in _chamadas:
-            _violacoes.append({'passou': False, 'descricao': f"O código deve chamar a função '{fn}()', mas não chamou."})
+    for _fn in _regras['deve_chamar']:
+        if _fn not in _chamadas:
+            _violacoes.append({'passou': False, 'descricao': f"O código deve chamar '{_fn}()', mas não chamou."})
             _passou = False
         else:
-            _violacoes.append({'passou': True, 'descricao': f"Chamada a '{fn}()' encontrada. ✓"})
+            _violacoes.append({'passou': True, 'descricao': f"Chamada a '{_fn}()' encontrada. ✓"})
+
+    for _fn in _regras['nao_deve_chamar']:
+        if _fn in _chamadas:
+            _violacoes.append({'passou': False, 'descricao': f"O código não deve chamar '{_fn}()'. Implemente você mesmo."})
+            _passou = False
+        else:
+            _violacoes.append({'passou': True, 'descricao': f"'{_fn}()' não foi chamado (ótimo!). ✓"})
 
 json.dumps({'passou': _passou, 'violacoes': _violacoes})
 `
@@ -254,13 +312,13 @@ json.dumps({'passou': _passou, 'violacoes': _violacoes})
     return {
       passou: false,
       casos:  [],
-      erro:   `Erro ao analisar o código: ${e.message}`,
+      erro:   `Erro ao analisar a estrutura do código: ${e.message}`,
     }
   }
 
   const resultado = JSON.parse(resultadoJson)
 
-  // Converte violações para o formato ResultadoCaso
+  // Converte cada violação/aprovação para o formato ResultadoCaso
   const casos = resultado.violacoes.map(v => ({
     passou:   v.passou,
     input:    '',

@@ -1,0 +1,36 @@
+{
+  "id": "05-ex02",
+  "modulo": "05",
+  "ordem": 2,
+  "titulo": "Contagem com for (sem while)",
+  "dificuldade": "facil",
+  "xp": 10,
+  "conceitos": ["for", "range", "print"],
+  "antes_de_codar": [
+    "Qual a diferença entre `for` e `while` em Python?",
+    "Como o `range(1, 6)` se comporta? Qual o primeiro e o último valor gerado?",
+    "Por que um `for` com `range` é mais adequado aqui do que um `while`?"
+  ],
+  "enunciado": "Escreva um programa que imprime os números de 1 a 5, um por linha.\n\n**Saída esperada:**\n```\n1\n2\n3\n4\n5\n```\n\n**Requisito:** use `for` com `range()`. O uso de `while` não será aceito.",
+  "dica": "`range(1, 6)` gera os números 1, 2, 3, 4, 5. O segundo argumento é exclusivo — por isso `6`, não `5`.",
+  "codigo_inicial": "# Imprima de 1 a 5 usando for\n",
+  "validacao": {
+    "tipo": "hibrido",
+    "validacoes": [
+      {
+        "tipo": "saida_exata",
+        "casos": [
+          { "input": "", "esperado": "1\n2\n3\n4\n5\n" }
+        ]
+      },
+      {
+        "tipo": "ast",
+        "deve_conter": ["For"],
+        "nao_deve_conter": ["While"],
+        "deve_chamar": [],
+        "nao_deve_chamar": []
+      }
+    ]
+  },
+  "solucao": "for i in range(1, 6):\n    print(i)"
+}
