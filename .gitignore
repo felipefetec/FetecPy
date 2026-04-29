@@ -1,0 +1,21 @@
+# Banco de dados e logs (gerados em runtime)
+data/*.db
+data/*.log
+
+# Dependências PHP e JS
+vendor/
+node_modules/
+
+# Variáveis de ambiente
+.env
+
+# Sistemas operacionais
+.DS_Store
+
+# Editores de texto
+*.swp
+.idea/
+.vscode/
+
+# Cobertura de testes
+coverage/
