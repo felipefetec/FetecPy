@@ -850,17 +850,19 @@
                     class="group relative text-left bg-slate-900 hover:bg-slate-800 border rounded-xl p-5 transition-all"
                     :class="ex.status_aluno ? 'border-yellow-500/40 hover:border-yellow-500/60' : 'border-slate-700 hover:border-slate-600'"
                   >
-                    <!-- Faixa de medalha no canto superior esquerdo.
-                         Usa x-show (não x-if) para reatividade mais confiável
-                         dentro de x-for em Alpine v3 -->
+                    <!-- Faixa de medalha — container w-24 (96px).
+                         A faixa precisa ser larga o suficiente para que as
+                         pontas toquem as bordas ao rodar -45°:
+                         largura mínima = 96 × √2 ≈ 136px → usamos 144px (w-36).
+                         Usa x-show (não x-if) para reatividade confiável em x-for. -->
                     <div
                       x-show="ex.status_aluno === 'concluido' || ex.status_aluno === 'concluido_com_ajuda'"
-                      class="absolute top-0 left-0 w-16 h-16 overflow-hidden rounded-tl-xl pointer-events-none"
+                      class="absolute top-0 left-0 w-24 h-24 overflow-hidden rounded-tl-xl pointer-events-none"
                     >
                       <div
-                        class="absolute -rotate-45 flex items-center justify-center w-[4.5rem] py-[3px] text-[11px] font-bold shadow-sm"
+                        class="absolute -rotate-45 flex items-center justify-center w-36 py-1.5 text-sm font-bold shadow"
                         :class="ex.status_aluno === 'concluido' ? 'bg-yellow-400 text-yellow-950' : 'bg-slate-400 text-slate-950'"
-                        style="top: 14px; left: -14px"
+                        style="top: 37px; left: -24px"
                         :title="ex.status_aluno === 'concluido' ? 'Resolvido!' : 'Resolvido com ajuda'"
                       >
                         <span x-text="ex.status_aluno === 'concluido' ? '🥇' : '🥉'"></span>
