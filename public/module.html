@@ -847,26 +847,24 @@
                 <template x-for="ex in modulo.exercicios" :key="ex.id">
                   <button
                     @click="abrirExercicio(ex)"
-                    class="group relative text-left bg-slate-900 hover:bg-slate-800 border rounded-xl p-5 transition-all"
+                    class="group relative overflow-hidden text-left bg-slate-900 hover:bg-slate-800 border rounded-xl p-5 transition-all"
                     :class="ex.status_aluno ? 'border-yellow-500/40 hover:border-yellow-500/60' : 'border-slate-700 hover:border-slate-600'"
                   >
-                    <!-- Faixa de medalha — container w-16 (64px), mesmo tamanho anterior.
-                         Faixa w-24 (96px) > diagonal do container (64×√2 = 91px)
-                         para as pontas tocarem as bordas ao rodar -45°.
-                         left = 64/2 - 96/2 = -16px  |  top = 64/2 - altura/2 = 22px
-                         Usa x-show (não x-if) para reatividade confiável em x-for. -->
+                    <!-- Triângulo de medalha — preenche o canto superior esquerdo.
+                         clip-path cria o triângulo; overflow-hidden no botão pai
+                         garante que respeita o border-radius do card. -->
                     <div
                       x-show="ex.status_aluno === 'concluido' || ex.status_aluno === 'concluido_com_ajuda'"
-                      class="absolute top-0 left-0 w-16 h-16 overflow-hidden rounded-tl-xl pointer-events-none"
+                      class="absolute top-0 left-0 w-20 h-20 pointer-events-none"
+                      :class="ex.status_aluno === 'concluido' ? 'bg-yellow-400' : 'bg-slate-500'"
+                      style="clip-path: polygon(0 0, 100% 0, 0 100%)"
+                      :title="ex.status_aluno === 'concluido' ? 'Resolvido!' : 'Resolvido com ajuda'"
                     >
-                      <div
-                        class="absolute -rotate-45 flex items-center justify-center w-24 py-1 font-bold shadow-sm"
-                        :class="ex.status_aluno === 'concluido' ? 'bg-yellow-400 text-yellow-950' : 'bg-slate-400 text-slate-950'"
-                        style="top: 22px; left: -16px"
-                        :title="ex.status_aluno === 'concluido' ? 'Resolvido!' : 'Resolvido com ajuda'"
-                      >
-                        <span class="text-xl leading-none" x-text="ex.status_aluno === 'concluido' ? '🥇' : '🥉'"></span>
-                      </div>
+                      <span
+                        class="absolute text-2xl leading-none"
+                        style="top: 9px; left: 9px"
+                        x-text="ex.status_aluno === 'concluido' ? '🥇' : '🥉'"
+                      ></span>
                     </div>
 
                     <!-- Cabeçalho: título + badge de dificuldade -->
