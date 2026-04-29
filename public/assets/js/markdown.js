@@ -55,8 +55,12 @@ function preprocessarBlocos(markdown) {
       const cfg = BLOCOS[tipo]
       if (!cfg) return _
       const htmlInterno = md.render(conteudo.trim())
-      // p-6 e text-[1.05rem] para texto interno maior e mais legível
-      return `<div class="rounded-xl pl-6 pr-6 pt-5 pb-5 my-8 ${cfg.borda} ${cfg.fundo}"><div class="flex items-center gap-3 mb-3 ${cfg.texto} font-bold text-xl"><span style="font-size:1.4rem">${cfg.icone}</span><span>${cfg.titulo}</span></div><div class="text-slate-200 text-[1.05rem] leading-relaxed [&>p]:mb-3 [&>p:last-child]:mb-0">${htmlInterno}</div></div>`
+      // Bloco tente ganha slot extra para o editor CodeMirror (ativado por module.html)
+      const slotEditor = tipo === 'tente'
+        ? `<div class="tente-editor-area mt-4" data-ready="false"></div>`
+        : ''
+
+      return `<div class="rounded-xl pl-6 pr-6 pt-5 pb-5 my-8 ${cfg.borda} ${cfg.fundo}"><div class="flex items-center gap-3 mb-3 ${cfg.texto} font-bold text-xl"><span style="font-size:1.4rem">${cfg.icone}</span><span>${cfg.titulo}</span></div><div class="text-slate-200 text-[1.05rem] leading-relaxed [&>p]:mb-3 [&>p:last-child]:mb-0">${htmlInterno}</div>${slotEditor}</div>`
     }
   )
 }

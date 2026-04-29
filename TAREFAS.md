@@ -43,6 +43,16 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 
 ---
 
+## Prompt 4.2 — Pyodide e editor
+- [ ] public/assets/js/pyodide.js — singleton, lazy load, stdout/stderr/stdin, barra de progresso
+- [ ] public/assets/js/editor.js — CodeMirror 6, tema dark, Python
+- [ ] markdown.js — :::tente adiciona slot .tente-editor-area
+- [ ] module.html — ativa editores, overlay de carregamento Pyodide, botão Rodar, saída
+- [ ] Testar: rodar print("hello") no browser
+- [ ] Commit
+
+---
+
 ## Prompt 4.1 — Renderização de conteúdo dos módulos
 - [x] ModuleController: GET /api/modules (lista front-matter), GET /api/modules/:id (conteúdo + exercícios + quiz sem respostas)
 - [x] content/01-algoritmos.md: introdução + seções 1.1-1.6 + mini-projeto + quiz

@@ -73,9 +73,12 @@
   </style>
 
   <script type="module">
-    import { verificarSessao }                          from '/assets/js/auth.js'
-    import { apiFetch }                                 from '/assets/js/api.js'
-    import { renderizar, extrairTOC, adicionarAncorasTitulos } from '/assets/js/markdown.js'
+    import { verificarSessao }                                  from '/assets/js/auth.js'
+    import { apiFetch }                                         from '/assets/js/api.js'
+    import { renderizar, extrairTOC, adicionarAncorasTitulos }  from '/assets/js/markdown.js'
+    import { carregarPyodide, runPython, pyodidePronto }        from '/assets/js/pyodide.js'
+    // criarEditor é importado dinamicamente dentro de ativarEditoresTente(),
+    // para não atrasar o registro do alpine:init com requisições para esm.sh
 
     // Ordem dos módulos para navegação Anterior/Próximo
     const MODULOS_ORDEM = ['01','02','03','04','05','06','07','08']
@@ -121,11 +124,13 @@
             this.erro = e.erro ?? 'Erro ao carregar o módulo.'
           } finally {
             this.carregando = false
-            // Roda o Prism após o Alpine inserir o HTML no DOM
+            // Aguarda Alpine inserir o HTML no DOM via x-html
             await this.$nextTick()
-            if (typeof Prism !== 'undefined') {
-              const el = document.getElementById('conteudo-md')
-              if (el) Prism.highlightAllUnder(el)
+            const conteudoEl = document.getElementById('conteudo-md')
+            if (conteudoEl) {
+              if (typeof Prism !== 'undefined') Prism.highlightAllUnder(conteudoEl)
+              // Ativa os editores nos slots :::tente
+              ativarEditoresTente(conteudoEl)
             }
           }
         },
@@ -136,6 +141,147 @@
           return `Módulo ${this.modulo.id} — ${this.modulo.titulo}`
         },
       }))
+    })
+
+    // ----------------------------------------------------------------
+    // Ativação dos blocos :::tente como editores interativos
+    // ----------------------------------------------------------------
+
+    /**
+     * Encontra todos os slots .tente-editor-area dentro do conteúdo renderizado
+     * e monta um editor CodeMirror + botão Rodar + área de saída em cada um.
+     *
+     * O Pyodide só é carregado quando o aluno clica "Rodar" pela primeira vez,
+     * para não penalizar o tempo de carregamento inicial da página.
+     */
+    async function ativarEditoresTente(conteudoEl) {
+      const slots = conteudoEl.querySelectorAll('.tente-editor-area[data-ready="false"]')
+      if (!slots.length) return
+
+      // Import dinâmico: carrega o CodeMirror só quando há editores na página,
+      // evitando bloquear o alpine:init com requisições de rede desnecessárias
+      const { criarEditor } = await import('/assets/js/editor.js')
+
+      slots.forEach((slot, idx) => {
+        slot.setAttribute('data-ready', 'true')
+
+        // Container principal do editor
+        slot.innerHTML = `
+          <div class="tente-wrapper mt-2">
+            <div class="tente-codemirror border border-slate-700 rounded-lg overflow-hidden"></div>
+            <div class="flex items-center gap-3 mt-2">
+              <button
+                class="tente-btn-rodar flex items-center gap-2 bg-python-500 hover:bg-python-400 text-slate-950 font-semibold text-sm px-4 py-2 rounded-lg transition-colors"
+              >
+                <span class="tente-icone-rodar">▶</span>
+                <span class="tente-label-rodar">Rodar</span>
+              </button>
+              <span class="tente-status text-xs text-slate-500"></span>
+            </div>
+            <div class="tente-saida hidden mt-3 rounded-lg overflow-hidden border border-slate-700">
+              <div class="flex items-center justify-between bg-slate-800 px-3 py-1.5">
+                <span class="text-xs text-slate-400 font-mono">saída</span>
+                <button class="tente-btn-limpar text-xs text-slate-600 hover:text-slate-400 transition-colors">limpar</button>
+              </div>
+              <pre class="tente-output font-mono text-sm text-slate-300 bg-slate-900 p-4 overflow-x-auto max-h-64 whitespace-pre-wrap"></pre>
+            </div>
+          </div>
+        `
+
+        // Monta o editor CodeMirror no elemento correto
+        const cmEl   = slot.querySelector('.tente-codemirror')
+        const btnRun = slot.querySelector('.tente-btn-rodar')
+        const status = slot.querySelector('.tente-status')
+        const saida  = slot.querySelector('.tente-saida')
+        const output = slot.querySelector('.tente-output')
+        const btnLimpar = slot.querySelector('.tente-btn-limpar')
+
+        // Cria o editor com callback para Ctrl+Enter também executar
+        const editor = criarEditor(cmEl, '', () => btnRun.click())
+
+        // Limpa a saída
+        btnLimpar.addEventListener('click', () => {
+          saida.classList.add('hidden')
+          output.textContent = ''
+        })
+
+        // Botão Rodar: carrega Pyodide se necessário e executa o código
+        btnRun.addEventListener('click', async () => {
+          const codigo = editor.getValue().trim()
+          if (!codigo) { status.textContent = 'Escreva algo primeiro.'; return }
+
+          btnRun.disabled = true
+          status.textContent = ''
+
+          // Se Pyodide ainda não foi carregado, mostra progresso
+          if (!pyodidePronto()) {
+            mostrarOverlayPyodide(true)
+            status.textContent = 'Carregando Python...'
+          }
+
+          try {
+            const { stdout, stderr } = await runPython(codigo)
+            mostrarOverlayPyodide(false)
+
+            // Exibe saída (stdout em branco, stderr em vermelho)
+            saida.classList.remove('hidden')
+            if (stdout || stderr) {
+              output.innerHTML =
+                (stdout ? escapeHtml(stdout) : '') +
+                (stderr ? `<span class="text-red-400">${escapeHtml(stderr)}</span>` : '')
+            } else {
+              output.innerHTML = '<span class="text-slate-500 italic">Nenhuma saída.</span>'
+            }
+
+            status.textContent = ''
+          } catch (e) {
+            mostrarOverlayPyodide(false)
+            output.textContent = '❌ ' + (e.message ?? 'Erro ao executar.')
+            saida.classList.remove('hidden')
+          } finally {
+            btnRun.disabled = false
+          }
+        })
+      })
+    }
+
+    /** Exibe ou oculta o overlay de carregamento do Pyodide */
+    function mostrarOverlayPyodide(visivel) {
+      let overlay = document.getElementById('overlay-pyodide')
+      if (!overlay) {
+        overlay = document.createElement('div')
+        overlay.id = 'overlay-pyodide'
+        overlay.innerHTML = `
+          <div class="bg-slate-900 border border-slate-700 rounded-2xl p-8 text-center shadow-2xl max-w-xs w-full">
+            <div class="text-4xl mb-4">🐍</div>
+            <p class="text-slate-200 font-semibold mb-2">Carregando Python...</p>
+            <p class="text-slate-400 text-sm mb-4">O ambiente Python está sendo instalado no seu navegador. Acontece só uma vez.</p>
+            <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+              <div id="overlay-pyodide-barra" class="h-full bg-python-500 rounded-full transition-all duration-500" style="width:30%"></div>
+            </div>
+          </div>
+        `
+        overlay.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm'
+        document.body.appendChild(overlay)
+      }
+      overlay.style.display = visivel ? 'flex' : 'none'
+    }
+
+    /** Escapa caracteres HTML para exibição segura na saída do console */
+    function escapeHtml(texto) {
+      return texto
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+    }
+
+    // Pré-aquece o Pyodide em segundo plano após a página carregar,
+    // assim quando o aluno clicar "Rodar" a espera é menor
+    window.addEventListener('load', () => {
+      // Delay de 3s para não competir com o carregamento inicial da página
+      setTimeout(() => {
+        carregarPyodide().catch(() => {}) // silencioso — tentativa best-effort
+      }, 3000)
     })
 
     // Verificação de sessão com .then() — não usar await top-level aqui
