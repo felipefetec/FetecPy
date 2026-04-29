@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FetecPy — Dashboard</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            python: { 400: '#4ade80', 500: '#22c55e', 600: '#16a34a' },
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
+          },
+          keyframes: {
+            surgir: {
+              '0%':   { opacity: '0', transform: 'translateY(12px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            pulsar: {
+              '0%, 100%': { transform: 'scale(1)' },
+              '50%':      { transform: 'scale(1.05)' },
+            },
+          },
+          animation: {
+            surgir:  'surgir 0.35s ease-out forwards',
+            pulsar:  'pulsar 0.4s ease-in-out',
+          },
+        },
+      },
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* Estilo autofill consistente com o tema dark */
+    input:-webkit-autofill { -webkit-box-shadow: 0 0 0 30px #1e293b inset !important; -webkit-text-fill-color: #f1f5f9 !important; }
+    /* Barra de rolagem discreta */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+  </style>
+
+  <script type="module">
+    import { verificarSessao, logout } from '/assets/js/auth.js'
+    import { apiFetch }                from '/assets/js/api.js'
+    import { carregarProgresso }       from '/assets/js/progress.js'
+    import { mesclarBadges, formatarXp, BADGES_CATALOGO } from '/assets/js/gamification.js'
+
+    // Redireciona para login se não estiver autenticado
+    const logado = await verificarSessao()
+    if (!logado) window.location.replace('/index.html')
+
+    // Títulos dos módulos — referência ao PLANO_ESTUDOS.md
+    const TITULOS_MODULOS = {
+      '01': 'Lógica e Algoritmos',
+      '02': 'Primeiros Passos em Python',
+      '03': 'Estruturas de Controle',
+      '04': 'Estruturas de Dados',
+      '05': 'Funções e Modularização',
+      '06': 'Programação Orientada a Objetos',
+      '07': 'Arquivos, JSON e Erros',
+      '08': 'Construindo Aplicações Reais',
+    }
+
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('dashboard', () => ({
+        // Dados do usuário
+        usuario:    null,
+        progresso:  [],
+        badges:     [],
+
+        // Estado da UI
+        carregando:      true,
+        modalBadge:      null,  // badge sendo exibida no modal
+        sidebarAberta:   false, // drawer de badges no mobile
+
+        // Dados derivados — calculados após carregamento
+        get xpFormatado()    { return this.usuario ? formatarXp(this.usuario.xp_total) : '—' },
+        get streakTexto()    { return this.usuario ? `${this.usuario.streak_dias} dias` : '—' },
+        get badgesCount()    { return this.badges.filter(b => b.conquistada).length },
+        get continuarModulo(){ return this.progresso.find(m => m.status === 'em_andamento') ?? null },
+        get titulosModulos() { return TITULOS_MODULOS },
+
+        async init() {
+          try {
+            // Carrega usuário e progresso em paralelo para reduzir tempo de espera
+            const [usuario, progresso] = await Promise.all([
+              apiFetch('/me'),
+              carregarProgresso(),
+            ])
+
+            this.usuario   = usuario
+            this.progresso = progresso
+            this.badges    = mesclarBadges(usuario.badges)
+
+          } catch (e) {
+            // Token pode ter expirado durante a navegação
+            if (e.status === 401) window.location.replace('/index.html')
+          } finally {
+            this.carregando = false
+          }
+        },
+
+        // Retorna as classes de cor do card de módulo conforme o status
+        corStatus(status) {
+          return {
+            'concluido':    'border-python-500/40 bg-python-500/5',
+            'em_andamento': 'border-blue-500/40 bg-blue-500/5',
+            'disponivel':   'border-slate-700 bg-slate-900 hover:border-slate-600',
+            'bloqueado':    'border-slate-800 bg-slate-900/50 opacity-50 cursor-not-allowed',
+          }[status] ?? 'border-slate-700 bg-slate-900'
+        },
+
+        // Cor da barra de progresso
+        corBarra(status) {
+          if (status === 'concluido')    return 'bg-python-500'
+          if (status === 'em_andamento') return 'bg-blue-500'
+          return 'bg-slate-700'
+        },
+
+        // Navega para a página do módulo (somente se não bloqueado)
+        abrirModulo(modulo) {
+          if (modulo.status === 'bloqueado') return
+          window.location.href = `/module.html?id=${modulo.modulo}`
+        },
+
+        // Abre o modal com detalhes da badge
+        verBadge(badge) {
+          this.modalBadge = badge
+        },
+
+        async fazerLogout() {
+          await logout()
+          window.location.replace('/index.html')
+        },
+      }))
+    })
+  </script>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
+</head>
+
+<body class="h-full bg-slate-950 text-slate-100">
+<div x-data="dashboard" class="min-h-full flex flex-col">
+
+  <!-- ================================================================
+       Header — nome do aluno, XP, streak e botão sair
+       ================================================================ -->
+  <header class="sticky top-0 z-10 bg-slate-950/90 backdrop-blur border-b border-slate-800">
+    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+
+      <!-- Logo -->
+      <a href="/app.html" class="font-mono font-bold text-lg shrink-0">
+        <span class="text-python-500">Fetec</span><span class="text-slate-100">Py</span>
+      </a>
+
+      <!-- Stats: XP e streak (oculto em telas muito pequenas) -->
+      <div class="hidden sm:flex items-center gap-4 text-sm">
+        <template x-if="usuario">
+          <>
+            <!-- XP total -->
+            <div class="flex items-center gap-1.5 text-slate-300">
+              <svg class="w-4 h-4 text-python-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <span x-text="xpFormatado" class="font-medium tabular-nums"></span>
+            </div>
+
+            <!-- Streak -->
+            <div class="flex items-center gap-1.5 text-slate-300">
+              <span class="text-base" aria-hidden="true">🔥</span>
+              <span x-text="streakTexto" class="font-medium tabular-nums"></span>
+            </div>
+          </>
+        </template>
+        <template x-if="!usuario && carregando">
+          <div class="h-4 w-24 bg-slate-800 rounded animate-pulse"></div>
+        </template>
+      </div>
+
+      <!-- Lado direito: nome + sair -->
+      <div class="flex items-center gap-3 ml-auto">
+        <span x-text="usuario ? usuario.nome : ''" class="text-sm text-slate-400 hidden sm:block"></span>
+        <button @click="fazerLogout" class="text-xs text-slate-500 hover:text-slate-300 transition-colors px-2 py-1 rounded hover:bg-slate-800">
+          Sair
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================================================================
+       Conteúdo principal
+       ================================================================ -->
+  <main class="flex-1 max-w-6xl mx-auto w-full px-4 py-8">
+
+    <!-- Loading skeleton -->
+    <template x-if="carregando">
+      <div class="space-y-6 animate-pulse">
+        <div class="h-8 w-48 bg-slate-800 rounded"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <template x-for="i in 8">
+            <div class="h-36 bg-slate-900 border border-slate-800 rounded-xl"></div>
+          </template>
+        </div>
+      </div>
+    </template>
+
+    <template x-if="!carregando">
+      <div class="space-y-8 animate-surgir">
+
+        <!-- Card "continuar de onde parou" -->
+        <template x-if="continuarModulo">
+          <div class="bg-gradient-to-r from-blue-500/10 to-python-500/10 border border-blue-500/30 rounded-xl p-5 flex items-center justify-between gap-4">
+            <div>
+              <p class="text-xs text-blue-400 font-medium uppercase tracking-wider mb-1">Continue de onde parou</p>
+              <p class="text-slate-100 font-semibold" x-text="'Módulo ' + continuarModulo.modulo + ' — ' + (titulosModulos[continuarModulo.modulo] ?? '')"></p>
+              <p class="text-sm text-slate-400 mt-0.5" x-text="continuarModulo.percentual + '% concluído'"></p>
+            </div>
+            <a :href="'/module.html?id=' + continuarModulo.modulo" class="shrink-0 bg-blue-500 hover:bg-blue-400 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
+              Continuar
+            </a>
+          </div>
+        </template>
+
+        <!-- Saudação e subtítulo -->
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold text-slate-100" x-text="'Olá, ' + (usuario?.nome ?? '') + '!'"></h1>
+            <p class="text-slate-400 text-sm mt-1">Escolha um módulo para começar ou continuar.</p>
+          </div>
+          <!-- Botão de badges no mobile -->
+          <button @click="sidebarAberta = true" class="sm:hidden flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-200 bg-slate-800 px-3 py-2 rounded-lg transition-colors">
+            <span>🏅</span>
+            <span x-text="badgesCount + '/15'"></span>
+          </button>
+        </div>
+
+        <!-- ============================================================
+             Layout: grid de módulos + sidebar de badges
+             ============================================================ -->
+        <div class="flex gap-6 items-start">
+
+          <!-- Grid de módulos -->
+          <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <template x-for="modulo in progresso" :key="modulo.modulo">
+              <div
+                @click="abrirModulo(modulo)"
+                :class="'relative border rounded-xl p-5 transition-all duration-200 ' + corStatus(modulo.status)"
+                class="cursor-pointer group"
+              >
+                <!-- Número do módulo -->
+                <div class="flex items-start justify-between mb-3">
+                  <span class="font-mono text-xs font-semibold text-slate-500" x-text="'Módulo ' + modulo.modulo"></span>
+
+                  <!-- Ícone de status -->
+                  <span x-show="modulo.status === 'concluido'"   class="text-python-500 text-sm" aria-label="Concluído">✓</span>
+                  <span x-show="modulo.status === 'bloqueado'"   class="text-slate-600 text-sm" aria-label="Bloqueado">🔒</span>
+                  <span x-show="modulo.status === 'em_andamento'" class="w-2 h-2 bg-blue-400 rounded-full mt-1 animate-pulse"></span>
+                </div>
+
+                <!-- Título -->
+                <p class="text-sm font-semibold text-slate-200 leading-snug group-hover:text-white transition-colors" x-text="titulosModulos[modulo.modulo] ?? 'Módulo ' + modulo.modulo"></p>
+
+                <!-- Barra de progresso -->
+                <div class="mt-4">
+                  <div class="flex justify-between text-xs text-slate-500 mb-1.5">
+                    <span x-text="modulo.concluidos + '/' + modulo.total + ' itens'"></span>
+                    <span x-text="modulo.percentual + '%'"></span>
+                  </div>
+                  <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div :class="'h-full rounded-full transition-all duration-500 ' + corBarra(modulo.status)" :style="'width: ' + modulo.percentual + '%'"></div>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <!-- ============================================================
+               Sidebar de badges (desktop: fixa; mobile: drawer)
+               ============================================================ -->
+          <aside class="hidden sm:block w-56 shrink-0 sticky top-20">
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+              <div class="flex items-center justify-between mb-3">
+                <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Badges</h2>
+                <span class="text-xs text-slate-500" x-text="badgesCount + '/15'"></span>
+              </div>
+              <div class="grid grid-cols-3 gap-2">
+                <template x-for="badge in badges" :key="badge.id">
+                  <button
+                    @click="verBadge(badge)"
+                    :title="badge.nome + ': ' + badge.descricao"
+                    :class="badge.conquistada ? 'bg-slate-800 hover:bg-slate-700' : 'bg-slate-900 opacity-35 grayscale'"
+                    class="aspect-square rounded-lg flex items-center justify-center text-xl transition-all cursor-pointer hover:scale-110"
+                  >
+                    <span :aria-label="badge.nome" x-text="badge.icone"></span>
+                  </button>
+                </template>
+              </div>
+            </div>
+          </aside>
+
+        </div><!-- /flex layout -->
+      </div><!-- /animate-surgir -->
+    </template>
+
+  </main><!-- /main -->
+
+  <!-- ================================================================
+       Modal de detalhes da badge
+       ================================================================ -->
+  <div
+    x-show="modalBadge !== null"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    @click.self="modalBadge = null"
+    @keydown.escape.window="modalBadge = null"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div
+      x-show="modalBadge !== null"
+      x-transition:enter="transition ease-out duration-200"
+      x-transition:enter-start="opacity-0 scale-95"
+      x-transition:enter-end="opacity-100 scale-100"
+      class="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-xs w-full text-center shadow-2xl"
+    >
+      <template x-if="modalBadge">
+        <div>
+          <!-- Ícone grande -->
+          <div :class="modalBadge.conquistada ? '' : 'grayscale opacity-40'" class="text-6xl mb-4 transition-all">
+            <span x-text="modalBadge.icone" :aria-label="modalBadge.nome"></span>
+          </div>
+
+          <h3 class="text-lg font-bold text-slate-100 mb-1" x-text="modalBadge.nome"></h3>
+          <p class="text-sm text-slate-400" x-text="modalBadge.descricao"></p>
+
+          <!-- Status de conquista -->
+          <div class="mt-4">
+            <template x-if="modalBadge.conquistada">
+              <p class="text-xs text-python-500 font-medium">
+                Conquistada em <span x-text="new Date(modalBadge.conquistado_em).toLocaleDateString('pt-BR')"></span>
+              </p>
+            </template>
+            <template x-if="!modalBadge.conquistada">
+              <p class="text-xs text-slate-500">Ainda não conquistada</p>
+            </template>
+          </div>
+
+          <button @click="modalBadge = null" class="mt-5 w-full text-sm text-slate-400 hover:text-slate-200 bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg transition-colors">
+            Fechar
+          </button>
+        </div>
+      </template>
+    </div>
+  </div>
+
+  <!-- ================================================================
+       Drawer de badges para mobile
+       ================================================================ -->
+  <div
+    x-show="sidebarAberta"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    @click.self="sidebarAberta = false"
+    class="fixed inset-0 z-40 bg-black/60 sm:hidden"
+  >
+    <div
+      x-show="sidebarAberta"
+      x-transition:enter="transition ease-out duration-300"
+      x-transition:enter-start="translate-x-full"
+      x-transition:enter-end="translate-x-0"
+      class="absolute right-0 top-0 bottom-0 w-64 bg-slate-900 border-l border-slate-800 p-4 overflow-y-auto"
+    >
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-semibold text-slate-200">Badges</h2>
+        <button @click="sidebarAberta = false" class="text-slate-500 hover:text-slate-300 p-1">✕</button>
+      </div>
+      <div class="grid grid-cols-4 gap-2">
+        <template x-for="badge in badges" :key="badge.id">
+          <button
+            @click="verBadge(badge); sidebarAberta = false"
+            :class="badge.conquistada ? 'bg-slate-800' : 'bg-slate-900 opacity-35 grayscale'"
+            class="aspect-square rounded-lg flex items-center justify-center text-2xl transition-all hover:scale-110"
+          >
+            <span x-text="badge.icone" :aria-label="badge.nome"></span>
+          </button>
+        </template>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /x-data dashboard -->
+</body>
+</html>

@@ -43,6 +43,16 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 
 ---
 
+## Prompt 3.2 — Dashboard
+- [x] ProgressController: GET /api/progress com status bloqueado/disponivel/em_andamento/concluido
+- [x] progress.js: carrega progresso e encontra último módulo em andamento
+- [x] gamification.js: catálogo de 15 badges, mesclarBadges(), formatarXp()
+- [x] app.html: header sticky com XP/streak, card "continuar", grid de módulos com barra de progresso, sidebar de badges desktop, drawer mobile, modal de badge
+- [x] Testado: API retorna 8 módulos corretamente, testes não-regressão passando
+- [x] Commit
+
+---
+
 ## Prompt 3.1 — Tela de login
 - [x] api.js: wrapper fetch com base URL automática via import.meta.url + token Bearer
 - [x] auth.js: login (salva token), logout, verificarSessao (redireciona se logado)

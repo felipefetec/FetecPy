@@ -22,6 +22,7 @@ use FetecPy\Http\Router;
 use FetecPy\Controllers\HealthController;
 use FetecPy\Controllers\AuthController;
 use FetecPy\Controllers\UserController;
+use FetecPy\Controllers\ProgressController;
 
 // Captura qualquer exceção não tratada e retorna JSON em vez de HTML de erro
 set_exception_handler(function (Throwable $e): void {
@@ -62,8 +63,8 @@ $router->get('me', [UserController::class, 'me']);
 // $router->get('modules/:moduloId/exercises/:exId',        [ExerciseController::class, 'show']);
 // $router->post('modules/:moduloId/exercises/:exId/submit',[ExerciseController::class, 'submit']);
 
-// -- Progresso (Prompt 6.1) --
-// $router->get('progress',  [ProgressController::class, 'index']);
+// -- Progresso --
+$router->get('progress', [ProgressController::class, 'index']);
 
 // -- Badges (Prompt 6.2) --
 // $router->get('badges', [BadgeController::class, 'index']);
