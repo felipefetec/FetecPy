@@ -121,7 +121,7 @@ Cron diário recomendado.
 
 ## Licença
 
-A definir.
+[CC BY-NC 4.0](./LICENSE) — uso livre para estudos e projetos pessoais. Uso comercial não permitido.
 
 ---
 
