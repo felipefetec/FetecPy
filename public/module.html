@@ -131,6 +131,8 @@
               if (typeof Prism !== 'undefined') Prism.highlightAllUnder(conteudoEl)
               // Ativa os editores nos slots :::tente
               ativarEditoresTente(conteudoEl)
+              // Ativa as áreas de reflexão nos slots :::reflexao
+              ativarBlocosReflexao(conteudoEl)
             }
           }
         },
@@ -265,6 +267,109 @@
         document.body.appendChild(overlay)
       }
       overlay.style.display = visivel ? 'flex' : 'none'
+    }
+
+    // ----------------------------------------------------------------
+    // Ativação dos blocos :::reflexao (texto livre + gabarito)
+    // ----------------------------------------------------------------
+
+    /**
+     * Ativa todos os slots .reflexao-area com textarea, contador de caracteres,
+     * botão "Ver resposta sugerida" (disponível após mínimo de caracteres)
+     * e botão "Marquei como feito".
+     *
+     * O gabarito fica em base64 no data-resposta e só é decodificado e exibido
+     * quando o aluno já escreveu sua própria resposta — incentiva o esforço antes
+     * de ver o modelo.
+     */
+    function ativarBlocosReflexao(conteudoEl) {
+      const MIN_CHARS = 30 // mínimo de caracteres para liberar o gabarito
+
+      const slots = conteudoEl.querySelectorAll('.reflexao-area[data-ready="false"]')
+      slots.forEach(slot => {
+        slot.setAttribute('data-ready', 'true')
+        const respostaB64 = slot.dataset.resposta ?? ''
+        const temGabarito = respostaB64.length > 0
+
+        slot.innerHTML = `
+          <div class="reflexao-wrapper space-y-3">
+            <textarea
+              class="reflexao-textarea w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 text-[1rem] leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent placeholder-slate-600 transition-colors"
+              rows="5"
+              placeholder="Escreva sua resposta aqui..."
+            ></textarea>
+
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+              <span class="reflexao-contador text-xs text-slate-500">0 / ${MIN_CHARS} caracteres mínimos</span>
+
+              <div class="flex items-center gap-2">
+                ${temGabarito ? `
+                <button class="reflexao-btn-gabarito hidden bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/40 text-teal-300 text-sm font-medium px-4 py-2 rounded-lg transition-colors">
+                  Ver resposta sugerida
+                </button>` : ''}
+                <button class="reflexao-btn-feito hidden bg-python-500 hover:bg-python-400 text-slate-950 text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
+                  ✓ Marquei como feito
+                </button>
+              </div>
+            </div>
+
+            <!-- Gabarito — oculto até o aluno clicar -->
+            ${temGabarito ? `
+            <div class="reflexao-gabarito hidden border border-teal-500/30 bg-teal-500/8 rounded-xl p-5">
+              <p class="text-teal-300 font-semibold text-sm mb-3">💡 Resposta sugerida</p>
+              <div class="reflexao-gabarito-conteudo text-slate-300 text-[1rem] leading-relaxed"></div>
+              <p class="text-slate-500 text-xs mt-3 italic">Compare com a sua resposta. Não existe uma única resposta certa — o importante é que os passos sejam precisos e completos.</p>
+            </div>` : ''}
+          </div>
+        `
+
+        const textarea  = slot.querySelector('.reflexao-textarea')
+        const contador  = slot.querySelector('.reflexao-contador')
+        const btnGabarito = slot.querySelector('.reflexao-btn-gabarito')
+        const btnFeito  = slot.querySelector('.reflexao-btn-feito')
+        const gabarito  = slot.querySelector('.reflexao-gabarito')
+        const gabConteudo = slot.querySelector('.reflexao-gabarito-conteudo')
+
+        // Atualiza contador e libera botões conforme o aluno escreve
+        textarea.addEventListener('input', () => {
+          const len = textarea.value.trim().length
+          const atingiu = len >= MIN_CHARS
+
+          contador.textContent = `${len} / ${MIN_CHARS} caracteres mínimos`
+          contador.className   = `reflexao-contador text-xs ${atingiu ? 'text-teal-400' : 'text-slate-500'}`
+
+          if (btnGabarito) btnGabarito.classList.toggle('hidden', !atingiu)
+          btnFeito.classList.toggle('hidden', !atingiu)
+        })
+
+        // Mostra o gabarito decodificando o base64
+        if (btnGabarito && gabarito && gabConteudo) {
+          btnGabarito.addEventListener('click', () => {
+            try {
+              const textoGabarito = decodeURIComponent(escape(atob(respostaB64)))
+              // Renderiza o gabarito como markdown simples (lista numerada, etc.)
+              gabConteudo.innerHTML = textoGabarito
+                .split('\n')
+                .map(linha => `<p class="mb-1">${escapeHtml(linha)}</p>`)
+                .join('')
+            } catch {
+              gabConteudo.textContent = 'Erro ao carregar resposta.'
+            }
+            gabarito.classList.remove('hidden')
+            btnGabarito.classList.add('hidden') // esconde o botão após ver
+          })
+        }
+
+        // Botão "Marquei como feito" — por ora apenas feedback visual
+        // (persistência será implementada no Prompt 6.1 com ProgressService)
+        btnFeito.addEventListener('click', () => {
+          btnFeito.textContent = '✓ Feito!'
+          btnFeito.disabled = true
+          btnFeito.className = 'text-sm font-semibold px-4 py-2 rounded-lg bg-slate-700 text-slate-400 cursor-default'
+          textarea.disabled = true
+          textarea.className = textarea.className + ' opacity-60'
+        })
+      })
     }
 
     /** Escapa caracteres HTML para exibição segura na saída do console */

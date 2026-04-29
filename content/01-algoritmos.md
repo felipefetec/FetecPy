@@ -56,8 +56,16 @@ Essa é a parte que muita gente erra no começo: o computador não tem intuiçã
 
 Isso parece uma limitação, mas na prática é uma vantagem: um computador nunca vai fazer algo diferente do que você pediu. Se o resultado estiver errado, o problema está nas suas instruções — e você pode encontrá-lo e corrigi-lo.
 
-:::tente
-Tente escrever em linguagem natural (português comum) os passos para trocar uma lâmpada queimada. Seja específico o suficiente para que alguém que nunca fez isso antes consiga seguir.
+:::reflexao
+Escreva em linguagem natural (português comum) os passos para trocar uma lâmpada queimada. Seja específico o suficiente para que alguém que nunca fez isso antes consiga seguir.
+---resposta
+1. Desligue o interruptor da luz antes de qualquer coisa.
+2. Espere a lâmpada esfriar por pelo menos 5 minutos (lâmpadas quentes podem queimar).
+3. Se necessário, posicione uma cadeira ou escada embaixo da lâmpada.
+4. Gire a lâmpada queimada no sentido anti-horário até ela soltar.
+5. Descarte a lâmpada queimada com cuidado.
+6. Pegue a lâmpada nova e gire no sentido horário até apertar (não force demais).
+7. Ligue o interruptor para verificar se a lâmpada nova funciona.
 :::
 
 ---
@@ -156,8 +164,18 @@ Para criar condições, usamos comparações:
 | `=`  | igual a         | `nome = "Felipe"` |
 | `≠`  | diferente de    | `senha ≠ "1234"` |
 
-:::tente
+:::reflexao
 Escreva em pseudocódigo uma condição que verifica se um número é positivo, negativo ou zero. Use SE/SENÃO SE/SENÃO.
+---resposta
+leia numero
+
+SE (numero > 0) ENTÃO
+    imprima "Positivo"
+SENÃO SE (numero < 0) ENTÃO
+    imprima "Negativo"
+SENÃO
+    imprima "Zero"
+FIM SE
 :::
 
 ---

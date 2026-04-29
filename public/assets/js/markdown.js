@@ -37,30 +37,58 @@ const md = markdownit({
 // Definições visuais de cada tipo de bloco customizado
 // borda-esq: barra colorida grossa na lateral esquerda para maior destaque visual
 const BLOCOS = {
-  dica:        { titulo: 'Dica',              icone: '💡', borda: 'border-l-4 border-emerald-400', fundo: 'bg-emerald-500/20',  texto: 'text-emerald-300' },
-  aviso:       { titulo: 'Atenção',           icone: '⚠️', borda: 'border-l-4 border-amber-400',   fundo: 'bg-amber-500/20',    texto: 'text-amber-300'   },
-  curiosidade: { titulo: 'Curiosidade',       icone: '🔍', borda: 'border-l-4 border-blue-400',    fundo: 'bg-blue-500/20',     texto: 'text-blue-300'    },
-  tente:       { titulo: 'Tente você mesmo',  icone: '⌨️', borda: 'border-l-4 border-violet-400',  fundo: 'bg-violet-500/20',   texto: 'text-violet-300'  },
+  dica:        { titulo: 'Dica',                    icone: '💡', borda: 'border-l-4 border-emerald-400', fundo: 'bg-emerald-500/20', texto: 'text-emerald-300' },
+  aviso:       { titulo: 'Atenção',                 icone: '⚠️', borda: 'border-l-4 border-amber-400',   fundo: 'bg-amber-500/20',   texto: 'text-amber-300'   },
+  curiosidade: { titulo: 'Curiosidade',             icone: '🔍', borda: 'border-l-4 border-blue-400',    fundo: 'bg-blue-500/20',    texto: 'text-blue-300'    },
+  tente:       { titulo: 'Tente você mesmo',        icone: '⌨️', borda: 'border-l-4 border-violet-400',  fundo: 'bg-violet-500/20',  texto: 'text-violet-300'  },
+  reflexao:    { titulo: 'Reflita e responda',      icone: '✍️', borda: 'border-l-4 border-teal-400',    fundo: 'bg-teal-500/20',    texto: 'text-teal-300'    },
 }
 
 /**
  * Substitui blocos :::tipo....::: por HTML estilizado antes do markdown-it.
  * Feito no pré-processamento porque markdown-it não tem suporte nativo
  * a containers customizados sem plugin externo.
+ *
+ * Bloco :::reflexao suporta separador ---resposta para incluir gabarito:
+ *   :::reflexao
+ *   Escreva os passos para...
+ *   ---resposta
+ *   1. Primeiro passo...
+ *   :::
+ * O gabarito é codificado em base64 para não aparecer visível no HTML.
  */
 function preprocessarBlocos(markdown) {
   return markdown.replace(
-    /^:::(dica|aviso|curiosidade|tente)\n([\s\S]*?)^:::/gm,
+    /^:::(dica|aviso|curiosidade|tente|reflexao)\n([\s\S]*?)^:::/gm,
     (_, tipo, conteudo) => {
       const cfg = BLOCOS[tipo]
       if (!cfg) return _
-      const htmlInterno = md.render(conteudo.trim())
-      // Bloco tente ganha slot extra para o editor CodeMirror (ativado por module.html)
+
+      let instrucao = conteudo.trim()
+      let respostaB64 = ''
+
+      // Separa instrução do gabarito se houver ---resposta
+      if (tipo === 'reflexao') {
+        const partes = conteudo.split(/^---resposta\s*$/m)
+        instrucao    = partes[0].trim()
+        const resp   = partes[1]?.trim() ?? ''
+        // Base64 para não expor o gabarito diretamente no HTML-fonte
+        respostaB64  = resp ? btoa(unescape(encodeURIComponent(resp))) : ''
+      }
+
+      const htmlInterno = md.render(instrucao)
+
+      // Slot do editor CodeMirror para :::tente
       const slotEditor = tipo === 'tente'
         ? `<div class="tente-editor-area mt-4" data-ready="false"></div>`
         : ''
 
-      return `<div class="rounded-xl pl-6 pr-6 pt-5 pb-5 my-8 ${cfg.borda} ${cfg.fundo}"><div class="flex items-center gap-3 mb-3 ${cfg.texto} font-bold text-xl"><span style="font-size:1.4rem">${cfg.icone}</span><span>${cfg.titulo}</span></div><div class="text-slate-200 text-[1.05rem] leading-relaxed [&>p]:mb-3 [&>p:last-child]:mb-0">${htmlInterno}</div>${slotEditor}</div>`
+      // Slot da área de reflexão para :::reflexao
+      const slotReflexao = tipo === 'reflexao'
+        ? `<div class="reflexao-area mt-4" data-resposta="${respostaB64}" data-ready="false"></div>`
+        : ''
+
+      return `<div class="rounded-xl pl-6 pr-6 pt-5 pb-5 my-8 ${cfg.borda} ${cfg.fundo}"><div class="flex items-center gap-3 mb-3 ${cfg.texto} font-bold text-xl"><span style="font-size:1.4rem">${cfg.icone}</span><span>${cfg.titulo}</span></div><div class="text-slate-200 text-[1.05rem] leading-relaxed [&>p]:mb-3 [&>p:last-child]:mb-0">${htmlInterno}</div>${slotEditor}${slotReflexao}</div>`
     }
   )
 }
