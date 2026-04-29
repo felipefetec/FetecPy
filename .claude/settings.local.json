@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /home/fetec/FetecPy status)",
+      "Bash(git init *)",
+      "Bash(git *)",
+      "Bash(php *)",
+      "Bash(apt list *)"
+    ]
+  }
+}

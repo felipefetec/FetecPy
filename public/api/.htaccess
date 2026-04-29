@@ -1,0 +1,4 @@
+# Redireciona todas as requisições da API para o front controller
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]

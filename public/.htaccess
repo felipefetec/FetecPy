@@ -1,0 +1,10 @@
+# Configurações gerais do webroot
+# Impede listagem de diretórios
+Options -Indexes
+
+# Redireciona tudo que não é arquivo real para index.html (SPA)
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/api/
+RewriteRule ^ index.html [L]

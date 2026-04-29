@@ -1,0 +1,29 @@
+{
+    "name": "fetec/fetecpy",
+    "description": "Plataforma web de ensino de Python para iniciantes",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.0",
+        "ext-pdo": "*",
+        "ext-pdo_sqlite": "*"
+    },
+    "require-dev": {},
+    "autoload": {
+        "psr-4": {
+            "FetecPy\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "FetecPy\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test:coverage": "phpunit --coverage-html coverage/"
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}
