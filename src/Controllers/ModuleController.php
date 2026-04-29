@@ -52,7 +52,8 @@ class ModuleController
     {
         AuthMiddleware::exigir($request);
 
-        $id = $request->params['id'] ?? '';
+        $userId = (int) $request->user['id'];
+        $id     = $request->params['id'] ?? '';
 
         // Valida que o ID é numérico de 2 dígitos (ex: "01", "08")
         if (!preg_match('/^\d{2}$/', $id)) {
@@ -69,11 +70,17 @@ class ModuleController
         $frontmatter = $parsed['frontmatter'];
         $markdown    = $parsed['conteudo'];
 
-        // Exercícios do módulo: lista os JSONs sem incluir a solução
-        $exercicios = $this->listarExercicios($id);
+        // Exercícios: lista os JSONs sem solução e injeta status do aluno.
+        // O status permite o frontend exibir a medalha sem chamada extra à API.
+        $exercicios  = $this->listarExercicios($id);
+        $concluidos  = $this->statusExercicios($userId, $id);
+        foreach ($exercicios as &$ex) {
+            $exKey          = explode('-', $ex['id'], 2)[1] ?? ''; // "01-ex03" → "ex03"
+            $ex['status_aluno'] = $concluidos[$exKey] ?? null;
+        }
+        unset($ex);
 
         // Quiz: retorna perguntas SEM resposta_correta
-        // (backend valida em POST /api/modules/:id/quiz — Prompt 5.x)
         $quiz = $this->carregarQuiz($id);
 
         JsonResponse::enviar([
@@ -230,5 +237,31 @@ class ModuleController
             unset($pergunta['resposta_correta']);
             return $pergunta;
         }, $dados);
+    }
+
+    /**
+     * Retorna o status de conclusão de cada exercício do módulo para o aluno.
+     *
+     * Retorna um mapa indexado por item_id (ex: "ex03" → "concluido").
+     * Exercícios não tentados ficam fora do mapa — o frontend trata ausência
+     * como null (sem medalha).
+     *
+     * @return array<string, string>  ['ex01' => 'concluido', 'ex03' => 'concluido_com_ajuda', ...]
+     */
+    private function statusExercicios(int $userId, string $moduloId): array
+    {
+        $pdo  = \FetecPy\Database::getConnection();
+        $stmt = $pdo->prepare(
+            'SELECT item_id, status FROM progress
+             WHERE user_id = ? AND modulo = ? AND item_tipo = "exercicio"
+               AND status IN ("concluido", "concluido_com_ajuda")'
+        );
+        $stmt->execute([$userId, $moduloId]);
+
+        $resultado = [];
+        foreach ($stmt->fetchAll() as $row) {
+            $resultado[$row['item_id']] = $row['status'];
+        }
+        return $resultado;
     }
 }
