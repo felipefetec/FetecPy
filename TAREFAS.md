@@ -106,7 +106,21 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 - [x] exercises/05/ex03.json — fatorial(n) com for: validação B+C (hibrido funcao + ast)
 - [x] 26 testes PHP + 3 JS passando
 
-### Prompt 5.3 — Testes dos validadores
+### Prompt 5.3 — Testes dos validadores e exercícios ✅
+- [x] tests/Frontend/validator.test.js (29 testes: textLivre, Output, Function, Ast, dispatcher)
+- [x] tests/Content/exercises.test.js (124 testes: schema 13 JSONs + soluções via python3)
+- [x] scripts/test.sh: validação de schema JSON em bash antes do Vitest
+- [x] 26 PHP + 156 JS = 182 testes passando
+
+---
+
+## Extras implementados na Fase 5
+
+- [x] Timer visual de análise para texto_livre (barra de progresso 2,5s)
+- [x] Confetes + serpentinas ao concluir exercício sem ajuda (canvas-confetti)
+- [x] Medalha SVG no canto do card (círculo dourado + fitas azuis em V)
+- [x] ModuleController injeta status_aluno por exercício (medalha persiste entre sessões)
+- [x] _marcarConcluido() desacoplado de enviarSubmissao (medalha garante aparição)
 
 ---
 
