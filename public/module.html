@@ -850,22 +850,22 @@
                     class="group relative text-left bg-slate-900 hover:bg-slate-800 border rounded-xl p-5 transition-all"
                     :class="ex.status_aluno ? 'border-yellow-500/40 hover:border-yellow-500/60' : 'border-slate-700 hover:border-slate-600'"
                   >
-                    <!-- Faixa de medalha — container w-24 (96px).
-                         A faixa precisa ser larga o suficiente para que as
-                         pontas toquem as bordas ao rodar -45°:
-                         largura mínima = 96 × √2 ≈ 136px → usamos 144px (w-36).
+                    <!-- Faixa de medalha — container w-16 (64px), mesmo tamanho anterior.
+                         Faixa w-24 (96px) > diagonal do container (64×√2 = 91px)
+                         para as pontas tocarem as bordas ao rodar -45°.
+                         left = 64/2 - 96/2 = -16px  |  top = 64/2 - altura/2 = 22px
                          Usa x-show (não x-if) para reatividade confiável em x-for. -->
                     <div
                       x-show="ex.status_aluno === 'concluido' || ex.status_aluno === 'concluido_com_ajuda'"
-                      class="absolute top-0 left-0 w-24 h-24 overflow-hidden rounded-tl-xl pointer-events-none"
+                      class="absolute top-0 left-0 w-16 h-16 overflow-hidden rounded-tl-xl pointer-events-none"
                     >
                       <div
-                        class="absolute -rotate-45 flex items-center justify-center w-36 py-1.5 text-sm font-bold shadow"
+                        class="absolute -rotate-45 flex items-center justify-center w-24 py-1 font-bold shadow-sm"
                         :class="ex.status_aluno === 'concluido' ? 'bg-yellow-400 text-yellow-950' : 'bg-slate-400 text-slate-950'"
-                        style="top: 37px; left: -24px"
+                        style="top: 22px; left: -16px"
                         :title="ex.status_aluno === 'concluido' ? 'Resolvido!' : 'Resolvido com ajuda'"
                       >
-                        <span x-text="ex.status_aluno === 'concluido' ? '🥇' : '🥉'"></span>
+                        <span class="text-xl leading-none" x-text="ex.status_aluno === 'concluido' ? '🥇' : '🥉'"></span>
                       </div>
                     </div>
 
