@@ -19,3 +19,8 @@ node_modules/
 
 # Cobertura de testes
 coverage/
+
+# Arquivos internos de desenvolvimento (não sobem ao repositório público)
+.claude/
+CLAUDE.md
+PROMPTS.md

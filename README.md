@@ -42,8 +42,6 @@ Stack escolhida pra rodar em **hospedagem PHP compartilhada** (sem Node, sem Doc
 ## Documentos importantes
 
 - [`PLANO_ESTUDOS.md`](./PLANO_ESTUDOS.md) — currículo completo, estrutura de módulos, exercícios
-- [`CLAUDE.md`](./CLAUDE.md) — instruções pra IA durante o desenvolvimento
-- [`PROMPTS.md`](./PROMPTS.md) — sequência de prompts pra construção via Claude Code
 
 ---
 
@@ -129,4 +127,4 @@ A definir.
 
 ## Créditos
 
-Projeto pessoal de **Felipe**, criado com auxílio do Claude (Anthropic) durante o planejamento e construção.
+Projeto pessoal de **Felipe Tavares** — [kelvinglab.com](https://kelvinglab.com)
