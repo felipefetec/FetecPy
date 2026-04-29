@@ -77,7 +77,7 @@
     import { apiFetch }                                         from '/assets/js/api.js'
     import { renderizar, extrairTOC, adicionarAncorasTitulos }  from '/assets/js/markdown.js'
     import { carregarPyodide, runPython, pyodidePronto }        from '/assets/js/pyodide.js'
-    import { validar }                                          from '/assets/js/validator.js'
+    import { validar, validateTextLivre }                        from '/assets/js/validator.js'
     // criarEditor é importado dinamicamente dentro de ativarEditoresTente(),
     // para não atrasar o registro do alpine:init com requisições para esm.sh
 
@@ -177,6 +177,7 @@
         // Flags de execução
         rodando: false,
         testando: false,
+        progressoValidacao: 0,  // 0-100 — controla a barra de progresso do timer de análise
 
         // ----------------------------------------------------------------
         // Helpers do modal
@@ -301,20 +302,31 @@
           this.resultadoValidacao = null
 
           try {
-            if (!this.ehTextoLivre && !pyodidePronto()) mostrarOverlayPyodide(true)
-            const resultado = await validar(this.exAtual, codigo, this.textoAluno)
-            mostrarOverlayPyodide(false)
+            let resultado
+
+            if (this.ehTextoLivre) {
+              // Para texto livre, a validação é instantânea (só conta caracteres).
+              // Validamos imediatamente mas exibimos um timer visual de ~2,5s para
+              // reforçar a percepção de que o sistema está analisando o raciocínio.
+              resultado = validateTextLivre(
+                this.textoAluno,
+                this.exAtual.validacao?.minimo_caracteres ?? 80
+              )
+              await this._animarProgresso(2500)
+            } else {
+              // Exercícios com código: roda no Pyodide (pode demorar segundos)
+              if (!pyodidePronto()) mostrarOverlayPyodide(true)
+              resultado = await validar(this.exAtual, codigo, this.textoAluno)
+              mostrarOverlayPyodide(false)
+            }
 
             this.resultadoValidacao = resultado
 
             if (resultado.passou) {
-              // Passou — envia pro backend como "concluido"
               await this.enviarSubmissao('concluido', codigo)
               this.exFase = 'concluido'
             } else {
-              // Falhou — incrementa tentativas
               this.tentativas++
-              // Salva automaticamente o código a cada tentativa
               await this.salvarCodigo(codigo)
             }
           } catch (e) {
@@ -323,6 +335,36 @@
           } finally {
             this.testando = false
           }
+        },
+
+        /**
+         * Anima a barra de progresso de validação por `duracaoMs` milissegundos.
+         * Usa easing out quadrático: rápido no início, desacelera no final —
+         * mais natural do que progresso linear.
+         */
+        async _animarProgresso(duracaoMs) {
+          this.progressoValidacao = 0
+          const intervaloMs = 30
+          const totalPassos = Math.round(duracaoMs / intervaloMs)
+          let passo = 0
+
+          await new Promise(resolve => {
+            const timer = setInterval(() => {
+              passo++
+              const t = Math.min(passo / totalPassos, 1)
+              // f(t) = 1 - (1-t)² — chega em 100% de forma suave
+              this.progressoValidacao = Math.round(100 * (1 - (1 - t) * (1 - t)))
+              if (passo >= totalPassos) {
+                clearInterval(timer)
+                this.progressoValidacao = 100
+                resolve()
+              }
+            }, intervaloMs)
+          })
+
+          // Pequena pausa com barra cheia antes de revelar o resultado
+          await new Promise(r => setTimeout(r, 250))
+          this.progressoValidacao = 0
         },
 
         /** Envia a solução (botão "Ver solução") */
@@ -927,6 +969,28 @@
               <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Seu código</div>
               <!-- Slot onde o CodeMirror é montado dinamicamente -->
               <div id="modal-editor-slot" class="border border-slate-700 rounded-lg overflow-hidden min-h-[160px]"></div>
+            </div>
+          </template>
+
+          <!-- Barra de progresso — aparece durante análise de texto livre -->
+          <template x-if="testando && ehTextoLivre">
+            <div class="rounded-xl border border-python-500/30 bg-python-500/8 p-4 space-y-3">
+              <div class="flex items-center gap-3">
+                <!-- Ícone de spinning -->
+                <svg class="animate-spin w-4 h-4 text-python-400 shrink-0" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+                <span class="text-python-400 text-sm font-medium">Analisando sua lógica...</span>
+                <span class="text-slate-500 text-xs ml-auto" x-text="progressoValidacao + '%'"></span>
+              </div>
+              <!-- Barra que cresce com easing ao longo de ~2,5s -->
+              <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+                <div
+                  class="h-full bg-python-500 rounded-full transition-[width] duration-75 ease-linear"
+                  :style="`width: ${progressoValidacao}%`"
+                ></div>
+              </div>
             </div>
           </template>
 
