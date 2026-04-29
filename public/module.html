@@ -327,6 +327,8 @@
 
             if (resultado.passou) {
               await this.enviarSubmissao('concluido', codigo)
+              // Atualiza a medalha AQUI (garantido), independente do API call
+              this._marcarConcluido('concluido')
               this.exFase = 'concluido'
               // Confetes apenas quando resolvido sem ajuda
               this.$nextTick(() => dispararConfetes())
@@ -376,6 +378,7 @@
         async usarSolucao() {
           const codigo = window._editorModal?.getValue() ?? this.codigoAluno
           await this.enviarSubmissao('concluido_com_ajuda', codigo)
+          this._marcarConcluido('concluido_com_ajuda')
           this.solucaoVisivel = true
           this.exFase = 'concluido'
         },
@@ -397,7 +400,7 @@
           } catch { /* silencioso — salvar é best-effort */ }
         },
 
-        /** Envia a submissão ao backend e atualiza XP/badges + medalha local */
+        /** Envia a submissão ao backend e atualiza XP/badges */
         async enviarSubmissao(status, codigo) {
           try {
             const exId = this.exAtual.id.split('-')[1] // "01-ex03" → "ex03"
@@ -413,22 +416,27 @@
             if (resp.solucao) {
               this.exAtual = { ...this.exAtual, solucao: resp.solucao }
             }
-
-            // Atualiza o status_aluno local para a medalha aparecer imediatamente
-            // no card sem recarregar a página.
-            // Usa splice() em vez de atribuição por índice porque o Alpine v3 só
-            // detecta mutações de array em métodos como splice/push/pop — a
-            // atribuição direta (arr[i] = x) não dispara re-render.
-            if (status !== 'tentado' && this.exAtual && this.modulo?.exercicios) {
-              const idx = this.modulo.exercicios.findIndex(e => e.id === this.exAtual.id)
-              if (idx !== -1) {
-                this.modulo.exercicios.splice(idx, 1, {
-                  ...this.modulo.exercicios[idx],
-                  status_aluno: status,
-                })
-              }
-            }
           } catch { /* não bloqueia a UI por erro de rede */ }
+        },
+
+        /**
+         * Atualiza o status_aluno no array local de exercícios para a medalha
+         * aparecer imediatamente no card sem precisar recarregar a página.
+         *
+         * Separado de enviarSubmissao() para garantir execução mesmo se o
+         * API call falhar — a medalha é feedback de UX, não depende do backend.
+         * Usa splice() porque Alpine v3 só detecta mutações via métodos nativos
+         * de array (splice/push/pop), não por atribuição direta de índice.
+         */
+        _marcarConcluido(status) {
+          if (!this.exAtual || !this.modulo?.exercicios) return
+          const id  = this.exAtual.id
+          const idx = this.modulo.exercicios.findIndex(e => e.id === id)
+          if (idx === -1) return
+          this.modulo.exercicios.splice(idx, 1, {
+            ...this.modulo.exercicios[idx],
+            status_aluno: status,
+          })
         },
       }))
     })
@@ -842,19 +850,22 @@
                     class="group relative text-left bg-slate-900 hover:bg-slate-800 border rounded-xl p-5 transition-all"
                     :class="ex.status_aluno ? 'border-yellow-500/40 hover:border-yellow-500/60' : 'border-slate-700 hover:border-slate-600'"
                   >
-                    <!-- Faixa de medalha no canto superior esquerdo -->
-                    <template x-if="ex.status_aluno === 'concluido' || ex.status_aluno === 'concluido_com_ajuda'">
-                      <div class="absolute top-0 left-0 w-16 h-16 overflow-hidden rounded-tl-xl pointer-events-none">
-                        <div
-                          class="absolute -rotate-45 flex items-center justify-center w-[4.5rem] py-[3px] text-[11px] font-bold shadow-sm"
-                          :class="ex.status_aluno === 'concluido' ? 'bg-yellow-400 text-yellow-950' : 'bg-slate-400 text-slate-950'"
-                          style="top: 14px; left: -14px"
-                          :title="ex.status_aluno === 'concluido' ? 'Resolvido!' : 'Resolvido com ajuda'"
-                        >
-                          <span x-text="ex.status_aluno === 'concluido' ? '🥇' : '🥉'"></span>
-                        </div>
+                    <!-- Faixa de medalha no canto superior esquerdo.
+                         Usa x-show (não x-if) para reatividade mais confiável
+                         dentro de x-for em Alpine v3 -->
+                    <div
+                      x-show="ex.status_aluno === 'concluido' || ex.status_aluno === 'concluido_com_ajuda'"
+                      class="absolute top-0 left-0 w-16 h-16 overflow-hidden rounded-tl-xl pointer-events-none"
+                    >
+                      <div
+                        class="absolute -rotate-45 flex items-center justify-center w-[4.5rem] py-[3px] text-[11px] font-bold shadow-sm"
+                        :class="ex.status_aluno === 'concluido' ? 'bg-yellow-400 text-yellow-950' : 'bg-slate-400 text-slate-950'"
+                        style="top: 14px; left: -14px"
+                        :title="ex.status_aluno === 'concluido' ? 'Resolvido!' : 'Resolvido com ajuda'"
+                      >
+                        <span x-text="ex.status_aluno === 'concluido' ? '🥇' : '🥉'"></span>
                       </div>
-                    </template>
+                    </div>
 
                     <!-- Cabeçalho: título + badge de dificuldade -->
                     <div class="flex items-start justify-between gap-3 mb-3">
