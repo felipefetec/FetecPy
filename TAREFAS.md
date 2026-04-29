@@ -43,6 +43,16 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 
 ---
 
+## Prompt 3.1 — Tela de login
+- [x] api.js: wrapper fetch com base URL automática via import.meta.url + token Bearer
+- [x] auth.js: login (salva token), logout, verificarSessao (redireciona se logado)
+- [x] index.html: dark slate + verde Python, Tailwind CDN + Alpine.js, mobile-first, animação surgir
+- [x] scripts/dev.sh + scripts/router.php: servidor local com API funcionando
+- [x] Testado: HTML servido, API respondendo via router, testes passando
+- [x] Commit
+
+---
+
 ## Prompt 2.3 — Testes da camada de autenticação
 - [x] Request::simular() adicionado (fábrica para testes sem servidor HTTP)
 - [x] AuthServiceTest.php — 10 testes (normalização, cadastro, PIN, token, logout)
