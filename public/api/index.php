@@ -21,6 +21,7 @@ use FetecPy\Http\Request;
 use FetecPy\Http\Router;
 use FetecPy\Controllers\HealthController;
 use FetecPy\Controllers\AuthController;
+use FetecPy\Controllers\UserController;
 
 // Captura qualquer exceção não tratada e retorna JSON em vez de HTML de erro
 set_exception_handler(function (Throwable $e): void {
@@ -50,8 +51,8 @@ $router->get('health', [HealthController::class, 'index']);
 $router->post('auth/login',  [AuthController::class, 'login']);
 $router->post('auth/logout', [AuthController::class, 'logout']);
 
-// -- Perfil do usuário (Prompt 2.2) --
-// $router->get('me', [UserController::class, 'me']);
+// -- Perfil do usuário --
+$router->get('me', [UserController::class, 'me']);
 
 // -- Módulos (Prompt 4.1) --
 // $router->get('modules',     [ModuleController::class, 'index']);

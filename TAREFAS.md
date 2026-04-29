@@ -43,6 +43,14 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 
 ---
 
+## Prompt 2.2 — Endpoint de perfil
+- [x] Criar src/Controllers/UserController.php (GET /api/me)
+- [x] Registrar rota no index.php
+- [x] Testado: autenticado 200 (sem pin_hash), sem token 401, token inválido 401
+- [x] Commit
+
+---
+
 ## Prompt 2.1 — Sistema de autenticação
 - [x] Criar src/Services/AuthService.php (normalizarChave, cadastrarOuLogin, criarSessao, validarToken, logout, rate limiting)
 - [x] Criar src/Controllers/AuthController.php (POST /api/auth/login, POST /api/auth/logout)
