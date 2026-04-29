@@ -19,5 +19,13 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 - [x] Criar `.gitignore` (já feito no Prompt 0.1)
 - [x] Criar `composer.json` mínimo
 - [x] Criar `install.php` (cria data/, executa migrations, ajusta permissões)
-- [!] Testar `install.php` — PHP não instalado localmente (ver DECISIONS.md 2026-04-29)
+- [x] Testar `install.php` — PHP 8.3 instalado, install.php executado com sucesso
+- [x] Commit
+
+---
+
+## Prompt 1.2 — Migrations e modelo de dados
+- [x] Criar migrations/001_initial.sql com tabelas users, progress, user_badges, sessions, rate_limits e índices
+- [x] Criar src/Database.php — singleton PDO com configurações corretas
+- [x] Testar via install.php — 5 tabelas + 6 índices criados com sucesso
 - [x] Commit
