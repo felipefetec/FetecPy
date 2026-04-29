@@ -36,7 +36,35 @@ else
 fi
 
 # --------------------------------------------------------------
-# Frontend: Vitest
+# Schema dos exercícios JSON (validação rápida em bash)
+# Garante que nenhum campo obrigatório está faltando antes de rodar
+# os testes mais lentos do Vitest
+# --------------------------------------------------------------
+echo ""
+echo "[ JSON] Validando schema dos exercícios..."
+echo "------------------------------"
+
+SCHEMA_OK=true
+CAMPOS_OBRIGATORIOS=("id" "modulo" "ordem" "titulo" "dificuldade" "xp" "enunciado" "antes_de_codar" "validacao")
+
+for json in exercises/**/*.json; do
+    for campo in "${CAMPOS_OBRIGATORIOS[@]}"; do
+        if ! grep -q "\"$campo\"" "$json"; then
+            echo "  FALTANDO campo '$campo' em: $json"
+            SCHEMA_OK=false
+        fi
+    done
+done
+
+if [ "$SCHEMA_OK" = true ]; then
+    echo "[ JSON] Schema de todos os exercícios válido."
+else
+    echo "[ JSON] FALHOU — campos obrigatórios ausentes (ver acima)."
+    PASSOU=false
+fi
+
+# --------------------------------------------------------------
+# Frontend: Vitest (validators + exercises + sanity)
 # --------------------------------------------------------------
 echo ""
 echo "[ JS  ] Rodando Vitest..."
