@@ -35,11 +35,12 @@ const md = markdownit({
 })
 
 // Definições visuais de cada tipo de bloco customizado
+// borda-esq: barra colorida grossa na lateral esquerda para maior destaque visual
 const BLOCOS = {
-  dica:        { titulo: 'Dica',              icone: '💡', borda: 'border-emerald-500/40', fundo: 'bg-emerald-500/5',  texto: 'text-emerald-400' },
-  aviso:       { titulo: 'Atenção',           icone: '⚠️', borda: 'border-amber-500/40',   fundo: 'bg-amber-500/5',    texto: 'text-amber-400'   },
-  curiosidade: { titulo: 'Curiosidade',       icone: '🔍', borda: 'border-blue-500/40',    fundo: 'bg-blue-500/5',     texto: 'text-blue-400'    },
-  tente:       { titulo: 'Tente você mesmo',  icone: '⌨️', borda: 'border-violet-500/40',  fundo: 'bg-violet-500/5',   texto: 'text-violet-400'  },
+  dica:        { titulo: 'Dica',              icone: '💡', borda: 'border-l-4 border-emerald-400', fundo: 'bg-emerald-500/8',  texto: 'text-emerald-300' },
+  aviso:       { titulo: 'Atenção',           icone: '⚠️', borda: 'border-l-4 border-amber-400',   fundo: 'bg-amber-500/8',    texto: 'text-amber-300'   },
+  curiosidade: { titulo: 'Curiosidade',       icone: '🔍', borda: 'border-l-4 border-blue-400',    fundo: 'bg-blue-500/8',     texto: 'text-blue-300'    },
+  tente:       { titulo: 'Tente você mesmo',  icone: '⌨️', borda: 'border-l-4 border-violet-400',  fundo: 'bg-violet-500/8',   texto: 'text-violet-300'  },
 }
 
 /**
@@ -54,7 +55,8 @@ function preprocessarBlocos(markdown) {
       const cfg = BLOCOS[tipo]
       if (!cfg) return _
       const htmlInterno = md.render(conteudo.trim())
-      return `<div class="border rounded-xl p-4 my-6 ${cfg.borda} ${cfg.fundo}"><div class="flex items-center gap-2 mb-2 ${cfg.texto} font-semibold text-sm"><span>${cfg.icone}</span><span>${cfg.titulo}</span></div><div class="text-slate-300 text-sm [&>p]:mb-2 [&>p:last-child]:mb-0">${htmlInterno}</div></div>`
+      // p-6 e text-[1.05rem] para texto interno maior e mais legível
+      return `<div class="rounded-xl pl-6 pr-6 pt-5 pb-5 my-8 ${cfg.borda} ${cfg.fundo}"><div class="flex items-center gap-3 mb-3 ${cfg.texto} font-bold text-xl"><span style="font-size:1.4rem">${cfg.icone}</span><span>${cfg.titulo}</span></div><div class="text-slate-200 text-[1.05rem] leading-relaxed [&>p]:mb-3 [&>p:last-child]:mb-0">${htmlInterno}</div></div>`
     }
   )
 }
