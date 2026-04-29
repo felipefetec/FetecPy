@@ -45,6 +45,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
+  <style>
+    /* Sobrescreve o estilo de autofill do browser (fundo azul/amarelo do Chrome/Firefox)
+       para manter a aparência consistente com o design dark da plataforma */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0 30px #1e293b inset !important;
+      -webkit-text-fill-color: #f1f5f9 !important;
+      caret-color: #f1f5f9;
+    }
+  </style>
+
   <!--
     Módulo principal da página:
     - Importa as funções de auth antes do Alpine carregar
@@ -149,11 +161,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
 </head>
 
-<!--
-  Página começa com opacity-0 para evitar flash de conteúdo durante
-  a verificação de sessão. O componente Alpine adiciona opacity-100.
--->
-<body class="h-full bg-slate-950 text-slate-100 transition-opacity duration-300 opacity-0">
+<body class="h-full bg-slate-950 text-slate-100">
 
   <div
     x-data="loginForm"
@@ -211,19 +219,7 @@
             <label for="nome" class="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wider">
               Nome
             </label>
-            <input
-              id="nome"
-              type="text"
-              x-model="nome"
-              autocomplete="given-name"
-              autocapitalize="words"
-              placeholder="Felipe"
-              :disabled="carregando"
-              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 placeholder-slate-600 text-sm
-                     focus:outline-none focus:ring-2 focus:ring-python-500 focus:border-transparent
-                     disabled:opacity-50 disabled:cursor-not-allowed
-                     transition-colors duration-150"
-            >
+            <input id="nome" type="text" x-model="nome" autocomplete="given-name" autocapitalize="words" placeholder="Felipe" :disabled="carregando" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 placeholder-slate-600 text-sm focus:outline-none focus:ring-2 focus:ring-python-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150">
           </div>
 
           <!-- Sobrenome -->
@@ -231,19 +227,7 @@
             <label for="sobrenome" class="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wider">
               Sobrenome
             </label>
-            <input
-              id="sobrenome"
-              type="text"
-              x-model="sobrenome"
-              autocomplete="family-name"
-              autocapitalize="words"
-              placeholder="Tavares"
-              :disabled="carregando"
-              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 placeholder-slate-600 text-sm
-                     focus:outline-none focus:ring-2 focus:ring-python-500 focus:border-transparent
-                     disabled:opacity-50 disabled:cursor-not-allowed
-                     transition-colors duration-150"
-            >
+            <input id="sobrenome" type="text" x-model="sobrenome" autocomplete="family-name" autocapitalize="words" placeholder="Tavares" :disabled="carregando" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 placeholder-slate-600 text-sm focus:outline-none focus:ring-2 focus:ring-python-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150">
           </div>
 
           <!-- PIN -->
@@ -251,22 +235,7 @@
             <label for="pin" class="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wider">
               PIN
             </label>
-            <input
-              id="pin"
-              x-ref="pin"
-              type="password"
-              inputmode="numeric"
-              pattern="[0-9]*"
-              x-model="pin"
-              autocomplete="current-password"
-              placeholder="••••"
-              maxlength="8"
-              :disabled="carregando"
-              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 placeholder-slate-600 text-sm
-                     focus:outline-none focus:ring-2 focus:ring-python-500 focus:border-transparent
-                     disabled:opacity-50 disabled:cursor-not-allowed
-                     transition-colors duration-150 font-mono tracking-widest"
-            >
+            <input id="pin" x-ref="pin" type="password" inputmode="numeric" pattern="[0-9]*" x-model="pin" autocomplete="current-password" placeholder="••••" maxlength="8" :disabled="carregando" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 placeholder-slate-600 text-sm focus:outline-none focus:ring-2 focus:ring-python-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 font-mono tracking-widest">
           </div>
 
           <!-- Mensagem de erro -->
