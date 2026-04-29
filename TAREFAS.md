@@ -43,6 +43,17 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 
 ---
 
+## Prompt 4.1 — Renderização de conteúdo dos módulos
+- [x] ModuleController: GET /api/modules (lista front-matter), GET /api/modules/:id (conteúdo + exercícios + quiz sem respostas)
+- [x] content/01-algoritmos.md: introdução + seções 1.1-1.6 + mini-projeto + quiz
+- [x] markdown.js: markdown-it ESM + pré-processador de blocos :::tipo + extrairTOC + adicionarAncorasTitulos
+- [x] module.html: sidebar TOC sticky, x-html para conteúdo, navegação Anterior/Próximo, drawer mobile
+- [x] Corrigido: html:true no markdown-it (blocos customizados), x-html em vez de getElementById (timing Alpine)
+- [x] Testado: todos os blocos (aviso, tente, dica, curiosidade) renderizando, código com fonte mono, tabela estilizada
+- [x] Commit
+
+---
+
 ## Prompt 3.2 — Dashboard
 - [x] ProgressController: GET /api/progress com status bloqueado/disponivel/em_andamento/concluido
 - [x] progress.js: carrega progresso e encontra último módulo em andamento

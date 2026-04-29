@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FetecPy — Módulo</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            python: { 400: '#4ade80', 500: '#22c55e', 600: '#16a34a' },
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
+          },
+          typography: {
+            DEFAULT: { css: { color: '#cbd5e1', maxWidth: 'none' } },
+          },
+        },
+      },
+    }
+  </script>
+
+  <!-- JetBrains Mono para blocos de código -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Prism.js para syntax highlighting Python -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+
+  <style>
+    /* Estilos da área de conteúdo Markdown */
+    .conteudo-md h1 { @apply text-2xl font-bold text-slate-100 mt-8 mb-4; }
+    .conteudo-md h2 { @apply text-xl font-bold text-slate-100 mt-8 mb-3 pb-2 border-b border-slate-800; }
+    .conteudo-md h3 { @apply text-lg font-semibold text-slate-200 mt-6 mb-2; }
+    .conteudo-md p  { @apply text-slate-300 leading-relaxed mb-4; }
+    .conteudo-md ul { @apply list-disc list-inside text-slate-300 mb-4 space-y-1 ml-2; }
+    .conteudo-md ol { @apply list-decimal list-inside text-slate-300 mb-4 space-y-1 ml-2; }
+    .conteudo-md li { @apply leading-relaxed; }
+    .conteudo-md strong { @apply text-slate-100 font-semibold; }
+    .conteudo-md em     { @apply text-slate-300 italic; }
+    .conteudo-md a      { @apply text-python-400 hover:text-python-300 underline; }
+    .conteudo-md hr     { @apply border-slate-800 my-8; }
+    .conteudo-md blockquote { @apply border-l-4 border-slate-600 pl-4 text-slate-400 italic my-4; }
+
+    /* Tabelas */
+    .conteudo-md table  { @apply w-full text-sm mb-6; }
+    .conteudo-md thead  { @apply bg-slate-800; }
+    .conteudo-md th     { @apply px-3 py-2 text-left text-slate-300 font-semibold; }
+    .conteudo-md td     { @apply px-3 py-2 text-slate-400 border-t border-slate-800; }
+
+    /* Código inline */
+    .conteudo-md :not(pre) > code {
+      @apply font-mono text-sm bg-slate-800 text-python-400 px-1.5 py-0.5 rounded;
+    }
+
+    /* Blocos de código (Prism.js) */
+    .conteudo-md pre {
+      @apply text-sm my-4 overflow-x-auto;
+    }
+    .conteudo-md pre code { @apply font-mono; }
+
+    /* Barra de rolagem */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+  </style>
+
+  <script type="module">
+    import { verificarSessao }                          from '/assets/js/auth.js'
+    import { apiFetch }                                 from '/assets/js/api.js'
+    import { renderizar, extrairTOC, adicionarAncorasTitulos } from '/assets/js/markdown.js'
+
+    // Ordem dos módulos para navegação Anterior/Próximo
+    const MODULOS_ORDEM = ['01','02','03','04','05','06','07','08']
+
+    // Registra componente Alpine ANTES de qualquer await
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('moduloPage', () => ({
+        modulo:      null,  // dados vindos da API
+        toc:         [],    // índice de seções (TOC)
+        conteudoHtml: '',   // HTML renderizado — vinculado via x-html no template
+        carregando:  true,
+        erro:        '',
+        tocAberto:   false, // drawer do TOC no mobile
+
+        // ID do módulo atual extraído da query string (?id=01)
+        get moduloId() {
+          return new URLSearchParams(window.location.search).get('id') ?? '01'
+        },
+
+        // Módulo anterior e próximo para navegação
+        get anteriorId() {
+          const idx = MODULOS_ORDEM.indexOf(this.moduloId)
+          return idx > 0 ? MODULOS_ORDEM[idx - 1] : null
+        },
+        get proximoId() {
+          const idx = MODULOS_ORDEM.indexOf(this.moduloId)
+          return idx < MODULOS_ORDEM.length - 1 ? MODULOS_ORDEM[idx + 1] : null
+        },
+
+        async init() {
+          try {
+            this.modulo = await apiFetch(`/modules/${this.moduloId}`)
+
+            // Extrai TOC e renderiza o HTML ANTES de liberar o carregando.
+            // Usar x-html em vez de getElementById() evita corrida com x-if:
+            // o Alpine injeta conteudoHtml no elemento quando ele aparecer no DOM.
+            this.toc = extrairTOC(this.modulo.conteudo_md)
+            let html = renderizar(this.modulo.conteudo_md)
+            this.conteudoHtml = adicionarAncorasTitulos(html)
+
+          } catch (e) {
+            if (e.status === 401) { window.location.replace('/index.html'); return }
+            this.erro = e.erro ?? 'Erro ao carregar o módulo.'
+          } finally {
+            this.carregando = false
+            // Roda o Prism após o Alpine inserir o HTML no DOM
+            await this.$nextTick()
+            if (typeof Prism !== 'undefined') {
+              const el = document.getElementById('conteudo-md')
+              if (el) Prism.highlightAllUnder(el)
+            }
+          }
+        },
+
+        // Atualiza título da página quando modulo carrega
+        get tituloCompleto() {
+          if (!this.modulo) return 'FetecPy — Módulo'
+          return `Módulo ${this.modulo.id} — ${this.modulo.titulo}`
+        },
+      }))
+    })
+
+    // Verificação de sessão com .then() — não usar await top-level aqui
+    verificarSessao().then(logado => {
+      if (!logado) window.location.replace('/index.html')
+    })
+  </script>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
+</head>
+
+<body class="h-full bg-slate-950 text-slate-100" x-data="moduloPage">
+
+  <!-- ================================================================
+       Header
+       ================================================================ -->
+  <header class="sticky top-0 z-20 bg-slate-950/90 backdrop-blur border-b border-slate-800">
+    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center gap-3">
+
+      <!-- Botão voltar ao dashboard -->
+      <a href="/app.html" class="text-slate-400 hover:text-slate-200 transition-colors p-1 -ml-1 rounded" aria-label="Voltar ao dashboard">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+        </svg>
+      </a>
+
+      <!-- Título do módulo -->
+      <h1 class="text-sm font-semibold text-slate-200 truncate flex-1" x-text="tituloCompleto"></h1>
+
+      <!-- Botão TOC no mobile -->
+      <button
+        @click="tocAberto = !tocAberto"
+        class="lg:hidden text-slate-400 hover:text-slate-200 transition-colors p-1.5 rounded hover:bg-slate-800"
+        aria-label="Índice do módulo"
+      >
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================================================================
+       Layout principal: sidebar + conteúdo
+       ================================================================ -->
+  <div class="max-w-6xl mx-auto px-4 py-6 flex gap-8 items-start">
+
+    <!-- ============================================================
+         Sidebar — Índice do módulo (TOC)
+         Visível sempre no desktop (lg+), drawer no mobile
+         ============================================================ -->
+    <aside class="hidden lg:block w-56 shrink-0 sticky top-20">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 max-h-[calc(100vh-6rem)] overflow-y-auto">
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Neste módulo</p>
+
+        <!-- Loading skeleton do TOC -->
+        <template x-if="carregando">
+          <div class="space-y-2 animate-pulse">
+            <template x-for="i in 6">
+              <div class="h-3 bg-slate-800 rounded" :style="'width: ' + (60 + Math.random() * 35) + '%'"></div>
+            </template>
+          </div>
+        </template>
+
+        <!-- Links do TOC -->
+        <nav x-show="!carregando" class="space-y-1">
+          <template x-for="item in toc" :key="item.ancora">
+            <a
+              :href="'#' + item.ancora"
+              :class="item.nivel === 3 ? 'pl-4 text-xs' : 'text-sm'"
+              class="block text-slate-400 hover:text-python-400 transition-colors py-1 leading-snug"
+              x-text="item.texto"
+              @click="tocAberto = false"
+            ></a>
+          </template>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- ============================================================
+         Área de conteúdo principal
+         ============================================================ -->
+    <main class="flex-1 min-w-0">
+
+      <!-- Estado de erro -->
+      <template x-if="erro">
+        <div class="bg-red-950 border border-red-900 rounded-xl p-6 text-center">
+          <p class="text-red-300" x-text="erro"></p>
+          <a href="/app.html" class="mt-3 inline-block text-sm text-slate-400 hover:text-slate-200">← Voltar ao dashboard</a>
+        </div>
+      </template>
+
+      <!-- Loading skeleton do conteúdo -->
+      <template x-if="carregando && !erro">
+        <div class="space-y-4 animate-pulse">
+          <div class="h-8 bg-slate-800 rounded w-3/4"></div>
+          <div class="h-4 bg-slate-800 rounded w-full"></div>
+          <div class="h-4 bg-slate-800 rounded w-5/6"></div>
+          <div class="h-4 bg-slate-800 rounded w-full"></div>
+          <div class="h-4 bg-slate-800 rounded w-4/5"></div>
+          <div class="h-32 bg-slate-800 rounded w-full mt-6"></div>
+          <div class="h-4 bg-slate-800 rounded w-full"></div>
+          <div class="h-4 bg-slate-800 rounded w-3/4"></div>
+        </div>
+      </template>
+
+      <!-- Conteúdo do módulo renderizado -->
+      <template x-if="!carregando && !erro">
+        <div>
+          <!-- x-html injeta o Markdown renderizado diretamente via Alpine,
+               evitando corrida com x-if que causava elemento não encontrado -->
+          <article id="conteudo-md" class="conteudo-md" x-html="conteudoHtml"></article>
+
+          <!-- Navegação Anterior / Próximo -->
+          <nav class="mt-12 pt-8 border-t border-slate-800 flex items-center justify-between gap-4">
+
+            <!-- Anterior -->
+            <div class="flex-1">
+              <template x-if="anteriorId">
+                <a :href="'/module.html?id=' + anteriorId" class="group flex items-center gap-3 text-slate-400 hover:text-slate-200 transition-colors">
+                  <span class="w-8 h-8 rounded-lg border border-slate-700 group-hover:border-slate-500 flex items-center justify-center transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/>
+                    </svg>
+                  </span>
+                  <div>
+                    <p class="text-xs text-slate-600">Anterior</p>
+                    <p class="text-sm font-medium" x-text="'Módulo ' + anteriorId"></p>
+                  </div>
+                </a>
+              </template>
+            </div>
+
+            <!-- Voltar ao dashboard -->
+            <a href="/app.html" class="text-xs text-slate-600 hover:text-slate-400 transition-colors">Dashboard</a>
+
+            <!-- Próximo -->
+            <div class="flex-1 flex justify-end">
+              <template x-if="proximoId">
+                <a :href="'/module.html?id=' + proximoId" class="group flex items-center gap-3 text-slate-400 hover:text-slate-200 transition-colors text-right">
+                  <div>
+                    <p class="text-xs text-slate-600">Próximo</p>
+                    <p class="text-sm font-medium" x-text="'Módulo ' + proximoId"></p>
+                  </div>
+                  <span class="w-8 h-8 rounded-lg border border-slate-700 group-hover:border-slate-500 flex items-center justify-center transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+                    </svg>
+                  </span>
+                </a>
+              </template>
+            </div>
+
+          </nav>
+        </div>
+      </template>
+
+    </main>
+  </div>
+
+  <!-- ================================================================
+       Drawer TOC para mobile
+       ================================================================ -->
+  <div
+    x-show="tocAberto"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    @click.self="tocAberto = false"
+    class="fixed inset-0 z-30 bg-black/60 lg:hidden"
+  >
+    <div
+      x-show="tocAberto"
+      x-transition:enter="transition ease-out duration-250"
+      x-transition:enter-start="-translate-x-full"
+      x-transition:enter-end="translate-x-0"
+      class="absolute left-0 top-0 bottom-0 w-72 bg-slate-900 border-r border-slate-800 p-5 overflow-y-auto"
+    >
+      <div class="flex items-center justify-between mb-4">
+        <p class="text-sm font-semibold text-slate-300">Índice do módulo</p>
+        <button @click="tocAberto = false" class="text-slate-500 hover:text-slate-300 p-1">✕</button>
+      </div>
+      <nav class="space-y-1">
+        <template x-for="item in toc" :key="item.ancora">
+          <a
+            :href="'#' + item.ancora"
+            :class="item.nivel === 3 ? 'pl-4 text-xs' : 'text-sm'"
+            class="block text-slate-400 hover:text-python-400 transition-colors py-1.5 leading-snug"
+            x-text="item.texto"
+            @click="tocAberto = false"
+          ></a>
+        </template>
+      </nav>
+    </div>
+  </div>
+
+</body>
+</html>
