@@ -40,3 +40,17 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 - [x] Endpoint GET /api/health
 - [x] Testar com curl — health 200, rota inexistente 404, método errado 405
 - [x] Commit
+
+---
+
+## Prompt 1.4 — Setup de testes automatizados
+- [x] Adicionar phpunit/phpunit ao composer.json (require-dev) e instalar
+- [x] Criar phpunit.xml
+- [x] Criar tests/bootstrap.php (banco em memória + modo teste JsonResponse)
+- [x] Criar tests/Backend/HealthCheckTest.php (2 testes passando)
+- [x] Criar package.json com vitest + npm install
+- [x] Criar vitest.config.js
+- [x] Criar tests/Frontend/sanity.test.js (3 testes passando)
+- [x] Criar scripts/test.sh e tornar executável
+- [x] ./scripts/test.sh — 5 testes passando (2 PHP + 3 JS)
+- [x] Commit

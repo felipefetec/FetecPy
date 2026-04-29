@@ -4,6 +4,10 @@
  *
  * Centraliza a serialização e os cabeçalhos HTTP, garantindo que toda
  * a API retorne o mesmo formato — inclusive nos casos de erro.
+ *
+ * Em testes: definir JsonResponse::$modoTeste = true faz com que
+ * os métodos lancem ResponseException em vez de chamar exit(),
+ * permitindo capturar e inspecionar a resposta sem encerrar o processo.
  */
 declare(strict_types=1);
 
@@ -12,6 +16,12 @@ namespace FetecPy\Http;
 class JsonResponse
 {
     /**
+     * Quando true, lança ResponseException em vez de chamar exit().
+     * Ativado em tests/bootstrap.php para não encerrar o PHPUnit.
+     */
+    public static bool $modoTeste = false;
+
+    /**
      * Envia uma resposta JSON de sucesso com os dados fornecidos.
      *
      * @param mixed $dados  Qualquer valor serializável em JSON
@@ -19,9 +29,8 @@ class JsonResponse
      */
     public static function enviar(mixed $dados, int $status = 200): never
     {
-        self::definirCabecalhos($status);
-        echo json_encode($dados, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        exit;
+        $corpo = json_encode($dados, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        self::finalizar($corpo, $status);
     }
 
     /**
@@ -34,11 +43,28 @@ class JsonResponse
      */
     public static function erro(string $mensagem, int $status = 400): never
     {
-        self::definirCabecalhos($status);
-        echo json_encode(
+        $corpo = json_encode(
             ['erro' => $mensagem],
             JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
         );
+        self::finalizar($corpo, $status);
+    }
+
+    /**
+     * Ponto único de saída: envia os cabeçalhos, escreve o corpo e encerra.
+     *
+     * Em modo de teste, lança ResponseException para que o PHPUnit
+     * possa capturar e inspecionar a resposta sem interromper a suíte.
+     */
+    private static function finalizar(string $corpo, int $status): never
+    {
+        if (self::$modoTeste) {
+            // Em testes, não enviamos cabeçalhos nem chamamos exit()
+            throw new ResponseException($corpo, $status);
+        }
+
+        self::definirCabecalhos($status);
+        echo $corpo;
         exit;
     }
 

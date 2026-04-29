@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Configuração do PHPUnit para o projeto FetecPy.
+    Suítes separadas para facilitar rodar só backend ou só conteúdo.
+-->
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+    bootstrap="tests/bootstrap.php"
+    colors="true"
+    stopOnFailure="false"
+>
+    <testsuites>
+        <!-- Testes de lógica de backend: controllers, services, models -->
+        <testsuite name="Backend">
+            <directory>tests/Backend</directory>
+        </testsuite>
+
+        <!-- Testes de conteúdo: valida schema dos exercícios e quizzes (Prompt 7.4) -->
+        <testsuite name="Content">
+            <directory>tests/Content</directory>
+        </testsuite>
+    </testsuites>
+
+    <!-- Cobertura de código: mede quais linhas de src/ são exercidas pelos testes -->
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+</phpunit>
