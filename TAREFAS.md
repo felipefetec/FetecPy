@@ -29,3 +29,14 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 - [x] Criar src/Database.php — singleton PDO com configurações corretas
 - [x] Testar via install.php — 5 tabelas + 6 índices criados com sucesso
 - [x] Commit
+
+---
+
+## Prompt 1.3 — Sistema de roteamento básico
+- [x] Criar src/Http/Request.php
+- [x] Criar src/Http/JsonResponse.php
+- [x] Criar src/Http/Router.php
+- [x] Atualizar public/api/index.php como front controller
+- [x] Endpoint GET /api/health
+- [x] Testar com curl — health 200, rota inexistente 404, método errado 405
+- [x] Commit
