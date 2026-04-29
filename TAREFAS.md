@@ -43,6 +43,18 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 
 ---
 
+## Prompt 2.1 — Sistema de autenticação
+- [x] Criar src/Services/AuthService.php (normalizarChave, cadastrarOuLogin, criarSessao, validarToken, logout, rate limiting)
+- [x] Criar src/Controllers/AuthController.php (POST /api/auth/login, POST /api/auth/logout)
+- [x] Criar src/Http/AuthMiddleware.php
+- [x] Criar src/Exceptions/AuthException.php
+- [x] Adicionar $user ao Request e registrar rotas no index.php
+- [x] Testar com curl — cadastro 201, login 200, PIN errado 401, sem campo 422, logout 200, sem token 401
+- [x] Testes anteriores passando (não-regressão)
+- [x] Commit
+
+---
+
 ## Prompt 1.4 — Setup de testes automatizados
 - [x] Adicionar phpunit/phpunit ao composer.json (require-dev) e instalar
 - [x] Criar phpunit.xml

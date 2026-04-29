@@ -21,6 +21,10 @@ class Request
     // Parâmetros extraídos da URL pelo Router, ex: ['id' => '01', 'exId' => 'ex02']
     public array $params = [];
 
+    // Dados do usuário autenticado, populados pelo AuthMiddleware.
+    // Null enquanto a rota não exigir autenticação ou o token for inválido.
+    public ?array $user = null;
+
     // Query string parseada, ex: ?page=2&limit=10 → ['page' => '2', 'limit' => '10']
     public readonly array $query;
 
