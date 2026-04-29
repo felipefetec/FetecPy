@@ -53,10 +53,6 @@
     import { carregarProgresso }       from '/assets/js/progress.js'
     import { mesclarBadges, formatarXp, BADGES_CATALOGO } from '/assets/js/gamification.js'
 
-    // Redireciona para login se não estiver autenticado
-    const logado = await verificarSessao()
-    if (!logado) window.location.replace('/index.html')
-
     // Títulos dos módulos — referência ao PLANO_ESTUDOS.md
     const TITULOS_MODULOS = {
       '01': 'Lógica e Algoritmos',
@@ -142,6 +138,13 @@
         },
       }))
     })
+
+  // Verificação de sessão com .then() — NÃO usar await aqui no topo.
+  // O await top-level pausa o módulo inteiro antes de registrar o alpine:init,
+  // fazendo Alpine carregar sem encontrar o componente 'dashboard'.
+  verificarSessao().then(logado => {
+    if (!logado) window.location.replace('/index.html')
+  })
   </script>
 
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
