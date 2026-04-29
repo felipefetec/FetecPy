@@ -28,8 +28,9 @@ class Request
     // Query string parseada, ex: ?page=2&limit=10 → ['page' => '2', 'limit' => '10']
     public readonly array $query;
 
-    // Corpo da requisição decodificado como array associativo (espera JSON)
-    public readonly array $body;
+    // Corpo da requisição decodificado como array associativo (espera JSON).
+    // Não é readonly para permitir injeção nos testes via Request::simular().
+    public array $body;
 
     // Cabeçalhos HTTP normalizados em lowercase com underscores, ex: 'authorization'
     private array $headers;
@@ -41,6 +42,41 @@ class Request
         $this->query   = $_GET ?? [];
         $this->body    = $this->parsearCorpo();
         $this->headers = $this->parsearCabecalhos();
+    }
+
+    /**
+     * Fábrica para uso exclusivo em testes — simula uma requisição HTTP.
+     *
+     * Em vez de depender de $_SERVER e php://input (indisponíveis no PHPUnit),
+     * recebe os dados diretamente e os injeta no objeto Request.
+     *
+     * @param string $method  Método HTTP: 'GET', 'POST', etc.
+     * @param string $path    Caminho sem /api/, ex: 'auth/login'
+     * @param array  $body    Corpo JSON simulado
+     * @param array  $headers Cabeçalhos extras, ex: ['Authorization' => 'Bearer abc']
+     */
+    public static function simular(
+        string $method,
+        string $path,
+        array $body = [],
+        array $headers = []
+    ): static {
+        // Prepara $_SERVER para que o construtor leia corretamente
+        $_SERVER['REQUEST_METHOD'] = strtoupper($method);
+        $_SERVER['REQUEST_URI']    = '/api/' . ltrim($path, '/');
+
+        // Mapeia cabeçalhos para o formato HTTP_* que $_SERVER usa
+        // Limpa o Authorization anterior para evitar contaminação entre testes
+        unset($_SERVER['HTTP_AUTHORIZATION']);
+        foreach ($headers as $nome => $valor) {
+            $chave = 'HTTP_' . strtoupper(str_replace('-', '_', $nome));
+            $_SERVER[$chave] = $valor;
+        }
+
+        $instance       = new static();
+        $instance->body = $body; // Sobrescreve o body (php://input está vazio em CLI)
+
+        return $instance;
     }
 
     /**
@@ -113,8 +149,8 @@ class Request
     {
         $cabecalhos = [];
 
-        // getallheaders() está disponível em Apache e php -S (servidor embutido)
-        // Em outros ambientes, fazemos fallback para $_SERVER
+        // getallheaders() está disponível em Apache e php -S (servidor embutido).
+        // Em CLI (PHPUnit), não existe — usamos o fallback via $_SERVER.
         if (function_exists('getallheaders')) {
             foreach (getallheaders() as $nome => $valor) {
                 $chave = strtolower(str_replace('-', '_', $nome));

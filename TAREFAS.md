@@ -43,6 +43,16 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 
 ---
 
+## Prompt 2.3 — Testes da camada de autenticação
+- [x] Request::simular() adicionado (fábrica para testes sem servidor HTTP)
+- [x] AuthServiceTest.php — 10 testes (normalização, cadastro, PIN, token, logout)
+- [x] AuthControllerTest.php — 8 testes (login 201/200/401/422, rate limit 429, logout 401/200)
+- [x] UserControllerTest.php — 5 testes (perfil, 401 sem token, 401 token inválido, sem pin_hash, usuário correto)
+- [x] ./scripts/test.sh — 26 testes PHP + 3 JS, todos passando
+- [x] Commit
+
+---
+
 ## Prompt 2.2 — Endpoint de perfil
 - [x] Criar src/Controllers/UserController.php (GET /api/me)
 - [x] Registrar rota no index.php
