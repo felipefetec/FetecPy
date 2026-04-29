@@ -868,24 +868,24 @@
                           :fill="ex.status_aluno === 'concluido' ? '#1D4ED8' : '#4B5563'"/>
                         <path d="M27 33 L33 33 L30 45 Z"
                           :fill="ex.status_aluno === 'concluido' ? '#1E3A8A' : '#374151'" opacity="0.5"/>
-                        <!-- Sombra (-15%: r=21→18, cy sobe 2px) -->
-                        <circle cx="26" cy="22" r="18"
+                        <!-- Sombra (r=18→16) -->
+                        <circle cx="26" cy="22" r="16"
                           :fill="ex.status_aluno === 'concluido' ? '#B8690A' : '#7C3A0A'"/>
-                        <!-- Anel externo (-15%: r=18) -->
-                        <circle cx="26" cy="21" r="18"
-                          :fill="ex.status_aluno === 'concluido' ? '#F59E0B' : '#92400E'"/>
-                        <!-- Corpo principal (-15%: r=19→16) -->
+                        <!-- Anel externo (r=18→16) -->
                         <circle cx="26" cy="21" r="16"
+                          :fill="ex.status_aluno === 'concluido' ? '#F59E0B' : '#92400E'"/>
+                        <!-- Corpo principal (r=16→14) -->
+                        <circle cx="26" cy="21" r="14"
                           :fill="ex.status_aluno === 'concluido' ? '#FCD34D' : '#D97706'"/>
-                        <!-- Brilho especular (-15%: rx=6→5, ry=5→4) -->
-                        <ellipse cx="19" cy="14" rx="5" ry="4" fill="white" opacity="0.28"/>
-                        <!-- Anel decorativo interno (-15%: r=14→12) -->
-                        <circle cx="26" cy="21" r="12" fill="none"
+                        <!-- Brilho especular (rx=5→4, ry=4→3) -->
+                        <ellipse cx="19" cy="14" rx="4" ry="3" fill="white" opacity="0.28"/>
+                        <!-- Anel decorativo interno (r=12→11) -->
+                        <circle cx="26" cy="21" r="11" fill="none"
                           :stroke="ex.status_aluno === 'concluido' ? '#F59E0B' : '#92400E'"
                           stroke-width="1.5"/>
-                        <!-- Número "1" (-15%: font-size=17→15, y ajustado) -->
-                        <text x="26" y="27" text-anchor="middle"
-                          font-size="15" font-weight="900"
+                        <!-- Número "1" (font-size=15→13) -->
+                        <text x="26" y="26" text-anchor="middle"
+                          font-size="13" font-weight="900"
                           font-family="Georgia,'Times New Roman',serif"
                           :fill="ex.status_aluno === 'concluido' ? '#92400E' : '#7C2D12'">1</text>
                       </svg>
