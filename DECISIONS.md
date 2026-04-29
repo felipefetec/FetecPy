@@ -5,12 +5,12 @@ Formato: data — título — contexto — decisão — consequências.
 
 ---
 
-## 2026-04-29 — PHP não instalado localmente
+## 2026-04-29 — PHP instalado localmente para testes
 
-**Contexto:** Durante o Prompt 1.1, ao tentar rodar `install.php` para validar a estrutura, constatou-se que PHP não está instalado na máquina de desenvolvimento (WSL2 Ubuntu).
+**Contexto:** O projeto roda em hospedagem PHP compartilhada, mas não faz sentido depender do servidor remoto para validar código durante o desenvolvimento.
 
-**Decisão:** Não instalar PHP localmente por enquanto. O projeto é direcionado a hospedagem PHP compartilhada; testes de backend serão rodados quando PHP for instalado ou via container Docker pontual. Scripts `composer` e `phpunit` ficam pendentes de PHP.
+**Decisão:** PHP 8.3 instalado localmente via `apt` (php-cli, php-sqlite3, php-mbstring). Todos os testes de backend rodam na máquina local, sem precisar subir para o host.
 
-**Consequências:** Testes de backend (PHPUnit) não rodam até que PHP seja instalado. Testes de frontend (Vitest/Node) rodam normalmente. O Prompt 1.4 (setup de testes) precisará instalar PHP primeiro.
+**Consequências:** `install.php`, PHPUnit e qualquer script PHP podem ser executados localmente. Ciclo de desenvolvimento mais rápido e independente do servidor de produção.
 
-**Alternativas consideradas:** Usar Docker com PHP — descartado por ora para não adicionar complexidade à máquina local que já tem Docker para a VPS.
+**Alternativas consideradas:** Usar Docker com PHP — descartado por adicionar complexidade desnecessária quando o `apt` resolve com menos fricção.
