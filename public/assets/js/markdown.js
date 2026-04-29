@@ -37,10 +37,10 @@ const md = markdownit({
 // Definições visuais de cada tipo de bloco customizado
 // borda-esq: barra colorida grossa na lateral esquerda para maior destaque visual
 const BLOCOS = {
-  dica:        { titulo: 'Dica',              icone: '💡', borda: 'border-l-4 border-emerald-400', fundo: 'bg-emerald-500/8',  texto: 'text-emerald-300' },
-  aviso:       { titulo: 'Atenção',           icone: '⚠️', borda: 'border-l-4 border-amber-400',   fundo: 'bg-amber-500/8',    texto: 'text-amber-300'   },
-  curiosidade: { titulo: 'Curiosidade',       icone: '🔍', borda: 'border-l-4 border-blue-400',    fundo: 'bg-blue-500/8',     texto: 'text-blue-300'    },
-  tente:       { titulo: 'Tente você mesmo',  icone: '⌨️', borda: 'border-l-4 border-violet-400',  fundo: 'bg-violet-500/8',   texto: 'text-violet-300'  },
+  dica:        { titulo: 'Dica',              icone: '💡', borda: 'border-l-4 border-emerald-400', fundo: 'bg-emerald-500/20',  texto: 'text-emerald-300' },
+  aviso:       { titulo: 'Atenção',           icone: '⚠️', borda: 'border-l-4 border-amber-400',   fundo: 'bg-amber-500/20',    texto: 'text-amber-300'   },
+  curiosidade: { titulo: 'Curiosidade',       icone: '🔍', borda: 'border-l-4 border-blue-400',    fundo: 'bg-blue-500/20',     texto: 'text-blue-300'    },
+  tente:       { titulo: 'Tente você mesmo',  icone: '⌨️', borda: 'border-l-4 border-violet-400',  fundo: 'bg-violet-500/20',   texto: 'text-violet-300'  },
 }
 
 /**
