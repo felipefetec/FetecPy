@@ -850,19 +850,29 @@
                     class="group relative overflow-hidden text-left bg-slate-900 hover:bg-slate-800 border rounded-xl p-5 transition-all"
                     :class="ex.status_aluno ? 'border-yellow-500/40 hover:border-yellow-500/60' : 'border-slate-700 hover:border-slate-600'"
                   >
-                    <!-- Triângulo de medalha — preenche o canto superior esquerdo.
-                         clip-path cria o triângulo; overflow-hidden no botão pai
-                         garante que respeita o border-radius do card. -->
+                    <!-- Medalha com faixa diagonal.
+                         Container w-16 (64px) com overflow-hidden recorta a faixa
+                         nas bordas do canto. Faixa w-24 (96px) > diagonal (91px)
+                         para as pontas tocarem as bordas. Emoji posicionado no
+                         centro da diagonal, maior que a faixa para "sobressair". -->
                     <div
                       x-show="ex.status_aluno === 'concluido' || ex.status_aluno === 'concluido_com_ajuda'"
-                      class="absolute top-0 left-0 w-20 h-20 pointer-events-none"
-                      :class="ex.status_aluno === 'concluido' ? 'bg-yellow-400' : 'bg-slate-500'"
-                      style="clip-path: polygon(0 0, 100% 0, 0 100%)"
+                      class="absolute top-0 left-0 w-16 h-16 overflow-hidden rounded-tl-xl pointer-events-none"
                       :title="ex.status_aluno === 'concluido' ? 'Resolvido!' : 'Resolvido com ajuda'"
                     >
+                      <!-- Faixa: retângulo de 96×32px rotacionado -45°,
+                           centrado em (32,32) do container:
+                           top = 32 - 16 = 16px  |  left = 32 - 48 = -16px -->
+                      <div
+                        class="absolute -rotate-45 w-24 h-8"
+                        :class="ex.status_aluno === 'concluido' ? 'bg-yellow-400' : 'bg-slate-500'"
+                        style="top: 16px; left: -16px"
+                      ></div>
+                      <!-- Emoji: centralizado no diagonal, text-2xl sobressai
+                           levemente da faixa de 32px de altura -->
                       <span
                         class="absolute text-2xl leading-none"
-                        style="top: 9px; left: 9px"
+                        style="top: 10px; left: 10px"
                         x-text="ex.status_aluno === 'concluido' ? '🥇' : '🥉'"
                       ></span>
                     </div>
