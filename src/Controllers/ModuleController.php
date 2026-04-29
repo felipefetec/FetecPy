@@ -16,13 +16,14 @@ namespace FetecPy\Controllers;
 use FetecPy\Http\AuthMiddleware;
 use FetecPy\Http\JsonResponse;
 use FetecPy\Http\Request;
+use FetecPy\Services\ProgressService;
 
 class ModuleController
 {
-    // Caminho base dos arquivos de conteúdo
     private string $contentDir;
     private string $exercisesDir;
     private string $quizDir;
+    private ProgressService $progress;
 
     public function __construct()
     {
@@ -30,6 +31,7 @@ class ModuleController
         $this->contentDir   = $raiz . '/content';
         $this->exercisesDir = $raiz . '/exercises';
         $this->quizDir      = $raiz . '/content/quiz';
+        $this->progress     = new ProgressService();
     }
 
     // ----------------------------------------------------------------
@@ -91,6 +93,75 @@ class ModuleController
             'conteudo_md'  => $markdown,
             'exercicios'   => $exercicios,
             'quiz'         => $quiz,
+        ]);
+    }
+
+    // ----------------------------------------------------------------
+    // GET /api/modules/:id/sections
+    // Retorna quais seções do módulo o aluno já marcou como lidas.
+    // ----------------------------------------------------------------
+
+    public function listarSecoes(Request $request): void
+    {
+        AuthMiddleware::exigir($request);
+
+        $userId   = (int) $request->user['id'];
+        $moduloId = $request->params['id'] ?? '';
+
+        if (!preg_match('/^\d{2}$/', $moduloId)) {
+            JsonResponse::erro('ID de módulo inválido.', 400);
+        }
+
+        $pdo  = \FetecPy\Database::getConnection();
+        $stmt = $pdo->prepare(
+            'SELECT item_id FROM progress
+             WHERE user_id = ? AND modulo = ? AND item_tipo = "secao" AND status = "concluido"'
+        );
+        $stmt->execute([$userId, $moduloId]);
+        $lidas = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+
+        $total     = $this->contarSecoesModulo($moduloId);
+        $percentual = $total > 0 ? (int) round((count($lidas) / $total) * 100) : 0;
+
+        JsonResponse::enviar([
+            'lidas'     => $lidas,
+            'total'     => $total,
+            'percentual' => $percentual,
+        ]);
+    }
+
+    // ----------------------------------------------------------------
+    // POST /api/modules/:id/sections/:secaoId
+    // Marca uma seção como lida e retorna % de progresso do módulo.
+    // ----------------------------------------------------------------
+
+    public function marcarSecao(Request $request): void
+    {
+        AuthMiddleware::exigir($request);
+
+        $userId   = (int) $request->user['id'];
+        $moduloId = $request->params['id']      ?? '';
+        $secaoId  = $request->params['secaoId'] ?? '';
+
+        if (!preg_match('/^\d{2}$/', $moduloId)) {
+            JsonResponse::erro('ID de módulo inválido.', 400);
+        }
+        if (empty($secaoId)) {
+            JsonResponse::erro('ID da seção é obrigatório.', 400);
+        }
+
+        $this->progress->marcarSecaoLida($userId, $moduloId, $secaoId);
+
+        // Conta total de seções disponíveis no módulo (baseado no arquivo MD)
+        $totalSecoes = $this->contarSecoesModulo($moduloId);
+        $lidas       = $this->progress->secoesLidas($userId, $moduloId);
+        $percent     = $totalSecoes > 0 ? (int) round(($lidas / $totalSecoes) * 100) : 0;
+
+        JsonResponse::enviar([
+            'secao_id'     => $secaoId,
+            'secoes_lidas' => $lidas,
+            'total_secoes' => $totalSecoes,
+            'percent'      => $percent,
         ]);
     }
 
@@ -237,6 +308,23 @@ class ModuleController
             unset($pergunta['resposta_correta']);
             return $pergunta;
         }, $dados);
+    }
+
+    /**
+     * Conta as seções H2 (##) no arquivo Markdown de um módulo.
+     * Usado para calcular % de progresso de leitura.
+     */
+    private function contarSecoesModulo(string $moduloId): int
+    {
+        $arquivo = $this->encontrarArquivoModulo($moduloId);
+        if ($arquivo === null) {
+            return 0;
+        }
+
+        $conteudo = file_get_contents($arquivo);
+        // Conta linhas que começam com ## (seção de nível 2)
+        preg_match_all('/^## .+/m', $conteudo, $matches);
+        return count($matches[0]);
     }
 
     /**

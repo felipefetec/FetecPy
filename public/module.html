@@ -81,6 +81,7 @@
     import { renderizar, extrairTOC, adicionarAncorasTitulos }  from '/assets/js/markdown.js'
     import { carregarPyodide, runPython, pyodidePronto }        from '/assets/js/pyodide.js'
     import { validar, validateTextLivre }                        from '/assets/js/validator.js'
+    import { processarRespostaGamificacao }                      from '/assets/js/gamification.js'
     // criarEditor é importado dinamicamente dentro de ativarEditoresTente(),
     // para não atrasar o registro do alpine:init com requisições para esm.sh
 
@@ -116,12 +117,22 @@
           try {
             this.modulo = await apiFetch(`/modules/${this.moduloId}`)
 
-            // Extrai TOC e renderiza o HTML ANTES de liberar o carregando.
-            // Usar x-html em vez de getElementById() evita corrida com x-if:
-            // o Alpine injeta conteudoHtml no elemento quando ele aparecer no DOM.
+            // Extrai TOC e renderiza o HTML ANTES de liberar o carregando
             this.toc = extrairTOC(this.modulo.conteudo_md)
             let html = renderizar(this.modulo.conteudo_md)
             this.conteudoHtml = adicionarAncorasTitulos(html)
+
+            // Carrega seções já lidas (barra de progresso de leitura)
+            try {
+              const regsProgress = await apiFetch(`/progress`)
+              // ProgressController retorna array de módulos; buscamos seções lidas
+              // no array geral de itens de progresso do usuário via endpoint dedicado
+              const secoesResp = await apiFetch(`/modules/${this.moduloId}/sections`)
+              this.secoesLidas   = new Set((secoesResp.lidas ?? []))
+              this.totalSecoes   = this.toc.length
+              this.percentSecoes = this.totalSecoes > 0
+                ? Math.round((this.secoesLidas.size / this.totalSecoes) * 100) : 0
+            } catch { /* progresso de seções é opcional */ }
 
           } catch (e) {
             if (e.status === 401) { window.location.replace('/index.html'); return }
@@ -181,6 +192,24 @@
         rodando: false,
         testando: false,
         progressoValidacao: 0,  // 0-100 — controla a barra de progresso do timer de análise
+
+        // ----------------------------------------------------------------
+        // Estado do quiz
+        // ----------------------------------------------------------------
+        quizAberto: false,
+        quizIdx: 0,             // índice da pergunta atual
+        quizRespostas: [],      // índices das respostas escolhidas
+        quizResultados: [],     // { correta, gabarito, explicacao } por pergunta
+        quizConcluido: false,
+        quizEnviando: false,
+        quizStreakAnterior: 0,  // streak antes de iniciar o quiz, para detectar aumento
+
+        // ----------------------------------------------------------------
+        // Estado do progresso de seções
+        // ----------------------------------------------------------------
+        secoesLidas: new Set(),   // IDs das seções já marcadas como lidas
+        totalSecoes: 0,           // total de seções do módulo (vindo da API)
+        percentSecoes: 0,         // % de seções lidas
 
         // ----------------------------------------------------------------
         // Helpers do modal
@@ -400,23 +429,117 @@
           } catch { /* silencioso — salvar é best-effort */ }
         },
 
-        /** Envia a submissão ao backend e atualiza XP/badges */
+        /** Envia a submissão ao backend e dispara notificações de gamificação */
         async enviarSubmissao(status, codigo) {
           try {
-            const exId = this.exAtual.id.split('-')[1] // "01-ex03" → "ex03"
-            const resp = await apiFetch(
+            const exId         = this.exAtual.id.split('-')[1] // "01-ex03" → "ex03"
+            const streakBefore = this.modulo?._streakAtual ?? 0
+            const resp         = await apiFetch(
               `/modules/${this.moduloId}/exercises/${exId}/submit`,
               {
                 method: 'POST',
-                body: JSON.stringify({ codigo, status, tentativas: this.tentativas }),
+                body: JSON.stringify({
+                  codigo,
+                  status,
+                  tentativas: this.tentativas,
+                  hora_local: new Date().toTimeString().slice(0, 5),
+                }),
               }
             )
             this.xpGanho     = resp.xp_ganho    ?? 0
             this.novasBadges = resp.novas_badges ?? []
+            // Guarda streak atual para comparação na próxima submissão
+            if (this.modulo) this.modulo._streakAtual = resp.streak_dias ?? 0
             if (resp.solucao) {
               this.exAtual = { ...this.exAtual, solucao: resp.solucao }
             }
+            // Dispara toasts de XP/badge/streak
+            processarRespostaGamificacao(resp, streakBefore)
           } catch { /* não bloqueia a UI por erro de rede */ }
+        },
+
+        // ----------------------------------------------------------------
+        // Métodos do quiz
+        // ----------------------------------------------------------------
+
+        /** Abre o quiz do módulo */
+        abrirQuiz() {
+          this.quizIdx        = 0
+          this.quizRespostas  = []
+          this.quizResultados = []
+          this.quizConcluido  = false
+          this.quizStreakAnterior = this.modulo?._streakAtual ?? 0
+          this.quizAberto = true
+        },
+
+        /** Marca a opção selecionada para a pergunta atual */
+        selecionarOpcaoQuiz(indice) {
+          if (this.quizResultados[this.quizIdx]) return  // já respondida
+          this.quizRespostas[this.quizIdx] = indice
+        },
+
+        /** Envia a resposta da pergunta atual ao backend */
+        async confirmarRespostaQuiz() {
+          if (this.quizEnviando) return
+          const perguntas = this.modulo?.quiz ?? []
+          const pergunta  = perguntas[this.quizIdx]
+          if (!pergunta) return
+
+          const resposta = this.quizRespostas[this.quizIdx]
+          if (resposta === undefined) return  // usuário não selecionou nada
+
+          this.quizEnviando = true
+          try {
+            const streakBefore = this.modulo?._streakAtual ?? 0
+            const resp = await apiFetch(`/modules/${this.moduloId}/quiz/submit`, {
+              method: 'POST',
+              body: JSON.stringify({
+                pergunta_id: pergunta.id,
+                resposta,
+                hora_local: new Date().toTimeString().slice(0, 5),
+              }),
+            })
+            // Guarda resultado desta pergunta
+            this.quizResultados[this.quizIdx] = {
+              correta:    resp.correta,
+              gabarito:   resp.gabarito,
+              explicacao: resp.explicacao ?? null,
+            }
+            if (this.modulo) this.modulo._streakAtual = resp.streak_dias ?? 0
+            processarRespostaGamificacao(resp, streakBefore)
+          } catch { /* não bloqueia — resultado visual não depende do backend */
+            this.quizResultados[this.quizIdx] = { correta: null, gabarito: -1, explicacao: null }
+          } finally {
+            this.quizEnviando = false
+          }
+        },
+
+        /** Avança para a próxima pergunta ou encerra o quiz */
+        proximaPerguntaQuiz() {
+          const total = this.modulo?.quiz?.length ?? 0
+          if (this.quizIdx < total - 1) {
+            this.quizIdx++
+          } else {
+            this.quizConcluido = true
+          }
+        },
+
+        /** Calcula acertos no quiz concluído */
+        get quizAcertos() {
+          return this.quizResultados.filter(r => r?.correta === true).length
+        },
+
+        /** Marca uma seção do TOC como lida */
+        async marcarSecao(secaoId) {
+          if (this.secoesLidas.has(secaoId)) return
+          this.secoesLidas.add(secaoId)
+          this.percentSecoes = this.totalSecoes > 0
+            ? Math.round((this.secoesLidas.size / this.totalSecoes) * 100) : 0
+          try {
+            await apiFetch(`/modules/${this.moduloId}/sections/${encodeURIComponent(secaoId)}`, {
+              method: 'POST', body: '{}',
+            })
+          } catch { /* best-effort */ }
         },
 
         /**
@@ -781,6 +904,19 @@
       <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 max-h-[calc(100vh-6rem)] overflow-y-auto">
         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Neste módulo</p>
 
+        <!-- Barra de progresso de leitura -->
+        <template x-if="totalSecoes > 0">
+          <div class="mb-3">
+            <div class="flex justify-between text-xs text-slate-600 mb-1">
+              <span>Leitura</span>
+              <span x-text="percentSecoes + '%'"></span>
+            </div>
+            <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+              <div class="h-full bg-emerald-600 transition-all duration-500 rounded-full" :style="`width: ${percentSecoes}%`"></div>
+            </div>
+          </div>
+        </template>
+
         <!-- Loading skeleton do TOC -->
         <template x-if="carregando">
           <div class="space-y-2 animate-pulse">
@@ -790,16 +926,30 @@
           </div>
         </template>
 
-        <!-- Links do TOC -->
+        <!-- Links do TOC com marcação de leitura -->
         <nav x-show="!carregando" class="space-y-1">
           <template x-for="item in toc" :key="item.ancora">
-            <a
-              :href="'#' + item.ancora"
-              :class="item.nivel === 3 ? 'pl-4 text-xs' : 'text-sm'"
-              class="block text-slate-400 hover:text-python-400 transition-colors py-1 leading-snug"
-              x-text="item.texto"
-              @click="tocAberto = false"
-            ></a>
+            <div class="flex items-center gap-1 group">
+              <a
+                :href="'#' + item.ancora"
+                :class="item.nivel === 3 ? 'pl-4 text-xs' : 'text-sm'"
+                class="flex-1 text-slate-400 hover:text-emerald-400 transition-colors py-1 leading-snug"
+                :style="secoesLidas.has(item.ancora) ? 'color: rgb(52 211 153 / 0.7)' : ''"
+                x-text="item.texto"
+                @click="tocAberto = false"
+              ></a>
+              <!-- Botão de marcar como lida (aparece no hover) -->
+              <button
+                @click.prevent="marcarSecao(item.ancora)"
+                :title="secoesLidas.has(item.ancora) ? 'Lida' : 'Marcar como lida'"
+                class="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded"
+                :class="secoesLidas.has(item.ancora) ? 'text-emerald-500' : 'text-slate-600 hover:text-emerald-400'"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                </svg>
+              </button>
+            </div>
           </template>
         </nav>
       </div>
@@ -932,6 +1082,105 @@
               </div>
             </section>
           </template>
+
+          <!-- ============================================================
+               Seção de Quiz — exibida quando modulo.quiz tem perguntas
+               ============================================================ -->
+          <template x-if="modulo.quiz && modulo.quiz.length">
+            <section class="mt-10 pt-8 border-t border-slate-800">
+              <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-slate-100">Quiz do módulo</h2>
+                <button @click="abrirQuiz()" class="bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
+                  Iniciar quiz →
+                </button>
+              </div>
+              <p class="text-slate-400 text-sm">
+                <span x-text="modulo.quiz.length"></span> perguntas · cada resposta certa vale 5 XP
+              </p>
+            </section>
+          </template>
+
+          <!-- Modal do quiz -->
+          <div x-show="quizAberto" x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+            <div @click.stop class="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-6">
+
+              <!-- Concluído -->
+              <template x-if="quizConcluido">
+                <div class="text-center">
+                  <div class="text-5xl mb-3" x-text="quizAcertos === modulo.quiz.length ? '🏆' : (quizAcertos >= modulo.quiz.length / 2 ? '🎯' : '📚')"></div>
+                  <h3 class="text-xl font-bold text-white mb-1">Quiz concluído!</h3>
+                  <p class="text-slate-400 text-sm mb-4">
+                    Você acertou <span class="text-emerald-400 font-semibold" x-text="quizAcertos"></span>
+                    de <span x-text="modulo.quiz.length"></span> perguntas.
+                  </p>
+                  <button @click="quizAberto = false" class="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2 rounded-lg text-sm font-semibold transition-colors w-full">
+                    Fechar
+                  </button>
+                </div>
+              </template>
+
+              <!-- Em andamento -->
+              <template x-if="!quizConcluido && modulo.quiz && modulo.quiz[quizIdx]">
+                <div>
+                  <!-- Progresso -->
+                  <div class="flex items-center justify-between mb-4">
+                    <span class="text-xs text-slate-500" x-text="`Pergunta ${quizIdx + 1} de ${modulo.quiz.length}`"></span>
+                    <button @click="quizAberto = false" class="text-slate-600 hover:text-slate-400 transition-colors">
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                  </div>
+                  <div class="w-full h-1 bg-slate-800 rounded mb-5">
+                    <div class="h-1 bg-violet-600 rounded transition-all" :style="`width: ${Math.round(((quizIdx) / modulo.quiz.length) * 100)}%`"></div>
+                  </div>
+
+                  <!-- Pergunta -->
+                  <p class="text-white font-medium mb-4" x-text="modulo.quiz[quizIdx].pergunta"></p>
+
+                  <!-- Opções -->
+                  <div class="flex flex-col gap-2 mb-5">
+                    <template x-for="(opcao, i) in modulo.quiz[quizIdx].opcoes" :key="i">
+                      <button
+                        @click="selecionarOpcaoQuiz(i)"
+                        :disabled="!!quizResultados[quizIdx]"
+                        :class="{
+                          'border-violet-500 bg-violet-900/30': quizRespostas[quizIdx] === i && !quizResultados[quizIdx],
+                          'border-emerald-500 bg-emerald-900/30 text-emerald-300': quizResultados[quizIdx] && quizResultados[quizIdx].gabarito === i,
+                          'border-red-500/60 bg-red-900/20 text-red-300': quizResultados[quizIdx] && quizRespostas[quizIdx] === i && !quizResultados[quizIdx].correta && quizResultados[quizIdx].gabarito !== i,
+                          'border-slate-700 hover:border-slate-500': quizRespostas[quizIdx] !== i && !quizResultados[quizIdx],
+                        }"
+                        class="w-full text-left px-4 py-3 rounded-lg border text-sm text-slate-300 transition-colors disabled:cursor-default"
+                        x-text="opcao"
+                      ></button>
+                    </template>
+                  </div>
+
+                  <!-- Explicação após responder -->
+                  <template x-if="quizResultados[quizIdx]">
+                    <div class="mb-4 p-3 rounded-lg text-sm"
+                      :class="quizResultados[quizIdx].correta ? 'bg-emerald-900/30 text-emerald-300 border border-emerald-700/50' : 'bg-red-900/20 text-red-300 border border-red-700/30'">
+                      <span x-text="quizResultados[quizIdx].correta ? '✓ Correto! ' : '✗ Incorreto. '"></span>
+                      <span x-text="quizResultados[quizIdx].explicacao ?? ''"></span>
+                    </div>
+                  </template>
+
+                  <!-- Botões de ação -->
+                  <div class="flex gap-2">
+                    <template x-if="!quizResultados[quizIdx]">
+                      <button @click="confirmarRespostaQuiz()" :disabled="quizRespostas[quizIdx] === undefined || quizEnviando" class="flex-1 bg-violet-600 disabled:opacity-40 hover:bg-violet-500 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors">
+                        <span x-text="quizEnviando ? 'Verificando…' : 'Confirmar'"></span>
+                      </button>
+                    </template>
+                    <template x-if="!!quizResultados[quizIdx]">
+                      <button @click="proximaPerguntaQuiz()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors">
+                        <span x-text="quizIdx < modulo.quiz.length - 1 ? 'Próxima →' : 'Ver resultado'"></span>
+                      </button>
+                    </template>
+                  </div>
+                </div>
+              </template>
+
+            </div>
+          </div>
 
           <!-- Navegação Anterior / Próximo -->
           <nav class="mt-12 pt-8 border-t border-slate-800 flex items-center justify-between gap-4">

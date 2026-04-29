@@ -25,6 +25,7 @@ use FetecPy\Controllers\UserController;
 use FetecPy\Controllers\ProgressController;
 use FetecPy\Controllers\ModuleController;
 use FetecPy\Controllers\ExerciseController;
+use FetecPy\Controllers\QuizController;
 
 // Captura qualquer exceção não tratada e retorna JSON em vez de HTML de erro
 set_exception_handler(function (Throwable $e): void {
@@ -68,8 +69,13 @@ $router->post('modules/:moduloId/exercises/:exId/submit', [ExerciseController::c
 // -- Progresso --
 $router->get('progress', [ProgressController::class, 'index']);
 
-// -- Badges (Prompt 6.2) --
-// $router->get('badges', [BadgeController::class, 'index']);
+// -- Quiz (Fase 6) --
+$router->get('modules/:moduloId/quiz',          [QuizController::class, 'show']);
+$router->post('modules/:moduloId/quiz/submit',  [QuizController::class, 'submit']);
+
+// -- Progresso de seções (Fase 6) --
+$router->get( 'modules/:id/sections',           [ModuleController::class, 'listarSecoes']);
+$router->post('modules/:id/sections/:secaoId',  [ModuleController::class, 'marcarSecao']);
 
 // ----------------------------------------------------------------
 // Despacha a requisição — encontra a rota e chama o controller
