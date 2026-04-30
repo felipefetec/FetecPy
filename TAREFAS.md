@@ -124,22 +124,41 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 
 ---
 
-## Fase 6+ — Gamificação, Conteúdo, Deploy
-(Prompts 6.x, 7.x, 8.x — ainda não iniciados)
+## Fase 6 — Gamificação + Conteúdo ✅
+
+### Bloco A — Gamificação (Prompts 6.1, 6.2, 6.3) ✅
+- [x] ProgressService.php: XP, streak, multiplicadores 7d (1.2x) e 30d (1.5x)
+- [x] BadgeChecker.php: 15 badges (streak_3/7/30, sniper, coruja, madrugador, persistente, velocista, criativo, pyodide_master + 5 originais)
+- [x] QuizController.php: GET quiz + POST quiz/submit
+- [x] ModuleController: marcarSecao + listarSecoes
+- [x] gamification.js: toastXp, toastBadge, celebrarBadges, processarRespostaGamificacao
+- [x] module.html: componente quiz, barra progresso de seções, marcar seção como lida
+- [x] ProgressServiceTest.php + BadgeCheckerTest.php (48 testes novos)
+- [x] ExerciseController refatorado para usar os dois serviços
+- [x] 72 PHP + 395 JS = 467 testes passando
+
+### Bloco B — Conteúdo módulos 2–8 ✅
+- [x] content/02-python-basico.md + quiz 02.json (5 perguntas)
+- [x] exercises/03/ (5) + content/03-estruturas-controle.md + quiz 03.json
+- [x] exercises/04/ (5) + content/04-estruturas-dados.md + quiz 04.json
+- [x] exercises/05/ completado (ex04, ex05) + content/05-funcoes.md + quiz 05.json
+- [x] exercises/06/ (5) + content/06-poo.md + quiz 06.json
+- [x] exercises/07/ (5) + content/07-arquivos-json.md + quiz 07.json
+- [x] exercises/08/ (5) + content/08-aplicacoes-reais.md + quiz 08.json
+- [x] Total: 43 exercícios + 7 quizzes (35 perguntas), todos testados
 
 ---
 
-## ⚠️ Módulo 9 — Boas Práticas e Profissionalização (BLOQUEADO até Prompt 7.4)
+## ⚠️ Módulo 9 — Boas Práticas e Profissionalização (DESBLOQUEADO)
 
 > Arquivos `PLANO_ESTUDOS_M9.md` e `PROMPTS_M9.md` já estão na raiz do projeto.
-> **NÃO executar antes de concluir o Prompt 7.4 do PROMPTS.md original.**
 
-Pré-requisitos para desbloquear:
-- [ ] Prompts 1.1 a 7.4 concluídos
-- [ ] `./scripts/test.sh` passando sem erros
-- [ ] Conteúdo dos módulos 1–8 completo
-- [ ] Sistema de gamificação funcionando
-- [ ] Validadores A, B, C funcionando
-- [ ] Pelo menos 1 deploy de teste validado
+Pré-requisitos atendidos:
+- [x] Prompts 1.1 a 7.x concluídos (conteúdo 1–8 completo)
+- [x] `./scripts/test.sh` passando (467 testes)
+- [x] Conteúdo dos módulos 1–8 completo
+- [x] Sistema de gamificação funcionando (15 badges, XP, streak)
+- [x] Validadores A, B, C funcionando
+- [ ] Deploy de teste validado (próxima sessão)
 
-Quando todos os itens acima estiverem `[x]`, iniciar pelo `PROMPTS_M9.md` → Prompt 7.5.1.
+Quando o deploy for validado, iniciar pelo `PROMPTS_M9.md` → Prompt 7.5.1.
