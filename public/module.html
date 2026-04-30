@@ -622,7 +622,9 @@
             // Usa percentual calculado pelo backend (denominador consistente)
             this.percentSecoes  = resp.percent ?? this.percentSecoes
             this.totalSecoes    = resp.total_secoes ?? this.totalSecoes
-          } catch { /* best-effort */ }
+          } catch (err) {
+            console.error('[FetecPy] Falha ao marcar seção:', err)
+          }
         },
 
         /**
@@ -1013,13 +1015,14 @@
         <nav x-show="!carregando" class="space-y-1">
           <template x-for="item in toc" :key="item.ancora">
             <div class="flex items-center gap-1 group">
+              <!-- Clicar no link de seção já marca como lida automaticamente -->
               <a
                 :href="'#' + item.ancora"
                 :class="item.nivel === 3 ? 'pl-4 text-xs' : 'text-sm'"
                 class="flex-1 text-slate-400 hover:text-emerald-400 transition-colors py-1 leading-snug"
                 :style="secoesLidas[item.ancora] ? 'color: rgb(52 211 153 / 0.7)' : ''"
                 x-text="item.texto"
-                @click="tocAberto = false"
+                @click="tocAberto = false; marcarSecao(item.ancora)"
               ></a>
               <!-- Botão de marcar como lida (aparece no hover) -->
               <button
@@ -1685,6 +1688,36 @@
       </nav>
     </div>
   </div>
+
+  <!-- Botão flutuante: voltar ao topo — aparece após rolar 400px -->
+  <button
+    id="btn-topo"
+    onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+    title="Voltar ao topo"
+    class="fixed bottom-6 right-6 z-50 w-10 h-10 bg-slate-700 hover:bg-slate-600 border border-slate-600 text-slate-300 hover:text-white rounded-full shadow-lg transition-all duration-300 flex items-center justify-center opacity-0 pointer-events-none"
+    aria-label="Voltar ao topo"
+  >
+    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+    </svg>
+  </button>
+
+  <script>
+    // Exibe/oculta o botão de voltar ao topo conforme o scroll
+    ;(function () {
+      const btn = document.getElementById('btn-topo')
+      if (!btn) return
+      window.addEventListener('scroll', function () {
+        if (window.scrollY > 400) {
+          btn.classList.remove('opacity-0', 'pointer-events-none')
+          btn.classList.add('opacity-100')
+        } else {
+          btn.classList.add('opacity-0', 'pointer-events-none')
+          btn.classList.remove('opacity-100')
+        }
+      }, { passive: true })
+    })()
+  </script>
 
 </body>
 </html>
