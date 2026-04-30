@@ -693,30 +693,36 @@
          * /solution só retorna se o aluno já tiver concluído o exercício.
          */
         async verSolucao(ex) {
-          // Usa solução em cache (definida em enviarSubmissao quando backend retorna)
-          if (ex.solucao) {
-            this.abrirExercicio(ex)
-            await this.$nextTick()
-            this.exFase = 'editor'
-            this.solucaoVisivel = true
-            return
+          let exComSolucao = ex
+
+          // Busca da API se a solução não estiver em cache
+          if (!ex.solucao) {
+            try {
+              const exId = ex.id.split('-').pop()
+              const resp = await apiFetch(`/modules/${this.moduloId}/exercises/${exId}/solution`)
+              exComSolucao = { ...ex, solucao: resp.solucao }
+              // Guarda em cache no array local para não repetir a requisição
+              const idx = this.modulo.exercicios.findIndex(e => e.id === ex.id)
+              if (idx !== -1) this.modulo.exercicios.splice(idx, 1, exComSolucao)
+            } catch {
+              // Se falhar (403 ou rede), abre sem solução
+            }
           }
 
-          // Busca da API e guarda em cache no array local para não repetir
-          try {
-            const exId = ex.id.split('-').pop()
-            const resp = await apiFetch(`/modules/${this.moduloId}/exercises/${exId}/solution`)
-            const idx  = this.modulo.exercicios.findIndex(e => e.id === ex.id)
-            const comSolucao = { ...ex, solucao: resp.solucao }
-            if (idx !== -1) this.modulo.exercicios.splice(idx, 1, comSolucao)
-            this.abrirExercicio(comSolucao)
-          } catch {
-            // Se falhar (403 ou rede), abre sem solução mesmo
-            this.abrirExercicio(ex)
-          }
+          // Abre o modal e vai direto para a fase de editor com a solução visível.
+          // codigoAluno recebe a solução para que o CodeMirror a exiba no editor —
+          // o aluno pode ler o gabarito com syntax highlighting e copiar se quiser.
+          this.abrirExercicio(exComSolucao)
+          this.codigoAluno = exComSolucao.solucao ?? ''
           await this.$nextTick()
           this.exFase = 'editor'
           this.solucaoVisivel = true
+          if (!this.ehTextoLivre) {
+            // _montarEditorModal não foi chamado por abrirExercicio (que foi para reflexao)
+            // — precisa ser chamado manualmente agora que exFase = 'editor'
+            await this.$nextTick()
+            this._montarEditorModal()
+          }
         },
 
         /** Reabre o exercício do zero — o aluno pode tentar de novo sem penalidade. */
