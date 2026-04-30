@@ -56,22 +56,26 @@ class ProgressService
         ?string $codigo,
         array  $metadados = []
     ): array {
-        $pdo     = Database::getConnection();
-        $xpBruto = $this->calcularXpExercicio($metadados, $status);
+        $pdo = Database::getConnection();
 
-        // Persiste o progresso (INSERT ou UPDATE)
+        // Verifica se o exercício já foi concluído ANTES desta submissão.
+        // Se sim, XP = 0 — cada exercício só pode dar XP uma vez.
+        $jaConcluido = $this->verificarJaConcluido($pdo, $userId, $moduloId, 'exercicio', $exId);
+        $xpBruto     = $jaConcluido ? 0 : $this->calcularXpExercicio($metadados, $status);
+
+        // Persiste o progresso (INSERT ou UPDATE preservando xp_ganho original)
         $this->salvarProgresso(
             $pdo, $userId, $moduloId, 'exercicio', $exId,
             $status, $tentativas, $codigo, $xpBruto
         );
 
-        // Atualiza XP e streak apenas em conclusões reais
-        if (in_array($status, ['concluido', 'concluido_com_ajuda'], true)) {
+        // Atualiza XP e streak apenas em conclusões reais E na primeira vez
+        if (!$jaConcluido && in_array($status, ['concluido', 'concluido_com_ajuda'], true)) {
             [$xpFinal, $streakAtual, $multiplicador] =
                 $this->atualizarXpEStreak($pdo, $userId, $xpBruto);
         } else {
             // Lê valores atuais sem alterar
-            $xpFinal      = 0;
+            $xpFinal       = 0;
             $multiplicador = 1.0;
             $streakAtual   = $this->lerStreak($pdo, $userId);
         }
@@ -98,14 +102,17 @@ class ProgressService
     ): array {
         $pdo    = Database::getConnection();
         $status = $correta ? 'concluido' : 'tentado';
-        $xpBruto = $correta ? self::XP_QUIZ_PERGUNTA : 0;
+
+        // Pergunta de quiz também só dá XP na primeira resposta correta
+        $jaConcluida = $this->verificarJaConcluido($pdo, $userId, $moduloId, 'quiz', $quizId);
+        $xpBruto     = ($correta && !$jaConcluida) ? self::XP_QUIZ_PERGUNTA : 0;
 
         $this->salvarProgresso(
             $pdo, $userId, $moduloId, 'quiz', $quizId,
             $status, 1, null, $xpBruto
         );
 
-        if ($correta) {
+        if ($correta && !$jaConcluida) {
             [$xpFinal, $streakAtual, $multiplicador] =
                 $this->atualizarXpEStreak($pdo, $userId, $xpBruto);
         } else {
@@ -278,7 +285,9 @@ class ProgressService
                status       = excluded.status,
                tentativas   = excluded.tentativas,
                codigo_salvo = COALESCE(excluded.codigo_salvo, codigo_salvo),
-               xp_ganho     = excluded.xp_ganho,
+               -- Preserva o XP registrado na primeira conclusão; não sobrescreve
+               -- com 0 quando o aluno refaz um exercício já concluído.
+               xp_ganho     = CASE WHEN excluded.xp_ganho > 0 THEN excluded.xp_ganho ELSE xp_ganho END,
                concluido_em = CASE
                  WHEN excluded.status IN ("concluido","concluido_com_ajuda")
                  THEN CURRENT_TIMESTAMP
@@ -295,6 +304,26 @@ class ProgressService
             ':codigo' => $codigo,
             ':xp'     => $xpGanho,
         ]);
+    }
+
+    /**
+     * Verifica se um item já foi concluído (com ou sem ajuda) pelo aluno.
+     * Usado para garantir que XP só é concedido uma vez por exercício/quiz.
+     */
+    private function verificarJaConcluido(
+        \PDO   $pdo,
+        int    $userId,
+        string $moduloId,
+        string $itemTipo,
+        string $itemId
+    ): bool {
+        $stmt = $pdo->prepare(
+            'SELECT 1 FROM progress
+             WHERE user_id = ? AND modulo = ? AND item_tipo = ? AND item_id = ?
+               AND status IN ("concluido", "concluido_com_ajuda")'
+        );
+        $stmt->execute([$userId, $moduloId, $itemTipo, $itemId]);
+        return (bool) $stmt->fetch();
     }
 
     /** Lê o streak atual sem alterar. */
