@@ -124,14 +124,13 @@
 
             // Carrega seções já lidas (barra de progresso de leitura)
             try {
-              const regsProgress = await apiFetch(`/progress`)
-              // ProgressController retorna array de módulos; buscamos seções lidas
-              // no array geral de itens de progresso do usuário via endpoint dedicado
               const secoesResp = await apiFetch(`/modules/${this.moduloId}/sections`)
-              this.secoesLidas   = new Set((secoesResp.lidas ?? []))
-              this.totalSecoes   = this.toc.length
-              this.percentSecoes = this.totalSecoes > 0
-                ? Math.round((this.secoesLidas.size / this.totalSecoes) * 100) : 0
+              // Converte array de IDs para objeto { id: true } — reativo no Alpine
+              const lidas = secoesResp.lidas ?? []
+              this.secoesLidas  = Object.fromEntries(lidas.map(id => [id, true]))
+              // Usa o total do backend (conta apenas ## headings) para consistência
+              this.totalSecoes  = secoesResp.total ?? this.toc.length
+              this.percentSecoes = secoesResp.percentual ?? 0
             } catch { /* progresso de seções é opcional */ }
 
           } catch (e) {
@@ -207,9 +206,10 @@
         // ----------------------------------------------------------------
         // Estado do progresso de seções
         // ----------------------------------------------------------------
-        secoesLidas: new Set(),   // IDs das seções já marcadas como lidas
-        totalSecoes: 0,           // total de seções do módulo (vindo da API)
-        percentSecoes: 0,         // % de seções lidas
+        // Objeto simples em vez de Set — Set não é reativo no Alpine
+        secoesLidas: {},    // { secaoId: true } para seções já lidas
+        totalSecoes: 0,     // total de seções do módulo (vindo da API)
+        percentSecoes: 0,   // % de seções lidas
 
         // ----------------------------------------------------------------
         // Helpers do modal
@@ -346,10 +346,13 @@
               )
               await this._animarProgresso(2500)
             } else {
-              // Exercícios com código: roda no Pyodide (pode demorar segundos)
+              // Exercícios com código: roda no Pyodide primeiro (tempo real de execução),
+              // depois mostra a mesma barra de "verificando" do texto_livre.
               if (!pyodidePronto()) mostrarOverlayPyodide(true)
               resultado = await validar(this.exAtual, codigo, this.textoAluno)
               mostrarOverlayPyodide(false)
+              // Animação de verificação: mesma UX do módulo 1 — 1,5s com barra
+              await this._animarProgresso(1500)
             }
 
             this.resultadoValidacao = resultado
@@ -531,14 +534,15 @@
 
         /** Marca uma seção do TOC como lida */
         async marcarSecao(secaoId) {
-          if (this.secoesLidas.has(secaoId)) return
-          this.secoesLidas.add(secaoId)
-          this.percentSecoes = this.totalSecoes > 0
-            ? Math.round((this.secoesLidas.size / this.totalSecoes) * 100) : 0
+          if (this.secoesLidas[secaoId]) return
+          this.secoesLidas[secaoId] = true   // reativo: Alpine detecta a nova chave
           try {
-            await apiFetch(`/modules/${this.moduloId}/sections/${encodeURIComponent(secaoId)}`, {
+            const resp = await apiFetch(`/modules/${this.moduloId}/sections/${encodeURIComponent(secaoId)}`, {
               method: 'POST', body: '{}',
             })
+            // Usa percentual calculado pelo backend (denominador consistente)
+            this.percentSecoes  = resp.percent ?? this.percentSecoes
+            this.totalSecoes    = resp.total_secoes ?? this.totalSecoes
           } catch { /* best-effort */ }
         },
 
@@ -934,16 +938,16 @@
                 :href="'#' + item.ancora"
                 :class="item.nivel === 3 ? 'pl-4 text-xs' : 'text-sm'"
                 class="flex-1 text-slate-400 hover:text-emerald-400 transition-colors py-1 leading-snug"
-                :style="secoesLidas.has(item.ancora) ? 'color: rgb(52 211 153 / 0.7)' : ''"
+                :style="secoesLidas[item.ancora] ? 'color: rgb(52 211 153 / 0.7)' : ''"
                 x-text="item.texto"
                 @click="tocAberto = false"
               ></a>
               <!-- Botão de marcar como lida (aparece no hover) -->
               <button
                 @click.prevent="marcarSecao(item.ancora)"
-                :title="secoesLidas.has(item.ancora) ? 'Lida' : 'Marcar como lida'"
+                :title="secoesLidas[item.ancora] ? 'Lida' : 'Marcar como lida'"
                 class="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded"
-                :class="secoesLidas.has(item.ancora) ? 'text-emerald-500' : 'text-slate-600 hover:text-emerald-400'"
+                :class="secoesLidas[item.ancora] ? 'text-emerald-500' : 'text-slate-600 hover:text-emerald-400'"
               >
                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
@@ -1340,19 +1344,20 @@
             </div>
           </template>
 
-          <!-- Barra de progresso — aparece durante análise de texto livre -->
-          <template x-if="testando && ehTextoLivre">
+          <!-- Barra de progresso — aparece durante análise (texto livre E código) -->
+          <template x-if="testando && progressoValidacao > 0">
             <div class="rounded-xl border border-python-500/30 bg-python-500/8 p-4 space-y-3">
               <div class="flex items-center gap-3">
-                <!-- Ícone de spinning -->
                 <svg class="animate-spin w-4 h-4 text-python-400 shrink-0" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                 </svg>
-                <span class="text-python-400 text-sm font-medium">Analisando sua lógica...</span>
+                <!-- Mensagem diferente para texto livre e código -->
+                <span class="text-python-400 text-sm font-medium"
+                  x-text="ehTextoLivre ? 'Analisando sua lógica...' : 'Verificando resultado...'">
+                </span>
                 <span class="text-slate-500 text-xs ml-auto" x-text="progressoValidacao + '%'"></span>
               </div>
-              <!-- Barra que cresce com easing ao longo de ~2,5s -->
               <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
                 <div
                   class="h-full bg-python-500 rounded-full transition-[width] duration-75 ease-linear"

@@ -56,15 +56,24 @@ export async function validateOutput(codigo, casos) {
   for (const caso of casos) {
     const { stdout, stderr } = await runPython(codigo, caso.input ?? '')
 
+    // Se houve erro de execução (stderr), o caso falha imediatamente —
+    // código com erros nunca deve ser considerado correto, mesmo que o
+    // stdout coincida com o esperado por acidente
+    if (stderr) {
+      if (!algumErro) algumErro = stderr
+      resultadosCasos.push({
+        passou:   false,
+        input:    caso.input ?? '',
+        esperado: caso.esperado,
+        obtido:   stdout,
+      })
+      continue
+    }
+
     // Normaliza ambos os lados antes de comparar
     const obtidoNorm   = normalizar(stdout)
     const esperadoNorm = normalizar(caso.esperado)
     const passou       = obtidoNorm === esperadoNorm
-
-    if (stderr && !algumErro) {
-      // Guarda só o primeiro erro de execução para exibir ao aluno
-      algumErro = stderr
-    }
 
     resultadosCasos.push({
       passou,
