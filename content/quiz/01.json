@@ -1,0 +1,66 @@
+{
+  "modulo": "01",
+  "titulo": "Quiz — Lógica e Algoritmos",
+  "perguntas": [
+    {
+      "id": "q1",
+      "pergunta": "O que é um algoritmo?",
+      "opcoes": [
+        "Um tipo de linguagem de programação",
+        "Uma sequência finita de passos bem definidos que resolve um problema",
+        "Um erro de programação",
+        "O nome do criador do Python"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "Algoritmo é uma receita precisa: tem começo, fim e cada passo é bem definido. Linguagens de programação são ferramentas para *escrever* algoritmos, não o algoritmo em si."
+    },
+    {
+      "id": "q2",
+      "pergunta": "Qual a diferença entre SE e ENQUANTO?",
+      "opcoes": [
+        "Nenhuma, fazem a mesma coisa",
+        "SE executa um bloco uma vez se a condição for verdadeira; ENQUANTO repete enquanto a condição for verdadeira",
+        "ENQUANTO é mais rápido que SE",
+        "SE é usado só em Python"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "SE é uma decisão única (ou executa, ou não). ENQUANTO é uma repetição que continua enquanto a condição for verdadeira — pode executar zero, uma ou muitas vezes."
+    },
+    {
+      "id": "q3",
+      "pergunta": "O que é uma variável?",
+      "opcoes": [
+        "Um erro no programa",
+        "Um tipo de loop",
+        "Um espaço na memória com nome e valor que pode mudar",
+        "Uma função matemática"
+      ],
+      "resposta_correta": 2,
+      "explicacao": "Variável = caixinha com nome. Você pode guardar um valor nela e trocar esse valor quando quiser. O nome é fixo; o conteúdo pode mudar."
+    },
+    {
+      "id": "q4",
+      "pergunta": "O que acontece se a condição de um ENQUANTO nunca ficar falsa?",
+      "opcoes": [
+        "O programa termina normalmente",
+        "O programa pula o bloco",
+        "O programa entra em loop infinito",
+        "Ocorre um erro de sintaxe"
+      ],
+      "resposta_correta": 2,
+      "explicacao": "Loop infinito: o computador fica repetindo o bloco para sempre (ou até a memória acabar / você forçar o encerramento). Por isso toda estrutura ENQUANTO precisa de algo que eventualmente torne a condição falsa."
+    },
+    {
+      "id": "q5",
+      "pergunta": "Por que usamos pseudocódigo antes de programar?",
+      "opcoes": [
+        "Porque o computador entende pseudocódigo diretamente",
+        "Para focar na lógica do problema sem se preocupar com a sintaxe da linguagem",
+        "Porque é obrigatório em todas as linguagens",
+        "Para substituir completamente o código real"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "Pseudocódigo é uma rascunho em linguagem natural. Permite pensar na solução sem travar em vírgulas e parênteses. Depois que a lógica está clara, traduzir para Python (ou outra linguagem) é simples."
+    }
+  ]
+}

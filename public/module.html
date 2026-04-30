@@ -113,6 +113,16 @@
           return idx < MODULOS_ORDEM.length - 1 ? MODULOS_ORDEM[idx + 1] : null
         },
 
+        // Verdadeiro quando todos os exercícios do módulo estão concluídos.
+        // Controla se o link de próximo módulo fica ativo ou bloqueado.
+        get moduloConcluido() {
+          const exs = this.modulo?.exercicios
+          if (!exs || exs.length === 0) return false
+          return exs.every(
+            e => e.status_aluno === 'concluido' || e.status_aluno === 'concluido_com_ajuda'
+          )
+        },
+
         async init() {
           try {
             this.modulo = await apiFetch(`/modules/${this.moduloId}`)
@@ -1248,20 +1258,40 @@
             <!-- Voltar ao dashboard -->
             <a href="/app.html" class="text-xs text-slate-600 hover:text-slate-400 transition-colors">Dashboard</a>
 
-            <!-- Próximo -->
+            <!-- Próximo módulo: ativo só após concluir todos os exercícios -->
             <div class="flex-1 flex justify-end">
               <template x-if="proximoId">
-                <a :href="'/module.html?id=' + proximoId" class="group flex items-center gap-3 text-slate-400 hover:text-slate-200 transition-colors text-right">
-                  <div>
-                    <p class="text-xs text-slate-600">Próximo</p>
-                    <p class="text-sm font-medium" x-text="'Módulo ' + proximoId"></p>
+                <template x-if="moduloConcluido">
+                  <!-- Concluído: link clicável -->
+                  <a :href="'/module.html?id=' + proximoId" class="group flex items-center gap-3 text-slate-400 hover:text-slate-200 transition-colors text-right">
+                    <div>
+                      <p class="text-xs text-slate-600">Próximo</p>
+                      <p class="text-sm font-medium" x-text="'Módulo ' + proximoId"></p>
+                    </div>
+                    <span class="w-8 h-8 rounded-lg border border-slate-700 group-hover:border-slate-500 flex items-center justify-center transition-colors">
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+                      </svg>
+                    </span>
+                  </a>
+                </template>
+                <template x-if="!moduloConcluido">
+                  <!-- Incompleto: exibe quantos exercícios faltam, sem link -->
+                  <div class="flex items-center gap-3 text-right opacity-40 cursor-not-allowed select-none">
+                    <div>
+                      <p class="text-xs text-slate-600">Próximo</p>
+                      <p class="text-sm font-medium" x-text="'Módulo ' + proximoId"></p>
+                      <p class="text-xs text-slate-600"
+                         x-text="'Complete os exercícios (' + (modulo?.exercicios?.filter(e => e.status_aluno === \'concluido\' || e.status_aluno === \'concluido_com_ajuda\').length ?? 0) + '/' + (modulo?.exercicios?.length ?? 0) + ')'">
+                      </p>
+                    </div>
+                    <span class="w-8 h-8 rounded-lg border border-slate-800 flex items-center justify-center">
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+                      </svg>
+                    </span>
                   </div>
-                  <span class="w-8 h-8 rounded-lg border border-slate-700 group-hover:border-slate-500 flex items-center justify-center transition-colors">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
-                    </svg>
-                  </span>
-                </a>
+                </template>
               </template>
             </div>
 

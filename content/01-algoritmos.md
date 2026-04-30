@@ -264,34 +264,6 @@ Não precisa de código Python — use pseudocódigo em português.
 
 ---
 
-## Quiz
-
-1. O que é um algoritmo?
-   - a) Um tipo de linguagem de programação
-   - b) Uma sequência finita de passos bem definidos que resolve um problema
-   - c) Um erro de programação
-   - d) O nome do criador do Python
-
-2. Qual a diferença entre SE e ENQUANTO?
-   - a) Nenhuma, fazem a mesma coisa
-   - b) SE executa um bloco uma vez se a condição for verdadeira; ENQUANTO repete enquanto a condição for verdadeira
-   - c) ENQUANTO é mais rápido que SE
-   - d) SE é usado só em Python
-
-3. O que é uma variável?
-   - a) Um erro no programa
-   - b) Um tipo de loop
-   - c) Um espaço na memória com nome e valor que pode mudar
-   - d) Uma função matemática
-
-4. O que acontece se a condição de um ENQUANTO nunca ficar falsa?
-   - a) O programa termina normalmente
-   - b) O programa pula o bloco
-   - c) O programa entra em loop infinito
-   - d) Ocorre um erro de sintaxe
-
----
-
 ## Resumo
 
 Neste módulo você aprendeu que:
