@@ -306,13 +306,21 @@
 
           try {
             if (!pyodidePronto()) mostrarOverlayPyodide(true)
-            const { stdout, stderr } = await runPython(codigo)
+
+            // Usa o stdin do primeiro caso de teste para que input() funcione.
+            // Sem isso, exercícios que chamam input() falham com EOFError ao "Rodar".
+            const stdin = this.exAtual?.validacao?.casos?.[0]?.input ?? ''
+            const { stdout, stderr } = await runPython(codigo, stdin)
             mostrarOverlayPyodide(false)
 
-            // Exibe saída bruta sem validar
+            // Prefixa a saída com a entrada usada para deixar transparente ao aluno
+            const entradaLabel = stdin
+              ? `[entrada simulada: ${stdin.replace(/\n/g, '↵').trim()}]\n`
+              : ''
+
             this.resultadoValidacao = {
-              passou: null, // null = só saída, sem veredicto
-              saidaBruta: stdout || stderr || '(sem saída)',
+              passou:       null,   // null = só saída, sem veredicto
+              saidaBruta:   entradaLabel + (stdout || stderr || '(sem saída)'),
               ehSaidaBruta: true,
             }
           } catch (e) {
@@ -337,25 +345,21 @@
             let resultado
 
             if (this.ehTextoLivre) {
-              // Para texto livre, a validação é instantânea (só conta caracteres).
-              // Validamos imediatamente mas exibimos um timer visual de ~2,5s para
-              // reforçar a percepção de que o sistema está analisando o raciocínio.
+              // Texto livre: validação instantânea + barra de 2,5s (revela no final)
               resultado = validateTextLivre(
                 this.textoAluno,
                 this.exAtual.validacao?.minimo_caracteres ?? 80
               )
               await this._animarProgresso(2500)
+              this.resultadoValidacao = resultado
             } else {
-              // Exercícios com código: roda no Pyodide primeiro (tempo real de execução),
-              // depois mostra a mesma barra de "verificando" do texto_livre.
+              // Código: roda Pyodide, depois barra de 1,5s revelando casos a 50%
               if (!pyodidePronto()) mostrarOverlayPyodide(true)
               resultado = await validar(this.exAtual, codigo, this.textoAluno)
               mostrarOverlayPyodide(false)
-              // Animação de verificação: mesma UX do módulo 1 — 1,5s com barra
-              await this._animarProgresso(1500)
+              // _animarProgressoComReveal define resultadoValidacao na metade da barra
+              await this._animarProgressoComReveal(resultado, 1500)
             }
-
-            this.resultadoValidacao = resultado
 
             if (resultado.passou) {
               await this.enviarSubmissao('concluido', codigo)
@@ -377,21 +381,19 @@
         },
 
         /**
-         * Anima a barra de progresso de validação por `duracaoMs` milissegundos.
-         * Usa easing out quadrático: rápido no início, desacelera no final —
-         * mais natural do que progresso linear.
+         * Anima a barra de 0→100% em `duracaoMs` ms (easing quadrático).
+         * Usado para texto_livre — resultado é revelado APÓS a animação terminar.
          */
         async _animarProgresso(duracaoMs) {
           this.progressoValidacao = 0
           const intervaloMs = 30
-          const totalPassos = Math.round(duracaoMs / intervaloMs)
+          const totalPassos  = Math.round(duracaoMs / intervaloMs)
           let passo = 0
 
           await new Promise(resolve => {
             const timer = setInterval(() => {
               passo++
               const t = Math.min(passo / totalPassos, 1)
-              // f(t) = 1 - (1-t)² — chega em 100% de forma suave
               this.progressoValidacao = Math.round(100 * (1 - (1 - t) * (1 - t)))
               if (passo >= totalPassos) {
                 clearInterval(timer)
@@ -401,9 +403,46 @@
             }, intervaloMs)
           })
 
-          // Pequena pausa com barra cheia antes de revelar o resultado
           await new Promise(r => setTimeout(r, 250))
           this.progressoValidacao = 0
+        },
+
+        /**
+         * Anima a barra e revela os resultados dos casos a 50%.
+         * Usado para saida_exata/funcao — o aluno vê os casos testados enquanto
+         * a barra termina, dando tempo de ler antes do veredicto final aparecer.
+         */
+        async _animarProgressoComReveal(resultado, duracaoMs) {
+          this.progressoValidacao = 0
+          const intervaloMs = 30
+          const totalPassos  = Math.round(duracaoMs / intervaloMs)
+          let passo    = 0
+          let revelado = false
+
+          await new Promise(resolve => {
+            const timer = setInterval(() => {
+              passo++
+              const t = Math.min(passo / totalPassos, 1)
+              this.progressoValidacao = Math.round(100 * (1 - (1 - t) * (1 - t)))
+
+              // Revela os casos de teste na metade da animação
+              if (!revelado && this.progressoValidacao >= 50) {
+                revelado = true
+                this.resultadoValidacao = resultado
+              }
+
+              if (passo >= totalPassos) {
+                clearInterval(timer)
+                this.progressoValidacao = 100
+                resolve()
+              }
+            }, intervaloMs)
+          })
+
+          await new Promise(r => setTimeout(r, 300))
+          this.progressoValidacao = 0
+          // Garante que o resultado fique mesmo se o callback de 50% não disparou
+          if (!revelado) this.resultadoValidacao = resultado
         },
 
         /** Envia a solução (botão "Ver solução") */
