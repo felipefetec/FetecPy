@@ -35,8 +35,9 @@ class ProgressController
         $userId = (int) $request->user['id'];
         $pdo    = Database::getConnection();
 
-        // Busca apenas exercícios e quiz — seções são progresso de leitura
-        // e não devem contar para o percentual de conclusão do módulo.
+        // Busca todos os itens relevantes — exercícios para progresso de conclusão,
+        // quiz para XP. Seções (item_tipo = "secao") ficam fora: são progresso de
+        // leitura e não devem contar para o desbloqueio do próximo módulo.
         $stmt = $pdo->prepare(
             'SELECT modulo, item_tipo, status, xp_ganho
              FROM progress
@@ -46,34 +47,34 @@ class ProgressController
         $stmt->execute([$userId]);
         $registros = $stmt->fetchAll();
 
-        // Agrupa registros por módulo para calcular percentuais
+        // Agrupa por módulo:
+        //   concluidos → conta apenas exercícios (determinam o desbloqueio)
+        //   xp         → soma tudo incluindo quiz (XP real do aluno)
         $porModulo = [];
         foreach ($registros as $reg) {
             $mod = $reg['modulo'];
             if (!isset($porModulo[$mod])) {
                 $porModulo[$mod] = ['concluidos' => 0, 'xp' => 0];
             }
-            // Conta qualquer status como "tentado" — concluídos têm peso maior
-            if (in_array($reg['status'], ['concluido', 'concluido_com_ajuda'])) {
+            // Só exercícios contam para avançar de módulo — quiz é bônus de XP
+            if ($reg['item_tipo'] === 'exercicio'
+                && in_array($reg['status'], ['concluido', 'concluido_com_ajuda'])) {
                 $porModulo[$mod]['concluidos']++;
             }
             $porModulo[$mod]['xp'] += (int) $reg['xp_ganho'];
         }
 
-        // Definição de quantos itens cada módulo tem no total.
-        // Módulo 01: 5 exercícios (sem quiz — primeiro módulo é pseudocódigo).
-        // Módulos 02–08: 5 exercícios + 5 perguntas de quiz = 10 itens.
-        // IMPORTANTE: cada resposta de quiz correta grava 1 linha na tabela progress,
-        // por isso o quiz conta como 5 itens, não 1.
+        // Total de exercícios por módulo — 5 em todos.
+        // Quiz não entra no total: é opcional e só contribui com XP.
         $totalPorModulo = [
             '01' => 5,
-            '02' => 10,
-            '03' => 10,
-            '04' => 10,
-            '05' => 10,
-            '06' => 10,
-            '07' => 10,
-            '08' => 10,
+            '02' => 5,
+            '03' => 5,
+            '04' => 5,
+            '05' => 5,
+            '06' => 5,
+            '07' => 5,
+            '08' => 5,
         ];
 
         // Monta a resposta com status calculado para cada módulo
