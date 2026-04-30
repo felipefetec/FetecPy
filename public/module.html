@@ -165,8 +165,48 @@
               ativarEditoresTente(conteudoEl)
               // Ativa as áreas de reflexão nos slots :::reflexao
               ativarBlocosReflexao(conteudoEl)
+              // Observa os títulos H2/H3 para marcar seções automaticamente
+              // quando o usuário rola e o título entra na faixa superior da tela.
+              this._observarSecoes(conteudoEl)
             }
           }
+        },
+
+        /**
+         * Observa todos os H2/H3 do conteúdo com IntersectionObserver.
+         *
+         * A faixa de detecção cobre os primeiros 25% do viewport (rootMargin
+         * deixa a área ativa do topo até 75% abaixo do topo). Quando um título
+         * entra nessa faixa — ou seja, o aluno rolou até aquela seção — ela é
+         * marcada como lida automaticamente.
+         *
+         * Por que 25% e não 0%: títulos costumam aparecer um pouco abaixo do topo
+         * enquanto o conteúdo anterior ainda está visível. 25% garante que a
+         * marcação aconteça logo que a seção fica "em foco" para leitura.
+         */
+        _observarSecoes(conteudoEl) {
+          const titulos = conteudoEl.querySelectorAll('h2[id], h3[id]')
+          if (!titulos.length) return
+
+          const self = this
+          const observer = new IntersectionObserver(
+            (entries) => {
+              for (const entry of entries) {
+                // Marca somente quando o título cruza para dentro da faixa ativa
+                if (entry.isIntersecting) {
+                  self.marcarSecao(entry.target.id)
+                }
+              }
+            },
+            {
+              // Recorta o viewport: ignora os 75% inferiores,
+              // então só a faixa superior (25%) dispara o evento.
+              rootMargin: '0px 0px -75% 0px',
+              threshold: 0,
+            }
+          )
+
+          titulos.forEach(h => observer.observe(h))
         },
 
         // Renderiza markdown simples para uso inline no modal
