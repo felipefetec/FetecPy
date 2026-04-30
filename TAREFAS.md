@@ -175,20 +175,67 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 - [x] scripts/test.sh atualizado — exibe quais arquivos de teste são rodados
 - [x] .githooks/pre-commit criado — bloqueia commit se testes falharem
 - [x] 72 PHP + 408 JS = 480 testes passando
-- [ ] Ativar hook localmente: `git config core.hooksPath .githooks`
+- [x] Ativar hook localmente: `git config core.hooksPath .githooks`
 
 ---
 
-## ⚠️ Módulo 9 — Boas Práticas e Profissionalização (DESBLOQUEADO)
+## Fase 8 — Polimento e Deploy ✅
+
+### Prompt 8.1 — UX final ✅
+- [x] 404.html customizada (dark, código Python, botões Dashboard/Voltar)
+- [x] Confirmação de logout em 2 etapas com auto-cancelamento em 4s
+- [x] Ctrl+S mostra toast "✓ Código salvo" por 1.8s
+- [x] role="dialog" aria-modal="true" aria-label no modal de exercícios
+- [x] Botões "Ver solução" e "Refazer" nos cards de exercício concluído
+- [x] Endpoint GET /solution com guarda 403 (só se já concluído)
+- [x] XP idempotente — cada exercício só concede XP uma vez (verificarJaConcluido)
+
+### Prompt 8.2 — Mobile e performance ✅
+- [x] Service worker (sw.js): cache Pyodide ~30MB no jsDelivr, assets locais
+- [x] Modal fullscreen em mobile (min-h-screen sm:min-h-0 sm:rounded-2xl)
+- [x] Botão TAB mobile (sm:hidden) — insere 4 espaços no CodeMirror
+
+### Prompt 8.3 — Deploy e docs ✅
+- [x] public/.htaccess: SPA routing, API routing, expires headers, security headers
+- [x] data/.htaccess: Deny from all (protege banco SQLite)
+- [x] .htaccess raiz: redirect para public/
+- [x] php-check.php: diagnóstico de ambiente PHP
+- [x] scripts/deploy.sh: FTP via lftp com .env.deploy
+- [x] README.md final
+
+### Hotfixes de deploy (sessão 2026-04-30) ✅
+- [x] Caminhos absolutos /assets/js/ → relativos ./assets/js/ (resolve [object HTMLInputElement] em /py/)
+- [x] Request::parsearCaminho: regex genérica suporta subdiretório /py/api/...
+- [x] Deploy na VPS: https://fetec.cloud/py/
+- [x] HTTPS: Let's Encrypt (certbot --apache -d fetec.cloud), cert válido até 2026-07-29
+- [x] Redirect HTTP→HTTPS com RewriteEngine On no vhost correto
+- [x] .phpunit.result.cache adicionado ao .gitignore
+
+---
+
+## 🎯 Módulo 9 — Boas Práticas e Profissionalização (EM ANDAMENTO)
 
 > Arquivos `PLANO_ESTUDOS_M9.md` e `PROMPTS_M9.md` já estão na raiz do projeto.
 
-Pré-requisitos atendidos:
-- [x] Prompts 1.1 a 7.x concluídos (conteúdo 1–8 completo)
-- [x] `./scripts/test.sh` passando (467 testes)
+Pré-requisitos — todos atendidos:
+- [x] Prompts 1.1 a 7.4 concluídos (conteúdo 1–8 completo)
+- [x] `./scripts/test.sh` passando (480 testes)
 - [x] Conteúdo dos módulos 1–8 completo
 - [x] Sistema de gamificação funcionando (15 badges, XP, streak)
 - [x] Validadores A, B, C funcionando
-- [ ] Deploy de teste validado (próxima sessão)
+- [x] Deploy validado em https://fetec.cloud/py/
 
-Quando o deploy for validado, iniciar pelo `PROMPTS_M9.md` → Prompt 7.5.1.
+### Prompt 7.5.1 — Estrutura e novos validadores
+- [ ] Atualizar CLAUDE.md (tipos D e E na tabela de validações)
+- [ ] Criar exercises/09/ com subpastas 9.1 a 9.5
+- [ ] Atualizar exercises/SCHEMA.md (terminal_output, github_url, manual)
+- [ ] Atualizar src/Models/Exercise.php para suportar novos tipos
+- [ ] Implementar validator.js: validateTerminalOutput, validateGithubUrl, validateManual
+- [ ] Testes: testTerminalOutput*, testGithubUrl*, testManualSempreRetornaPendente
+- [ ] ./scripts/test.sh passando
+- [ ] Commit: "feat: adiciona suporte ao Módulo 9 (validadores D e E) - Prompt 7.5.1"
+
+### Prompt 7.5.2 — Conteúdo Markdown (a fazer)
+### Prompt 7.5.3 — Exercícios e quizzes (a fazer)
+### Prompt 7.5.4 — Mini-projeto final (a fazer)
+### Prompt 7.5.5 — Badges, XP e ajustes finais (a fazer)
