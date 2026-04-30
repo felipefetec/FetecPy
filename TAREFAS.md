@@ -167,6 +167,18 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 
 ---
 
+## Prompt 7.4 — Testes de regressão de conteúdo ✅
+
+- [x] tests/Content/quizTest.js — 8 quizzes × (cobertura + estrutura + perguntas) = valida 100% dos quizzes
+- [x] tests/Content/moduleStructureTest.js — 8 módulos × (front-matter + conteúdo) = sem módulo sem título/resumo
+- [x] exercises.test.js: Grupo 3 — anti-exemplos por tipo (saida_exata, funcao, texto_livre, hibrido)
+- [x] scripts/test.sh atualizado — exibe quais arquivos de teste são rodados
+- [x] .githooks/pre-commit criado — bloqueia commit se testes falharem
+- [x] 72 PHP + 408 JS = 480 testes passando
+- [ ] Ativar hook localmente: `git config core.hooksPath .githooks`
+
+---
+
 ## ⚠️ Módulo 9 — Boas Práticas e Profissionalização (DESBLOQUEADO)
 
 > Arquivos `PLANO_ESTUDOS_M9.md` e `PROMPTS_M9.md` já estão na raiz do projeto.
