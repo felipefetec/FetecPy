@@ -67,7 +67,9 @@ fi
 # Frontend: Vitest (validators + exercises + sanity)
 # --------------------------------------------------------------
 echo ""
-echo "[ JS  ] Rodando Vitest..."
+echo "[ JS  ] Rodando Vitest (frontend + conteúdo)..."
+echo "  Inclui: validator.test.js, pyodide.test.js,"
+echo "          exercises.test.js, quizTest.js, moduleStructureTest.js"
 echo "------------------------------"
 
 if npm test --silent; then

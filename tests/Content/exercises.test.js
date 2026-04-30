@@ -236,3 +236,90 @@ print(json.dumps(${nomeFn}(${argsStr}), ensure_ascii=False))
     }
   }
 })
+
+// ----------------------------------------------------------------
+// Grupo 3 — Anti-exemplos (soluções erradas devem FALHAR)
+//
+// Garante que os validadores realmente rejeitam código incorreto.
+// Um anti-exemplo por tipo de validação, usando um exercício
+// representativo de cada módulo.
+// ----------------------------------------------------------------
+describe('Anti-exemplos (soluções erradas devem falhar)', () => {
+  const todos = listarTodos()
+
+  // ── saida_exata: imprimir "errado" não passa ─────────────────
+  // Pega 1 exercício saida_exata por módulo (amostragem representativa)
+  const saidaExata = Object.values(
+    Object.fromEntries(
+      todos
+        .filter(ex => ex.validacao?.tipo === 'saida_exata' && (ex.validacao?.casos ?? []).length > 0)
+        .map(ex => [ex.modulo, ex])
+    )
+  )
+
+  for (const ex of saidaExata) {
+    const caso = ex.validacao.casos[0]
+    it(`${ex.id}: print("errado") não passa no caso 1 (saida_exata)`, () => {
+      const { stdout } = runPython('print("errado")', caso.input ?? '')
+      expect(normalizar(stdout)).not.toBe(normalizar(caso.esperado))
+    })
+  }
+
+  // ── funcao: retornar None nunca é correto ────────────────────
+  const funcoes = Object.values(
+    Object.fromEntries(
+      todos
+        .filter(ex => ex.validacao?.tipo === 'funcao' && ex.validacao?.nome_funcao && (ex.validacao?.casos ?? []).length > 0)
+        .map(ex => [ex.modulo, ex])
+    )
+  )
+
+  for (const ex of funcoes) {
+    const nomeFn = ex.validacao.nome_funcao
+    const caso   = ex.validacao.casos[0]
+    it(`${ex.id}: retornar None não passa no caso 1 (funcao)`, () => {
+      const argsStr = caso.args.map(a => JSON.stringify(a)).join(', ')
+      const script  = `import json\ndef ${nomeFn}(*a, **k): return None\nprint(json.dumps(${nomeFn}(${argsStr}), ensure_ascii=False))`
+      const { stdout } = runPython(script)
+      let obtido
+      try { obtido = JSON.parse(stdout.trim()) } catch { obtido = '__parse_error__' }
+      expect(JSON.stringify(obtido)).not.toBe(JSON.stringify(caso.esperado))
+    })
+  }
+
+  // ── texto_livre: texto abaixo do mínimo não passa ───────────
+  const textoLivreEx = todos.find(ex => ex.validacao?.tipo === 'texto_livre')
+
+  it('texto_livre: string vazia falha (comprimento < mínimo)', () => {
+    if (!textoLivreEx) return
+    const min = textoLivreEx.validacao.minimo_caracteres ?? 80
+    expect(''.trim().length).toBeLessThan(min)
+  })
+
+  it('texto_livre: texto com 1 caractere falha (comprimento < mínimo)', () => {
+    if (!textoLivreEx) return
+    const min = textoLivreEx.validacao.minimo_caracteres ?? 80
+    expect('x'.length).toBeLessThan(min)
+  })
+
+  it('texto_livre: texto exatamente no limite passa', () => {
+    if (!textoLivreEx) return
+    const min = textoLivreEx.validacao.minimo_caracteres ?? 80
+    expect('a'.repeat(min).trim().length).toBeGreaterThanOrEqual(min)
+  })
+
+  // ── hibrido saida_exata: solução errada no sub-validador ─────
+  const hibridoSaida = todos.find(
+    ex => ex.validacao?.tipo === 'hibrido' &&
+      ex.validacao.validacoes?.some(v => v.tipo === 'saida_exata' && v.casos?.length > 0)
+  )
+
+  if (hibridoSaida) {
+    const subVal = hibridoSaida.validacao.validacoes.find(v => v.tipo === 'saida_exata')
+    const caso   = subVal.casos[0]
+    it(`${hibridoSaida.id}: print("errado") não passa no sub-validador saida_exata (hibrido)`, () => {
+      const { stdout } = runPython('print("errado")', caso.input ?? '')
+      expect(normalizar(stdout)).not.toBe(normalizar(caso.esperado))
+    })
+  }
+})

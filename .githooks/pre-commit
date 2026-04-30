@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Pre-commit hook do FetecPy.
+#
+# Roda a suíte completa de testes antes de cada commit.
+# Se qualquer teste falhar, o commit é bloqueado.
+#
+# Para ativar: git config core.hooksPath .githooks
+# Para desativar (emergência): git commit --no-verify
+
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+echo ""
+echo "[ hook ] Rodando testes antes do commit..."
+
+if ./scripts/test.sh; then
+  echo "[ hook ] Testes passaram — commit liberado."
+  exit 0
+else
+  echo ""
+  echo "[ hook ] COMMIT BLOQUEADO — corrija os testes acima antes de commitar."
+  echo "         Para pular (emergência): git commit --no-verify"
+  exit 1
+fi
