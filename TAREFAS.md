@@ -149,6 +149,24 @@ Cada prompt do PROMPTS.md tem sua seção aqui com checklist.
 
 ---
 
+---
+
+## Hotfixes pós-Fase 6 (sessão 2026-04-30) ✅
+
+- [x] ProgressController: totalPorModulo errado (6→5/10), seções contavam como itens, anteriorCompleto propagava de módulos bloqueados
+- [x] Critério de desbloqueio mudado para Opção A: só exercícios desbloqueiam (quiz = bônus XP)
+- [x] Quiz módulo 01 movido de markdown para content/quiz/01.json (5 perguntas)
+- [x] Próximo módulo bloqueado no frontend até todos os exercícios estarem concluídos
+- [x] enviarSubmissao: tentativas = Math.max(1, tentativas) — resolvia 400 Bad Request na primeira tentativa
+- [x] enviarSubmissao: IDs capturados antes da animação — evita null se modal fechado durante animação
+- [x] Erros de submit e marcarSecao agora logados no console do navegador
+- [x] Barra de leitura: IntersectionObserver marca seções automaticamente ao rolar
+- [x] Barra de leitura: clicar no link do TOC também marca a seção
+- [x] hr + padding-bottom: espaçamento correto entre separadores e títulos
+- [x] Botão flutuante "voltar ao topo" (aparece após 400px de scroll)
+
+---
+
 ## ⚠️ Módulo 9 — Boas Práticas e Profissionalização (DESBLOQUEADO)
 
 > Arquivos `PLANO_ESTUDOS_M9.md` e `PROMPTS_M9.md` já estão na raiz do projeto.
