@@ -27,6 +27,13 @@ if ($uri !== '/' && file_exists($arquivo) && !is_dir($arquivo)) {
     return false; // false = servidor embutido serve o arquivo normalmente
 }
 
+// Requisições a arquivos .html inexistentes → página 404 customizada
+if (str_ends_with($uri, '.html')) {
+    http_response_code(404);
+    require __DIR__ . '/../public/404.html';
+    return true;
+}
+
 // Qualquer outra rota → SPA (index.html)
 require __DIR__ . '/../public/index.html';
 return true;

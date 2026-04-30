@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FetecPy — Página não encontrada</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            python: { 400: '#4ade80', 500: '#22c55e', 600: '#16a34a' },
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
+          },
+          keyframes: {
+            surgir: {
+              '0%':   { opacity: '0', transform: 'translateY(16px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+          },
+          animation: {
+            surgir: 'surgir 0.4s ease-out forwards',
+          },
+        },
+      },
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+
+<body class="h-full bg-slate-950 text-slate-100 font-mono flex items-center justify-center p-6">
+  <div class="text-center animate-surgir max-w-md">
+
+    <!-- Bloco de código decorativo -->
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 mb-8 text-left text-sm">
+      <div class="flex items-center gap-2 mb-4">
+        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+        <span class="ml-2 text-slate-500 text-xs">erro.py</span>
+      </div>
+      <pre class="text-slate-300 leading-relaxed"><code><span class="text-slate-500"># tentando acessar a página...</span>
+
+<span class="text-red-400">raise</span> <span class="text-yellow-400">PageNotFoundError</span><span class="text-slate-400">(</span>
+    <span class="text-python-400">"Essa página não existe"</span><span class="text-slate-400">,</span>
+    <span class="text-python-400">code=404</span>
+<span class="text-slate-400">)</span>
+
+<span class="text-red-300">PageNotFoundError:</span> <span class="text-slate-400">Essa página não existe</span></code></pre>
+    </div>
+
+    <!-- Mensagem principal -->
+    <h1 class="text-6xl font-bold text-slate-700 mb-2">404</h1>
+    <p class="text-xl text-slate-300 font-semibold mb-2">Página não encontrada</p>
+    <p class="text-slate-500 text-sm mb-8">
+      Parece que esta rota não existe no nosso programa.<br>
+      Mas não se preocupe — todo erro é uma oportunidade de aprender!
+    </p>
+
+    <!-- Ações -->
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a
+        href="/app.html"
+        class="bg-python-500 hover:bg-python-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition-colors"
+      >
+        Ir para o Dashboard
+      </a>
+      <button
+        onclick="history.back()"
+        class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium px-6 py-2.5 rounded-lg border border-slate-700 transition-colors"
+      >
+        ← Voltar
+      </button>
+    </div>
+  </div>
+</body>
+</html>
