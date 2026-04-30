@@ -35,11 +35,12 @@ class ProgressController
         $userId = (int) $request->user['id'];
         $pdo    = Database::getConnection();
 
-        // Busca todos os registros de progresso do aluno de uma vez
+        // Busca apenas exercícios e quiz — seções são progresso de leitura
+        // e não devem contar para o percentual de conclusão do módulo.
         $stmt = $pdo->prepare(
             'SELECT modulo, item_tipo, status, xp_ganho
              FROM progress
-             WHERE user_id = ?
+             WHERE user_id = ? AND item_tipo IN ("exercicio", "quiz")
              ORDER BY modulo ASC'
         );
         $stmt->execute([$userId]);
@@ -59,17 +60,20 @@ class ProgressController
             $porModulo[$mod]['xp'] += (int) $reg['xp_ganho'];
         }
 
-        // Definição de quantos itens cada módulo tem no total
-        // (exercícios + quiz + mini-projeto). Atualizar conforme conteúdo for adicionado.
+        // Definição de quantos itens cada módulo tem no total.
+        // Módulo 01: 5 exercícios (sem quiz — primeiro módulo é pseudocódigo).
+        // Módulos 02–08: 5 exercícios + 5 perguntas de quiz = 10 itens.
+        // IMPORTANTE: cada resposta de quiz correta grava 1 linha na tabela progress,
+        // por isso o quiz conta como 5 itens, não 1.
         $totalPorModulo = [
-            '01' => 6,  // 5 exercícios + 1 mini-projeto
-            '02' => 6,
-            '03' => 6,
-            '04' => 6,
-            '05' => 6,
-            '06' => 6,
-            '07' => 6,
-            '08' => 15, // módulo 8 tem 5 submódulos com mais itens
+            '01' => 5,
+            '02' => 10,
+            '03' => 10,
+            '04' => 10,
+            '05' => 10,
+            '06' => 10,
+            '07' => 10,
+            '08' => 10,
         ];
 
         // Monta a resposta com status calculado para cada módulo
@@ -101,8 +105,10 @@ class ProgressController
                 'status'     => $status,
             ];
 
-            // O próximo módulo só fica disponível se este estiver 100% completo
-            $anteriorCompleto = ($percentual >= 100);
+            // O próximo módulo só fica disponível se ESTE estiver 100% completo
+            // E não estava bloqueado — evita que itens registrados em módulos
+            // inacessíveis desbloqueiem o módulo seguinte de forma indevida.
+            $anteriorCompleto = ($percentual >= 100 && $status !== 'bloqueado');
         }
 
         JsonResponse::enviar($resultado);
