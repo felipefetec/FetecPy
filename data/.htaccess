@@ -1,0 +1,4 @@
+# Bloqueia qualquer acesso HTTP direto à pasta data/
+# O banco SQLite e logs nunca devem ser acessíveis via browser.
+Order deny,allow
+Deny from all

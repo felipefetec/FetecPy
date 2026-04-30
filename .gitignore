@@ -6,8 +6,10 @@ data/*.log
 vendor/
 node_modules/
 
-# Variáveis de ambiente
+# Variáveis de ambiente e credenciais de deploy
 .env
+.env.*
+.env.deploy
 
 # Sistemas operacionais
 .DS_Store
