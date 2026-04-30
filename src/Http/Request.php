@@ -117,8 +117,9 @@ class Request
         $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
         $uri = rawurldecode($uri ?? '/');
 
-        // Remove o prefixo /api para que o Router trabalhe com caminhos relativos
-        $uri = preg_replace('#^/api/?#', '', $uri);
+        // Remove tudo até (e incluindo) o segmento /api/ — funciona tanto em
+        // deploy na raiz (/api/health) quanto em subdiretório (/py/api/health).
+        $uri = preg_replace('#^.*/api/?#', '', $uri);
 
         // Remove barras iniciais e finais residuais
         return trim($uri, '/');
