@@ -26,3 +26,6 @@ coverage/
 .claude/
 CLAUDE.md
 PROMPTS.md
+
+# Cache interno do PHPUnit — gerado automaticamente, sem valor para o repo
+.phpunit.result.cache
