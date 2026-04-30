@@ -1,0 +1,25 @@
+{
+  "id": "06-ex05",
+  "modulo": "06",
+  "ordem": 5,
+  "titulo": "Pilha (Stack) com classe",
+  "dificuldade": "desafio",
+  "xp": 30,
+  "conceitos": ["class", "encapsulamento", "estrutura de dados"],
+  "antes_de_codar": [
+    "O que é uma pilha (stack)? Dê um exemplo do mundo real.",
+    "Quais operações uma pilha precisa ter?",
+    "O que deve acontecer se alguém tentar remover de uma pilha vazia?"
+  ],
+  "enunciado": "Implemente uma classe Pilha com:\n- push(item) — adiciona no topo\n- pop() — remove e retorna o topo (ValueError se vazia)\n- peek() — retorna o topo sem remover (ValueError se vazia)\n- esta_vazia() — True se vazia\n- tamanho() — número de elementos",
+  "dica": "Internamente, use uma lista. O 'topo' é o último elemento: use append() para push e pop() da lista para pop.",
+  "codigo_inicial": "class Pilha:\n    def __init__(self):\n        self._itens = []\n\n    def push(self, item):\n        pass\n\n    def pop(self):\n        pass\n\n    def peek(self):\n        pass\n\n    def esta_vazia(self):\n        pass\n\n    def tamanho(self):\n        pass",
+  "validacao": {
+    "tipo": "saida_exata",
+    "codigo_teste": "p = Pilha()\np.push(1)\np.push(2)\np.push(3)\nprint(p.peek())\nprint(p.pop())\nprint(p.tamanho())\nprint(p.esta_vazia())",
+    "casos": [
+      { "input": "", "esperado": "3\n3\n2\nFalse\n" }
+    ]
+  },
+  "solucao": "class Pilha:\n    def __init__(self):\n        self._itens = []\n\n    def push(self, item):\n        self._itens.append(item)\n\n    def pop(self):\n        if self.esta_vazia():\n            raise ValueError('Pilha vazia')\n        return self._itens.pop()\n\n    def peek(self):\n        if self.esta_vazia():\n            raise ValueError('Pilha vazia')\n        return self._itens[-1]\n\n    def esta_vazia(self):\n        return len(self._itens) == 0\n\n    def tamanho(self):\n        return len(self._itens)\n\np = Pilha()\np.push(1)\np.push(2)\np.push(3)\nprint(p.peek())\nprint(p.pop())\nprint(p.tamanho())\nprint(p.esta_vazia())"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "07-ex02",
+  "modulo": "07",
+  "ordem": 2,
+  "titulo": "Serializar e parsear JSON",
+  "dificuldade": "facil",
+  "xp": 10,
+  "conceitos": ["json", "dumps", "loads"],
+  "antes_de_codar": [
+    "Qual módulo Python lida com JSON?",
+    "Qual função converte dicionário Python em string JSON?",
+    "Qual função faz o caminho inverso?"
+  ],
+  "enunciado": "Escreva uma função ciclo_json(dado) que:\n1. Converte o dado Python para string JSON\n2. Parseia de volta para Python\n3. Retorna o objeto resultante\n\nA função deve demonstrar que os dados sobrevivem à conversão.",
+  "dica": "import json. json.dumps() serializa, json.loads() parseia.",
+  "codigo_inicial": "import json\n\ndef ciclo_json(dado):\n    # serialize e desserialize\n    pass",
+  "validacao": {
+    "tipo": "funcao",
+    "nome_funcao": "ciclo_json",
+    "casos": [
+      { "args": [{"nome": "Ana", "nota": 9.5}], "esperado": {"nome": "Ana", "nota": 9.5} },
+      { "args": [[1, 2, 3]], "esperado": [1, 2, 3] }
+    ]
+  },
+  "solucao": "import json\n\ndef ciclo_json(dado):\n    return json.loads(json.dumps(dado))"
+}

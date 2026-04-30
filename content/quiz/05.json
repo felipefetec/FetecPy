@@ -1,0 +1,61 @@
+{
+  "modulo": "05",
+  "titulo": "Quiz — Módulo 5: Funções",
+  "perguntas": [
+    {
+      "id": "q1",
+      "pergunta": "O que uma função retorna se não tiver um comando return explícito?",
+      "opcoes": ["0", "False", "None", "Causa um erro"],
+      "resposta_correta": 2,
+      "explicacao": "Em Python, toda função que não tem return (ou tem return sem valor) devolve None implicitamente. É diferente de um erro — é o valor padrão de 'sem resultado'."
+    },
+    {
+      "id": "q2",
+      "pergunta": "O que são 'parâmetros padrão' (default parameters)?",
+      "opcoes": [
+        "Parâmetros que sempre recebem o mesmo tipo",
+        "Parâmetros com um valor pré-definido, usado quando o argumento não é passado",
+        "Os parâmetros mais importantes de uma função",
+        "Parâmetros que não podem ser modificados"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "def f(x, y=10): define y com valor padrão 10. Se você chamar f(5), y vale 10. Se chamar f(5, 20), y vale 20. Isso torna parâmetros opcionais."
+    },
+    {
+      "id": "q3",
+      "pergunta": "Uma variável criada dentro de uma função pode ser usada fora dela?",
+      "opcoes": [
+        "Sim, variáveis em Python são sempre globais",
+        "Não, ela só existe dentro do escopo da função",
+        "Sim, se você usar a palavra-chave public",
+        "Depende do tipo da variável"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "Variáveis criadas dentro de uma função têm escopo local — elas só existem enquanto a função está rodando. Tentar acessá-las de fora causa NameError."
+    },
+    {
+      "id": "q4",
+      "pergunta": "O que retorna a função abaixo?\n\ndef f():\n    return 1, 2, 3",
+      "opcoes": [
+        "O número 1 (os demais são ignorados)",
+        "Uma lista [1, 2, 3]",
+        "Uma tupla (1, 2, 3)",
+        "Causa um SyntaxError"
+      ],
+      "resposta_correta": 2,
+      "explicacao": "Python permite retornar múltiplos valores separados por vírgula — isso cria e retorna uma tupla automaticamente. return 1, 2, 3 é equivalente a return (1, 2, 3)."
+    },
+    {
+      "id": "q5",
+      "pergunta": "O que é uma lambda em Python?",
+      "opcoes": [
+        "Uma função de múltiplos parâmetros sem nome",
+        "Uma função anônima de expressão única",
+        "Um método de classes especiais",
+        "Uma palavra reservada para loops aninhados"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "lambda parâmetros: expressão cria uma função anônima (sem nome) de uma única expressão. É útil para funções simples passadas como argumento, como chave de ordenação: sorted(lista, key=lambda x: x[1])."
+    }
+  ]
+}

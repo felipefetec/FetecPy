@@ -1,0 +1,31 @@
+{
+  "id": "08-ex04",
+  "modulo": "08",
+  "ordem": 4,
+  "titulo": "8.4 — Modelo de dados para Flet",
+  "dificuldade": "medio",
+  "xp": 20,
+  "conceitos": [
+    "dataclass",
+    "list",
+    "filtragem"
+  ],
+  "antes_de_codar": [
+    "O que é uma dataclass e por que é útil em apps Flet?",
+    "Como você filtraria uma lista de tarefas por status?",
+    "Como contar itens por categoria?"
+  ],
+  "enunciado": "Usando dataclass, implemente Tarefa(titulo, concluida=False) e uma função resumo_tarefas(tarefas) que retorna {'total': N, 'concluidas': N, 'pendentes': N}.",
+  "dica": "from dataclasses import dataclass. @dataclass define automaticamente __init__ e __repr__.",
+  "codigo_inicial": "from dataclasses import dataclass\n\n@dataclass\nclass Tarefa:\n    titulo: str\n    concluida: bool = False\n\ndef resumo_tarefas(tarefas):\n    # retorna dict com total, concluidas, pendentes\n    pass",
+  "validacao": {
+    "tipo": "saida_exata",
+    "casos": [
+      {
+        "input": "",
+        "esperado": "3\n2\n1\n"
+      }
+    ]
+  },
+  "solucao": "def resumo_tarefas(tarefas):\n    concluidas = sum(1 for t in tarefas if t.get('concluida', False))\n    return {'total': len(tarefas), 'concluidas': concluidas, 'pendentes': len(tarefas) - concluidas}\n\ntarefas = [{'titulo': 'A', 'concluida': True}, {'titulo': 'B', 'concluida': False}, {'titulo': 'C', 'concluida': True}]\nr = resumo_tarefas(tarefas)\nprint(r['total'])\nprint(r['concluidas'])\nprint(r['pendentes'])"
+}

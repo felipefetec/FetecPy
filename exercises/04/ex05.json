@@ -1,0 +1,24 @@
+{
+  "id": "04-ex05",
+  "modulo": "04",
+  "ordem": 5,
+  "titulo": "Remover duplicatas",
+  "dificuldade": "desafio",
+  "xp": 30,
+  "conceitos": ["set", "list", "sorted"],
+  "antes_de_codar": [
+    "O que é um conjunto (set) em Python?",
+    "Qual é a propriedade dos sets em relação a duplicatas?",
+    "Como converter uma lista em set e de volta para lista ordenada?"
+  ],
+  "enunciado": "Dada a lista de números abaixo, remova os duplicados e imprima os elementos únicos em ordem crescente, um por linha.",
+  "dica": "Converta a lista para set() para remover duplicatas automaticamente. Depois, sorted() ordena.",
+  "codigo_inicial": "numeros = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5]\n# seu código aqui",
+  "validacao": {
+    "tipo": "saida_exata",
+    "casos": [
+      { "input": "", "esperado": "1\n2\n3\n4\n5\n6\n9\n" }
+    ]
+  },
+  "solucao": "numeros = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5]\nfor n in sorted(set(numeros)):\n    print(n)"
+}

@@ -1,0 +1,24 @@
+{
+  "id": "06-ex03",
+  "modulo": "06",
+  "ordem": 3,
+  "titulo": "Herança: Animal e seus filhos",
+  "dificuldade": "medio",
+  "xp": 20,
+  "conceitos": ["heranca", "super", "polimorfismo", "override"],
+  "antes_de_codar": [
+    "O que Cachorro e Gato têm em comum com Animal?",
+    "O que é diferente entre eles (o som que fazem)?",
+    "Como usar super().__init__() para aproveitar o __init__ da classe pai?"
+  ],
+  "enunciado": "Crie:\n- Classe Animal com __init__(nome) e método falar() → 'Animal fala'\n- Classe Cachorro(Animal) que sobrescreve falar() → 'Au au!'\n- Classe Gato(Animal) que sobrescreve falar() → 'Miau!'\n\nTest: imprima o resultado de cachorro.falar() e gato.falar()",
+  "dica": "Cachorro e Gato herdam de Animal. Use super().__init__(nome) nos filhos.",
+  "codigo_inicial": "class Animal:\n    def __init__(self, nome):\n        self.nome = nome\n\n    def falar(self):\n        return 'Animal fala'\n\nclass Cachorro(Animal):\n    # seu código aqui\n    pass\n\nclass Gato(Animal):\n    # seu código aqui\n    pass\n\nc = Cachorro('Rex')\ng = Gato('Mimi')\nprint(c.falar())\nprint(g.falar())",
+  "validacao": {
+    "tipo": "saida_exata",
+    "casos": [
+      { "input": "", "esperado": "Au au!\nMiau!\n" }
+    ]
+  },
+  "solucao": "class Animal:\n    def __init__(self, nome):\n        self.nome = nome\n\n    def falar(self):\n        return 'Animal fala'\n\nclass Cachorro(Animal):\n    def falar(self):\n        return 'Au au!'\n\nclass Gato(Animal):\n    def falar(self):\n        return 'Miau!'\n\nc = Cachorro('Rex')\ng = Gato('Mimi')\nprint(c.falar())\nprint(g.falar())"
+}

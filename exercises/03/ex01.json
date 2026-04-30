@@ -1,0 +1,43 @@
+{
+  "id": "03-ex01",
+  "modulo": "03",
+  "ordem": 1,
+  "titulo": "Par ou ímpar",
+  "dificuldade": "facil",
+  "xp": 10,
+  "conceitos": [
+    "if",
+    "else",
+    "operador modulo"
+  ],
+  "antes_de_codar": [
+    "Como você identifica matematicamente se um número é par?",
+    "O que o operador % (módulo) retorna?",
+    "Quais são os dois casos possíveis (par ou ímpar)?"
+  ],
+  "enunciado": "Leia um número inteiro e imprima 'par' se for par, ou 'impar' se for ímpar.",
+  "dica": "Um número é par quando o resto da divisão por 2 é zero: n % 2 == 0",
+  "codigo_inicial": "numero = int(input('Digite um número: '))\n# seu código aqui",
+  "validacao": {
+    "tipo": "saida_exata",
+    "casos": [
+      {
+        "input": "4\n",
+        "esperado": "par\n"
+      },
+      {
+        "input": "7\n",
+        "esperado": "impar\n"
+      },
+      {
+        "input": "0\n",
+        "esperado": "par\n"
+      },
+      {
+        "input": "-3\n",
+        "esperado": "impar\n"
+      }
+    ]
+  },
+  "solucao": "numero = int(input())\nif numero % 2 == 0:\n    print('par')\nelse:\n    print('impar')"
+}

@@ -1,0 +1,61 @@
+{
+  "modulo": "08",
+  "titulo": "Quiz — Módulo 8: Aplicações Reais",
+  "perguntas": [
+    {
+      "id": "q1",
+      "pergunta": "Qual biblioteca Python você usa para fazer requisições HTTP a APIs externas?",
+      "opcoes": ["urllib", "requests", "httplib", "socket"],
+      "resposta_correta": 1,
+      "explicacao": "requests é a biblioteca padrão da comunidade para HTTP em Python — simples, idiomática e com excelente tratamento de erros. No Pyodide (navegador), use pyodide.http.pyfetch como alternativa."
+    },
+    {
+      "id": "q2",
+      "pergunta": "O que o Streamlit faz cada vez que o usuário interage com um widget?",
+      "opcoes": [
+        "Atualiza apenas o widget que foi modificado",
+        "Re-executa o script Python do início ao fim",
+        "Envia uma requisição AJAX para o servidor",
+        "Chama o callback definido no widget"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "Streamlit re-executa o script inteiro a cada interação. Isso simplifica o modelo mental (sem gerenciamento de estado complexo), mas significa que variáveis não persistem — use st.session_state para estado que precisa sobreviver entre execuções."
+    },
+    {
+      "id": "q3",
+      "pergunta": "No Flask, o que o decorador @app.route('/usuarios', methods=['POST']) faz?",
+      "opcoes": [
+        "Define que a função só pode ser chamada internamente",
+        "Mapeia requisições POST para /usuarios à função decorada",
+        "Cria automaticamente um banco de dados para usuários",
+        "Serializa automaticamente o retorno da função para JSON"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "O decorador @app.route registra a função como handler para aquele path e método HTTP. Quando uma requisição POST chegar em /usuarios, o Flask chamará essa função."
+    },
+    {
+      "id": "q4",
+      "pergunta": "Qual a vantagem do FastAPI sobre o Flask para criar APIs?",
+      "opcoes": [
+        "FastAPI é mais antigo e mais estável",
+        "FastAPI usa type hints para validar dados automaticamente e gera documentação interativa",
+        "Flask não suporta JSON, apenas HTML",
+        "FastAPI é a única opção para APIs assíncronas em Python"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "FastAPI usa Pydantic para validação automática baseada em type hints e gera documentação Swagger/OpenAPI em /docs sem esforço extra. Flask é mais simples mas requer validação manual."
+    },
+    {
+      "id": "q5",
+      "pergunta": "O que o método page.update() faz em um app Flet?",
+      "opcoes": [
+        "Reinicia o servidor do app",
+        "Atualiza o arquivo Python no disco",
+        "Re-renderiza a interface com as mudanças feitas nos componentes",
+        "Faz uma requisição para verificar atualizações do Flet"
+      ],
+      "resposta_correta": 2,
+      "explicacao": "Em Flet, você modifica os componentes (ex: mensagem.value = 'Olá') e depois chama page.update() para que as mudanças sejam aplicadas visualmente. Sem update(), a interface não reflete as alterações."
+    }
+  ]
+}

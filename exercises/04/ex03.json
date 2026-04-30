@@ -1,0 +1,24 @@
+{
+  "id": "04-ex03",
+  "modulo": "04",
+  "ordem": 3,
+  "titulo": "Agenda de contatos simples",
+  "dificuldade": "medio",
+  "xp": 20,
+  "conceitos": ["dict", "keys", "values", "items"],
+  "antes_de_codar": [
+    "Como um dicionário mapeia chaves a valores?",
+    "Como você acessa um valor dado uma chave?",
+    "Como verificar se uma chave existe antes de acessar?"
+  ],
+  "enunciado": "Dado um dicionário de contatos, imprima o telefone de 'Carlos'.\nSe 'Carlos' não existir, imprima 'contato nao encontrado'.",
+  "dica": "Use o operador 'in' para verificar se a chave existe antes de acessar. Ex: if nome in contatos:",
+  "codigo_inicial": "contatos = {\n    'Ana': '9999-1111',\n    'Carlos': '9888-2222',\n    'Diana': '9777-3333'\n}\nbusca = 'Carlos'\n# seu código aqui",
+  "validacao": {
+    "tipo": "saida_exata",
+    "casos": [
+      { "input": "", "esperado": "9888-2222\n" }
+    ]
+  },
+  "solucao": "contatos = {\n    'Ana': '9999-1111',\n    'Carlos': '9888-2222',\n    'Diana': '9777-3333'\n}\nbusca = 'Carlos'\nif busca in contatos:\n    print(contatos[busca])\nelse:\n    print('contato nao encontrado')"
+}

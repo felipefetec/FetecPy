@@ -1,0 +1,61 @@
+{
+  "modulo": "04",
+  "titulo": "Quiz — Módulo 4: Estruturas de Dados",
+  "perguntas": [
+    {
+      "id": "q1",
+      "pergunta": "Qual é o índice do último elemento de uma lista de 5 elementos?",
+      "opcoes": ["5", "4", "-1", "Ambos 4 e -1 são válidos"],
+      "resposta_correta": 3,
+      "explicacao": "Uma lista com 5 elementos tem índices 0 a 4. O índice -1 é um atalho para o último elemento. Então tanto lista[4] quanto lista[-1] acessam o último elemento."
+    },
+    {
+      "id": "q2",
+      "pergunta": "Qual a principal diferença entre lista e tupla?",
+      "opcoes": [
+        "Listas usam [], tuplas usam () — são idênticas funcionalmente",
+        "Listas são mutáveis (podem ser modificadas); tuplas são imutáveis",
+        "Tuplas são mais rápidas que listas em todas as operações",
+        "Listas só aceitam números; tuplas aceitam qualquer tipo"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "A diferença fundamental é mutabilidade: você pode adicionar, remover ou modificar elementos de uma lista. Uma tupla não pode ser alterada após criada — isso é intencional e oferece uma garantia de imutabilidade."
+    },
+    {
+      "id": "q3",
+      "pergunta": "O que d.get('chave', 'padrao') faz quando 'chave' não existe no dicionário d?",
+      "opcoes": [
+        "Lança um KeyError",
+        "Retorna None",
+        "Retorna 'padrao'",
+        "Cria a chave no dicionário com o valor 'padrao'"
+      ],
+      "resposta_correta": 2,
+      "explicacao": ".get(chave, valor_default) retorna o valor associado à chave se ela existir; caso contrário, retorna o valor_default sem lançar exceção. É a forma segura de acessar dicionários."
+    },
+    {
+      "id": "q4",
+      "pergunta": "Para que serve um set (conjunto) em Python?",
+      "opcoes": [
+        "Para armazenar pares chave-valor",
+        "Para manter elementos únicos e fazer operações de conjunto eficientemente",
+        "Para armazenar sequências de elementos em ordem",
+        "Para criar tabelas de banco de dados em memória"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "Sets armazenam apenas elementos únicos (duplicatas são automaticamente removidas) e permitem operações de conjunto como união (|), interseção (&) e diferença (-). A busca em sets é O(1)."
+    },
+    {
+      "id": "q5",
+      "pergunta": "O que [x*2 for x in [1,2,3] if x > 1] retorna?",
+      "opcoes": [
+        "[2, 4, 6]",
+        "[4, 6]",
+        "[2, 4]",
+        "[1, 4, 6]"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "A list comprehension aplica o filtro 'if x > 1' primeiro (descarta x=1), depois multiplica por 2. Resultado: [2*2, 3*2] = [4, 6]."
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "07-ex04",
+  "modulo": "07",
+  "ordem": 4,
+  "titulo": "Filtrar e transformar JSON",
+  "dificuldade": "medio",
+  "xp": 20,
+  "conceitos": ["json", "list comprehension", "filtro"],
+  "antes_de_codar": [
+    "Como você acessa campos de uma lista de dicionários?",
+    "Como filtrar itens de uma lista por um critério?",
+    "Como extrair só alguns campos de cada item?"
+  ],
+  "enunciado": "Dado um JSON de produtos, escreva filtrar_disponiveis(json_str) que:\n- Parseia o JSON\n- Retorna lista com nome e preco dos produtos onde 'disponivel' é True\n- Ordenado por preço (do menor para o maior)",
+  "dica": "json.loads() para parsear. Filtre com if item['disponivel']. Ordene com sorted(key=lambda x: x['preco']).",
+  "codigo_inicial": "import json\n\ndef filtrar_disponiveis(json_str):\n    # parseia, filtra disponíveis, ordena por preco\n    pass",
+  "validacao": {
+    "tipo": "funcao",
+    "nome_funcao": "filtrar_disponiveis",
+    "casos": [
+      {
+        "args": ["[{\"nome\":\"A\",\"preco\":30,\"disponivel\":true},{\"nome\":\"B\",\"preco\":10,\"disponivel\":false},{\"nome\":\"C\",\"preco\":20,\"disponivel\":true}]"],
+        "esperado": [{"nome": "C", "preco": 20}, {"nome": "A", "preco": 30}]
+      }
+    ]
+  },
+  "solucao": "import json\n\ndef filtrar_disponiveis(json_str):\n    produtos = json.loads(json_str)\n    disponiveis = [{'nome': p['nome'], 'preco': p['preco']} for p in produtos if p['disponivel']]\n    return sorted(disponiveis, key=lambda x: x['preco'])"
+}

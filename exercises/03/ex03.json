@@ -1,0 +1,30 @@
+{
+  "id": "03-ex03",
+  "modulo": "03",
+  "ordem": 3,
+  "titulo": "Tabuada",
+  "dificuldade": "facil",
+  "xp": 10,
+  "conceitos": [
+    "for",
+    "range"
+  ],
+  "antes_de_codar": [
+    "Quantas linhas a tabuada tem?",
+    "Como você expressa 'repita de 1 até 10' em Python?",
+    "Qual é o padrão de cada linha? (ex: '3 x 1 = 3')"
+  ],
+  "enunciado": "Leia um número e imprima a tabuada dele de 1 a 10.\nFormato de cada linha: 'N x M = R' (sem aspas, com espaços ao redor de x e =).",
+  "dica": "Use for i in range(1, 11): para iterar de 1 a 10 inclusive.",
+  "codigo_inicial": "n = int(input('Tabuada de: '))\n# seu código aqui",
+  "validacao": {
+    "tipo": "saida_exata",
+    "casos": [
+      {
+        "input": "3\n",
+        "esperado": "3 x 1 = 3\n3 x 2 = 6\n3 x 3 = 9\n3 x 4 = 12\n3 x 5 = 15\n3 x 6 = 18\n3 x 7 = 21\n3 x 8 = 24\n3 x 9 = 27\n3 x 10 = 30\n"
+      }
+    ]
+  },
+  "solucao": "n = int(input())\nfor i in range(1, 11):\n    print(f'{n} x {i} = {n * i}')"
+}

@@ -1,0 +1,56 @@
+{
+  "modulo": "02",
+  "titulo": "Quiz — Módulo 2: Primeiros Passos em Python",
+  "perguntas": [
+    {
+      "id": "q1",
+      "pergunta": "O que a função input() retorna em Python?",
+      "opcoes": [
+        "Um número inteiro",
+        "Um número decimal",
+        "Uma string (texto)",
+        "Um booleano"
+      ],
+      "resposta_correta": 2,
+      "explicacao": "input() SEMPRE retorna uma string, independente do que o usuário digitou. Por isso é necessário converter com int() ou float() quando precisar de número."
+    },
+    {
+      "id": "q2",
+      "pergunta": "Qual é o resultado de 10 // 3 em Python?",
+      "opcoes": ["3.33", "3", "1", "0.33"],
+      "resposta_correta": 1,
+      "explicacao": "O operador // é divisão inteira e descarta o decimal. 10 // 3 = 3 (o quociente inteiro)."
+    },
+    {
+      "id": "q3",
+      "pergunta": "Como você escreve um texto que inclui o valor de uma variável de forma elegante?",
+      "opcoes": [
+        "print('Olá ' + nome + '!')",
+        "print(f'Olá {nome}!')",
+        "print('Olá', nome, '!')",
+        "Todas as formas estão corretas"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "f-string (opção B) é a forma mais moderna e legível. As outras funcionam, mas a f-string é preferida pela clareza."
+    },
+    {
+      "id": "q4",
+      "pergunta": "O que acontece se você tentar fazer: x = '5' + 3?",
+      "opcoes": [
+        "x recebe o valor 8",
+        "x recebe o valor '53'",
+        "Ocorre um erro de tipo (TypeError)",
+        "Python converte automaticamente e x recebe 8"
+      ],
+      "resposta_correta": 2,
+      "explicacao": "Python não mistura tipos automaticamente. Somar str com int gera TypeError. Você precisa converter explicitamente: int('5') + 3 ou '5' + str(3)."
+    },
+    {
+      "id": "q5",
+      "pergunta": "Qual é a saída de print(f'{3.14159:.2f}')?",
+      "opcoes": ["3.14159", "3.14", "3.1", "3"],
+      "resposta_correta": 1,
+      "explicacao": "O formatador :.2f limita a saída a 2 casas decimais. 3.14159 com :.2f vira '3.14'."
+    }
+  ]
+}

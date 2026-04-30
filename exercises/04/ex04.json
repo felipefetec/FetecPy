@@ -1,0 +1,27 @@
+{
+  "id": "04-ex04",
+  "modulo": "04",
+  "ordem": 4,
+  "titulo": "Contador de palavras",
+  "dificuldade": "medio",
+  "xp": 20,
+  "conceitos": ["dict", "split", "contagem de frequência"],
+  "antes_de_codar": [
+    "Como você divide uma frase em palavras?",
+    "Como usar um dicionário para contar ocorrências?",
+    "Como ordenar o resultado?"
+  ],
+  "enunciado": "Conte quantas vezes cada palavra aparece na frase abaixo e imprima no formato 'palavra: N' em ordem alfabética.\n\nFrase: 'o gato e o rato e o cachorro'",
+  "dica": "Use frase.split() para obter uma lista de palavras. Para cada palavra, incremente o contador no dicionário.",
+  "codigo_inicial": "frase = 'o gato e o rato e o cachorro'\ncontagem = {}\n# seu código aqui",
+  "validacao": {
+    "tipo": "saida_exata",
+    "casos": [
+      {
+        "input": "",
+        "esperado": "cachorro: 1\ne: 2\ngato: 1\no: 3\nrato: 1\n"
+      }
+    ]
+  },
+  "solucao": "frase = 'o gato e o rato e o cachorro'\ncontagem = {}\nfor palavra in frase.split():\n    contagem[palavra] = contagem.get(palavra, 0) + 1\nfor palavra in sorted(contagem):\n    print(f'{palavra}: {contagem[palavra]}')"
+}

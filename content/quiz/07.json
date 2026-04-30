@@ -1,0 +1,61 @@
+{
+  "modulo": "07",
+  "titulo": "Quiz — Módulo 7: Arquivos, JSON e Erros",
+  "perguntas": [
+    {
+      "id": "q1",
+      "pergunta": "Por que é recomendado usar 'with open(arquivo) as f:' em vez de apenas 'f = open(arquivo)'?",
+      "opcoes": [
+        "É mais rápido do que a forma tradicional",
+        "Garante que o arquivo seja fechado automaticamente, mesmo se ocorrer uma exceção",
+        "É obrigatório para arquivos maiores que 1MB",
+        "Permite abrir múltiplos arquivos ao mesmo tempo"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "O bloco with é um context manager. Ao sair do bloco (com ou sem erro), __exit__ é chamado automaticamente — o que fecha o arquivo. Sem with, um erro antes de f.close() deixa o arquivo aberto."
+    },
+    {
+      "id": "q2",
+      "pergunta": "Qual a diferença entre json.dumps() e json.dump()?",
+      "opcoes": [
+        "dumps() é mais rápido; dump() é mais preciso",
+        "dumps() retorna uma string; dump() escreve diretamente em um arquivo",
+        "São sinônimos — fazem exatamente a mesma coisa",
+        "dump() aceita mais tipos de dados que dumps()"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "json.dumps() (dump to String) retorna uma string JSON. json.dump() (dump to file) escreve diretamente em um objeto file. A mesma distinção existe para loads() e load()."
+    },
+    {
+      "id": "q3",
+      "pergunta": "O que o bloco 'finally' garante em um try/except?",
+      "opcoes": [
+        "Só executa se não houver exceção",
+        "Só executa se houver exceção",
+        "Sempre executa, independente de ter ocorrido exceção ou não",
+        "Executa apenas se a exceção foi capturada"
+      ],
+      "resposta_correta": 2,
+      "explicacao": "finally SEMPRE executa — após o try (se não houve erro), após o except (se houve e foi tratado), até mesmo em casos de return. É usado para garantir limpeza de recursos."
+    },
+    {
+      "id": "q4",
+      "pergunta": "O que é bom praticar ao criar exceções personalizadas?",
+      "opcoes": [
+        "Herdar diretamente de BaseException",
+        "Herdar de Exception ou de um tipo mais específico como ValueError",
+        "Não é possível criar exceções personalizadas em Python",
+        "Sempre usar apenas raise Exception('mensagem')"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "Herdar de Exception (ou subclasse como ValueError, IOError) é a prática recomendada. Herdar de BaseException é reservado para erros do sistema (como KeyboardInterrupt). Exceções customizadas tornam o código mais semântico e facilitam o tratamento específico."
+    },
+    {
+      "id": "q5",
+      "pergunta": "Qual modo de abertura você usa para adicionar conteúdo ao FINAL de um arquivo existente sem apagar o que já está nele?",
+      "opcoes": ["'w'", "'r'", "'a'", "'x'"],
+      "resposta_correta": 2,
+      "explicacao": "'a' (append) abre o arquivo posicionando o cursor no final. Qualquer write() adiciona ao final. 'w' sobrescreve tudo. 'r' é somente leitura. 'x' cria novo e falha se já existir."
+    }
+  ]
+}

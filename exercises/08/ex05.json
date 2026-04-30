@@ -1,0 +1,45 @@
+{
+  "id": "08-ex05",
+  "modulo": "08",
+  "ordem": 5,
+  "titulo": "8.5 — Schema de endpoint FastAPI",
+  "dificuldade": "medio",
+  "xp": 20,
+  "conceitos": [
+    "dict",
+    "validacao",
+    "pydantic-like"
+  ],
+  "antes_de_codar": [
+    "O que é um schema Pydantic e para que serve?",
+    "Como validar tipos e valores obrigatórios?",
+    "Como retornar erros estruturados?"
+  ],
+  "enunciado": "Implemente validar_produto(dados) que valida um dicionário de produto para FastAPI:\n- Campos obrigatórios: 'nome' (str), 'preco' (float > 0), 'estoque' (int >= 0)\n- Retorna {'valido': True, 'produto': dados_limpos} ou {'valido': False, 'erros': [lista de erros]}",
+  "dica": "Colete todos os erros antes de retornar. Use isinstance() para verificar tipos.",
+  "codigo_inicial": "def validar_produto(dados):\n    erros = []\n    # valide cada campo\n    # retorne {'valido': True/False, ...}\n    pass",
+  "validacao": {
+    "tipo": "funcao",
+    "nome_funcao": "validar_produto",
+    "casos": [
+      {
+        "args": [
+          {
+            "nome": "Camiseta",
+            "preco": 59.9,
+            "estoque": 10
+          }
+        ],
+        "esperado": {
+          "valido": true,
+          "produto": {
+            "nome": "Camiseta",
+            "preco": 59.9,
+            "estoque": 10
+          }
+        }
+      }
+    ]
+  },
+  "solucao": "def validar_produto(dados):\n    erros = []\n    if not dados.get('nome'):\n        erros.append('nome obrigatorio')\n    preco = dados.get('preco')\n    if preco is None or not isinstance(preco, (int, float)) or preco <= 0:\n        erros.append('preco deve ser numero positivo')\n    estoque = dados.get('estoque')\n    if estoque is None or not isinstance(estoque, int) or estoque < 0:\n        erros.append('estoque deve ser inteiro nao negativo')\n    if erros:\n        return {'valido': False, 'erros': erros}\n    return {'valido': True, 'produto': dados}"
+}

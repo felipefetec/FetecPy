@@ -1,0 +1,28 @@
+{
+  "id": "07-ex01",
+  "modulo": "07",
+  "ordem": 1,
+  "titulo": "Ler e contar linhas",
+  "dificuldade": "facil",
+  "xp": 10,
+  "conceitos": ["open", "readlines", "with"],
+  "antes_de_codar": [
+    "O que o bloco 'with' garante ao abrir um arquivo?",
+    "Qual método retorna uma lista com todas as linhas?",
+    "Como contar o total de linhas e palavras?"
+  ],
+  "enunciado": "Dado o texto abaixo como string, escreva uma função analisar_texto(texto) que retorna um dicionário com 'linhas', 'palavras' e 'caracteres' (excluindo espaços).",
+  "dica": "texto.split('\\n') divide em linhas. texto.split() divide em palavras. texto.replace(' ','') remove espaços antes de contar.",
+  "codigo_inicial": "def analisar_texto(texto):\n    # retorna {'linhas': N, 'palavras': N, 'caracteres': N}\n    pass",
+  "validacao": {
+    "tipo": "funcao",
+    "nome_funcao": "analisar_texto",
+    "casos": [
+      {
+        "args": ["Olá mundo\nPython é incrível\nFetecPy"],
+        "esperado": {"linhas": 3, "palavras": 6, "caracteres": 30}
+      }
+    ]
+  },
+  "solucao": "def analisar_texto(texto):\n    linhas = len(texto.split('\\n'))\n    palavras = len(texto.split())\n    caracteres = len(texto.replace(' ', '').replace('\\n', ''))\n    return {'linhas': linhas, 'palavras': palavras, 'caracteres': caracteres}"
+}

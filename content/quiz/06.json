@@ -1,0 +1,61 @@
+{
+  "modulo": "06",
+  "titulo": "Quiz — Módulo 6: POO",
+  "perguntas": [
+    {
+      "id": "q1",
+      "pergunta": "O que é o parâmetro 'self' em um método de classe?",
+      "opcoes": [
+        "Uma palavra reservada que representa o módulo atual",
+        "Uma referência à própria instância do objeto",
+        "O construtor da classe",
+        "Um decorador especial do Python"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "self é uma referência ao próprio objeto. Quando você chama meu_obj.metodo(), Python automaticamente passa meu_obj como primeiro argumento (o self). Por convenção, esse parâmetro sempre se chama self."
+    },
+    {
+      "id": "q2",
+      "pergunta": "Qual método especial é chamado automaticamente quando um objeto é criado?",
+      "opcoes": ["__create__", "__new_instance__", "__init__", "__start__"],
+      "resposta_correta": 2,
+      "explicacao": "__init__ é o construtor. Ele é chamado imediatamente após o objeto ser criado com NomeDaClasse(). É onde você inicializa os atributos da instância."
+    },
+    {
+      "id": "q3",
+      "pergunta": "O que significa class Gato(Animal): em Python?",
+      "opcoes": [
+        "Gato é um tipo de Animal (herança)",
+        "Gato contém um Animal como atributo (composição)",
+        "Gato importa métodos do módulo Animal",
+        "Gato e Animal são sinônimos"
+      ],
+      "resposta_correta": 0,
+      "explicacao": "Gato(Animal) significa que Gato herda de Animal — Gato é uma subclasse. Gato herda todos os atributos e métodos de Animal e pode sobrescrever os que precisar."
+    },
+    {
+      "id": "q4",
+      "pergunta": "Para que serve o método __str__?",
+      "opcoes": [
+        "Para converter strings em objetos",
+        "Para definir como o objeto é representado como texto (print/str())",
+        "Para comparar dois objetos",
+        "Para inicializar atributos do tipo string"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "__str__ define o que print(obj) e str(obj) retornam. Sem ele, print(obj) mostra algo como <__main__.Produto object at 0x...>. Com ele, você controla a representação."
+    },
+    {
+      "id": "q5",
+      "pergunta": "O que é polimorfismo em POO?",
+      "opcoes": [
+        "A capacidade de uma classe ter múltiplos construtores",
+        "Objetos de classes diferentes respondendo ao mesmo método de formas diferentes",
+        "Herdar de múltiplas classes ao mesmo tempo",
+        "Esconder atributos internos com __"
+      ],
+      "resposta_correta": 1,
+      "explicacao": "Polimorfismo: Cachorro.falar() retorna 'Au au!', Gato.falar() retorna 'Miau!'. O mesmo 'nome de método' (falar) produz comportamentos diferentes dependendo do tipo do objeto. Isso permite tratar objetos de tipos diferentes de forma uniforme."
+    }
+  ]
+}

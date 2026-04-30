@@ -1,0 +1,36 @@
+{
+  "id": "04-ex01",
+  "modulo": "04",
+  "ordem": 1,
+  "titulo": "Média de notas com lista",
+  "dificuldade": "facil",
+  "xp": 10,
+  "conceitos": [
+    "list",
+    "append",
+    "sum",
+    "len"
+  ],
+  "antes_de_codar": [
+    "Como você vai armazenar múltiplas notas em Python?",
+    "Qual é a fórmula da média? Que operações você precisa?",
+    "Como iterar para ler 5 notas do usuário?"
+  ],
+  "enunciado": "Leia 5 notas (floats) do usuário, armazene-as em uma lista e imprima a média com 2 casas decimais.\n\nExemplo:\nNota 1: 7.0\nNota 2: 8.5\n...\nMédia: 7.80",
+  "dica": "Use uma lista vazia e append() para adicionar cada nota. Depois, sum(lista)/len(lista) calcula a média.",
+  "codigo_inicial": "notas = []\nfor i in range(1, 6):\n    nota = float(input(f'Nota {i}: '))\n    # adicione a nota na lista\n# imprima a média",
+  "validacao": {
+    "tipo": "saida_exata",
+    "casos": [
+      {
+        "input": "7.0\n8.5\n6.0\n9.0\n8.5\n",
+        "esperado": "Média: 7.80\n"
+      },
+      {
+        "input": "10.0\n10.0\n10.0\n10.0\n10.0\n",
+        "esperado": "Média: 10.00\n"
+      }
+    ]
+  },
+  "solucao": "notas = []\nfor i in range(1, 6):\n    nota = float(input())\n    notas.append(nota)\nprint(f'Média: {sum(notas)/len(notas):.2f}')"
+}

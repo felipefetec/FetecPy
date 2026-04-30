@@ -1,0 +1,32 @@
+{
+  "id": "07-ex05",
+  "modulo": "07",
+  "ordem": 5,
+  "titulo": "Exceção personalizada",
+  "dificuldade": "desafio",
+  "xp": 30,
+  "conceitos": [
+    "class",
+    "Exception",
+    "raise",
+    "heranca"
+  ],
+  "antes_de_codar": [
+    "Como você cria uma exceção customizada em Python?",
+    "Por que é útil criar exceções específicas em vez de usar ValueError genérico?",
+    "Como capturar sua exceção customizada no try/except?"
+  ],
+  "enunciado": "Crie uma exceção Nota Invalida (NotaInvalida) e uma função validar_nota(nota) que:\n- Levanta NotaInvalida se nota < 0 ou nota > 10\n- Retorna a nota se válida\n\nA exceção deve ter uma mensagem descritiva com o valor inválido.",
+  "dica": "class NotaInvalida(ValueError): pass. Use raise NotaInvalida(f'Nota {nota} fora do intervalo 0-10')",
+  "codigo_inicial": "class NotaInvalida(ValueError):\n    pass\n\ndef validar_nota(nota):\n    # seu código aqui\n    pass",
+  "validacao": {
+    "tipo": "saida_exata",
+    "casos": [
+      {
+        "input": "",
+        "esperado": "7.5\n0.0\n10.0\nNotaInvalida\nNotaInvalida\n"
+      }
+    ]
+  },
+  "solucao": "class NotaInvalida(ValueError):\n    pass\n\ndef validar_nota(nota):\n    if nota < 0 or nota > 10:\n        raise NotaInvalida(f'Nota {nota} fora do intervalo 0-10')\n    return nota\n\nprint(validar_nota(7.5))\nprint(validar_nota(0.0))\nprint(validar_nota(10.0))\ntry:\n    validar_nota(-1)\nexcept NotaInvalida:\n    print('NotaInvalida')\ntry:\n    validar_nota(11)\nexcept NotaInvalida:\n    print('NotaInvalida')"
+}

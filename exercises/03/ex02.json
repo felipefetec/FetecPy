@@ -1,0 +1,47 @@
+{
+  "id": "03-ex02",
+  "modulo": "03",
+  "ordem": 2,
+  "titulo": "Classificação de nota",
+  "dificuldade": "facil",
+  "xp": 10,
+  "conceitos": [
+    "if",
+    "elif",
+    "else"
+  ],
+  "antes_de_codar": [
+    "Quantas faixas de nota existem? Quais são os limites?",
+    "Qual é a ordem correta de verificar as condições (da maior para a menor)?",
+    "O que acontece se a nota for exatamente 7.0?"
+  ],
+  "enunciado": "Leia uma nota (0 a 10) e classifique:\n- 9 a 10: 'A'\n- 7 a 8.9: 'B'\n- 5 a 6.9: 'C'\n- abaixo de 5: 'D'",
+  "dica": "Use elif para encadear condições. Verifique da faixa mais alta para a mais baixa.",
+  "codigo_inicial": "nota = float(input('Nota: '))\n# seu código aqui",
+  "validacao": {
+    "tipo": "saida_exata",
+    "casos": [
+      {
+        "input": "9.5\n",
+        "esperado": "A\n"
+      },
+      {
+        "input": "7.0\n",
+        "esperado": "B\n"
+      },
+      {
+        "input": "5.5\n",
+        "esperado": "C\n"
+      },
+      {
+        "input": "3.0\n",
+        "esperado": "D\n"
+      },
+      {
+        "input": "10.0\n",
+        "esperado": "A\n"
+      }
+    ]
+  },
+  "solucao": "nota = float(input())\nif nota >= 9:\n    print('A')\nelif nota >= 7:\n    print('B')\nelif nota >= 5:\n    print('C')\nelse:\n    print('D')"
+}

@@ -1,0 +1,24 @@
+{
+  "id": "04-ex02",
+  "modulo": "04",
+  "ordem": 2,
+  "titulo": "Buscar elemento em lista",
+  "dificuldade": "facil",
+  "xp": 10,
+  "conceitos": ["list", "in", "index"],
+  "antes_de_codar": [
+    "Como você verifica se um elemento está em uma lista?",
+    "O que retorna o operador 'in'?",
+    "Como encontrar a posição de um elemento?"
+  ],
+  "enunciado": "Dado o código abaixo com uma lista de frutas, complete para:\n1. Verificar se 'manga' está na lista — imprima 'encontrado' ou 'nao encontrado'\n2. Se encontrado, imprima a posição (índice) de 'manga'",
+  "dica": "Use 'manga' in frutas para verificar. Use frutas.index('manga') para obter o índice.",
+  "codigo_inicial": "frutas = ['banana', 'manga', 'uva', 'pera', 'abacaxi']\nbusca = 'manga'\n# seu código aqui",
+  "validacao": {
+    "tipo": "saida_exata",
+    "casos": [
+      { "input": "", "esperado": "encontrado\n1\n" }
+    ]
+  },
+  "solucao": "frutas = ['banana', 'manga', 'uva', 'pera', 'abacaxi']\nbusca = 'manga'\nif busca in frutas:\n    print('encontrado')\n    print(frutas.index(busca))\nelse:\n    print('nao encontrado')"
+}

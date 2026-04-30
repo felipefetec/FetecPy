@@ -1,0 +1,31 @@
+{
+  "id": "06-ex02",
+  "modulo": "06",
+  "ordem": 2,
+  "titulo": "Conta bancária",
+  "dificuldade": "medio",
+  "xp": 20,
+  "conceitos": [
+    "class",
+    "encapsulamento",
+    "excecao"
+  ],
+  "antes_de_codar": [
+    "O que deve acontecer se alguém tentar sacar mais do que tem?",
+    "Como garantir que o saldo nunca fique negativo?",
+    "O que é 'encapsulamento' e por que é útil aqui?"
+  ],
+  "enunciado": "Crie uma classe ContaBancaria com:\n- __init__(self, titular, saldo_inicial=0.0)\n- depositar(self, valor) → soma ao saldo (levanta ValueError se valor <= 0)\n- sacar(self, valor) → subtrai do saldo (levanta ValueError se insuficiente ou valor <= 0)\n- saldo (property) → retorna o saldo atual\n- __str__ → 'Conta de TITULAR: R$ SALDO'",
+  "dica": "Use try/raise ValueError para validar os valores. O saldo deve ser um atributo privado (convenção: _saldo).",
+  "codigo_inicial": "class ContaBancaria:\n    def __init__(self, titular, saldo_inicial=0.0):\n        self.titular = titular\n        self._saldo  = saldo_inicial\n\n    def depositar(self, valor):\n        pass\n\n    def sacar(self, valor):\n        pass\n\n    @property\n    def saldo(self):\n        return self._saldo\n\n    def __str__(self):\n        pass",
+  "validacao": {
+    "tipo": "saida_exata",
+    "casos": [
+      {
+        "input": "",
+        "esperado": "120.0\nConta de Ana: R$ 120.0\n"
+      }
+    ]
+  },
+  "solucao": "class ContaBancaria:\n    def __init__(self, titular, saldo_inicial=0.0):\n        self.titular = titular\n        self._saldo  = saldo_inicial\n\n    def depositar(self, valor):\n        if valor <= 0:\n            raise ValueError('Valor de depósito deve ser positivo')\n        self._saldo += valor\n\n    def sacar(self, valor):\n        if valor <= 0:\n            raise ValueError('Valor de saque deve ser positivo')\n        if valor > self._saldo:\n            raise ValueError('Saldo insuficiente')\n        self._saldo -= valor\n\n    @property\n    def saldo(self):\n        return self._saldo\n\n    def __str__(self):\n        return f'Conta de {self.titular}: R$ {self._saldo}'\n\nc = ContaBancaria('Ana', 100.0)\nc.depositar(50)\nc.sacar(30)\nprint(c.saldo)\nprint(c)"
+}
