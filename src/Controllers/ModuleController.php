@@ -303,11 +303,19 @@ class ModuleController
             return [];
         }
 
+        // Suporta dois formatos:
+        // 1. Array direto de perguntas: [{id, pergunta, ...}, ...]
+        // 2. Objeto com chave "perguntas": {modulo, titulo, perguntas: [...]}
+        $perguntas = isset($dados['perguntas']) ? $dados['perguntas'] : $dados;
+        if (!is_array($perguntas)) {
+            return [];
+        }
+
         // Remove respostas corretas de cada pergunta antes de enviar
         return array_map(function (array $pergunta) {
             unset($pergunta['resposta_correta']);
             return $pergunta;
-        }, $dados);
+        }, $perguntas);
     }
 
     /**
