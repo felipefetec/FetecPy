@@ -48,10 +48,10 @@
   </style>
 
   <script type="module">
-    import { verificarSessao, logout } from '/assets/js/auth.js'
-    import { apiFetch }                from '/assets/js/api.js'
-    import { carregarProgresso }       from '/assets/js/progress.js'
-    import { mesclarBadges, formatarXp, BADGES_CATALOGO } from '/assets/js/gamification.js'
+    import { verificarSessao, logout } from './assets/js/auth.js'
+    import { apiFetch }                from './assets/js/api.js'
+    import { carregarProgresso }       from './assets/js/progress.js'
+    import { mesclarBadges, formatarXp, BADGES_CATALOGO } from './assets/js/gamification.js'
 
     // Títulos dos módulos — referência ao PLANO_ESTUDOS.md
     const TITULOS_MODULOS = {
@@ -102,7 +102,7 @@
 
           } catch (e) {
             // Token expirado → volta para o login
-            if (e.status === 401) { window.location.replace('/index.html'); return }
+            if (e.status === 401) { window.location.replace('./index.html'); return }
             // Outros erros → mensagem amigável (não mostra stack trace)
             this.erroCarregamento = e.erro ?? 'Não foi possível carregar o dashboard. Verifique sua conexão e tente novamente.'
           } finally {
@@ -130,7 +130,7 @@
         // Navega para a página do módulo (somente se não bloqueado)
         abrirModulo(modulo) {
           if (modulo.status === 'bloqueado') return
-          window.location.href = `/module.html?id=${modulo.modulo}`
+          window.location.href = `./module.html?id=${modulo.modulo}`
         },
 
         // Abre o modal com detalhes da badge
@@ -150,7 +150,7 @@
           clearTimeout(this._timerLogout)
           this.logoutCarregando = true
           await logout()
-          window.location.replace('/index.html')
+          window.location.replace('./index.html')
         },
 
         cancelarLogout() {
@@ -171,7 +171,7 @@
   // O await top-level pausa o módulo inteiro antes de registrar o alpine:init,
   // fazendo Alpine carregar sem encontrar o componente 'dashboard'.
   verificarSessao().then(logado => {
-    if (!logado) window.location.replace('/index.html')
+    if (!logado) window.location.replace('./index.html')
   })
   </script>
 
@@ -188,7 +188,7 @@
     <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
 
       <!-- Logo -->
-      <a href="/app.html" class="font-mono font-bold text-lg shrink-0">
+      <a href="./app.html" class="font-mono font-bold text-lg shrink-0">
         <span class="text-python-500">Fetec</span><span class="text-slate-100">Py</span>
       </a>
 
@@ -297,7 +297,7 @@
               <p class="text-slate-100 font-semibold" x-text="'Módulo ' + continuarModulo.modulo + ' — ' + (titulosModulos[continuarModulo.modulo] ?? '')"></p>
               <p class="text-sm text-slate-400 mt-0.5" x-text="continuarModulo.percentual + '% concluído'"></p>
             </div>
-            <a :href="'/module.html?id=' + continuarModulo.modulo" class="shrink-0 bg-blue-500 hover:bg-blue-400 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
+            <a :href="'./module.html?id=' + continuarModulo.modulo" class="shrink-0 bg-blue-500 hover:bg-blue-400 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
               Continuar
             </a>
           </div>

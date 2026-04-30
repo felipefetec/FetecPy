@@ -64,7 +64,7 @@
     - Verifica sessão existente e redireciona se já estiver logado
   -->
   <script type="module">
-    import { login, verificarSessao } from '/assets/js/auth.js'
+    import { login, verificarSessao } from './assets/js/auth.js'
 
     // Expõe para o componente Alpine.js (que não é módulo ES)
     window.__auth = { login, verificarSessao }
@@ -72,7 +72,7 @@
     // Redireciona imediatamente se já houver sessão válida,
     // evitando que o aluno logado veja a tela de login
     verificarSessao().then(logado => {
-      if (logado) window.location.replace('/app.html')
+      if (logado) window.location.replace('./app.html')
     })
 
     // Registra o componente Alpine antes de ele processar o DOM
@@ -139,7 +139,7 @@
             // Pequena pausa para que o aluno veja o feedback visual
             // antes de ser redirecionado para o dashboard
             await new Promise(r => setTimeout(r, 500))
-            window.location.href = '/app.html'
+            window.location.href = './app.html'
 
           } catch (e) {
             // Mensagem de erro vinda da API ou fallback genérico

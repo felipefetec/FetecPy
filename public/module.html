@@ -84,12 +84,12 @@
   </style>
 
   <script type="module">
-    import { verificarSessao }                                  from '/assets/js/auth.js'
-    import { apiFetch }                                         from '/assets/js/api.js'
-    import { renderizar, extrairTOC, adicionarAncorasTitulos }  from '/assets/js/markdown.js'
-    import { carregarPyodide, runPython, pyodidePronto }        from '/assets/js/pyodide.js'
-    import { validar, validateTextLivre }                        from '/assets/js/validator.js'
-    import { processarRespostaGamificacao }                      from '/assets/js/gamification.js'
+    import { verificarSessao }                                  from './assets/js/auth.js'
+    import { apiFetch }                                         from './assets/js/api.js'
+    import { renderizar, extrairTOC, adicionarAncorasTitulos }  from './assets/js/markdown.js'
+    import { carregarPyodide, runPython, pyodidePronto }        from './assets/js/pyodide.js'
+    import { validar, validateTextLivre }                        from './assets/js/validator.js'
+    import { processarRespostaGamificacao }                      from './assets/js/gamification.js'
     // criarEditor é importado dinamicamente dentro de ativarEditoresTente(),
     // para não atrasar o registro do alpine:init com requisições para esm.sh
 
@@ -152,7 +152,7 @@
             } catch { /* progresso de seções é opcional */ }
 
           } catch (e) {
-            if (e.status === 401) { window.location.replace('/index.html'); return }
+            if (e.status === 401) { window.location.replace('./index.html'); return }
             this.erro = e.erro ?? 'Erro ao carregar o módulo.'
           } finally {
             this.carregando = false
@@ -361,7 +361,7 @@
           slot.innerHTML = ''
           window._editorModal = null
 
-          const { criarEditor } = await import('/assets/js/editor.js')
+          const { criarEditor } = await import('./assets/js/editor.js')
           window._editorModal = criarEditor(slot, this.codigoAluno, () => {
             // Ctrl+Enter dispara "Testar"
             document.getElementById('btn-modal-testar')?.click()
@@ -769,7 +769,7 @@
 
       // Import dinâmico: carrega o CodeMirror só quando há editores na página,
       // evitando bloquear o alpine:init com requisições de rede desnecessárias
-      const { criarEditor } = await import('/assets/js/editor.js')
+      const { criarEditor } = await import('./assets/js/editor.js')
 
       slots.forEach((slot, idx) => {
         slot.setAttribute('data-ready', 'true')
@@ -1041,7 +1041,7 @@
 
     // Verificação de sessão com .then() — não usar await top-level aqui
     verificarSessao().then(logado => {
-      if (!logado) window.location.replace('/index.html')
+      if (!logado) window.location.replace('./index.html')
     })
   </script>
 
@@ -1057,7 +1057,7 @@
     <div class="max-w-6xl mx-auto px-4 h-14 flex items-center gap-3">
 
       <!-- Botão voltar ao dashboard -->
-      <a href="/app.html" class="text-slate-400 hover:text-slate-200 transition-colors p-1 -ml-1 rounded" aria-label="Voltar ao dashboard">
+      <a href="./app.html" class="text-slate-400 hover:text-slate-200 transition-colors p-1 -ml-1 rounded" aria-label="Voltar ao dashboard">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
         </svg>
@@ -1153,7 +1153,7 @@
       <template x-if="erro">
         <div class="bg-red-950 border border-red-900 rounded-xl p-6 text-center">
           <p class="text-red-300" x-text="erro"></p>
-          <a href="/app.html" class="mt-3 inline-block text-sm text-slate-400 hover:text-slate-200">← Voltar ao dashboard</a>
+          <a href="./app.html" class="mt-3 inline-block text-sm text-slate-400 hover:text-slate-200">← Voltar ao dashboard</a>
         </div>
       </template>
 
@@ -1408,7 +1408,7 @@
             <!-- Anterior -->
             <div class="flex-1">
               <template x-if="anteriorId">
-                <a :href="'/module.html?id=' + anteriorId" class="group flex items-center gap-3 text-slate-400 hover:text-slate-200 transition-colors">
+                <a :href="'./module.html?id=' + anteriorId" class="group flex items-center gap-3 text-slate-400 hover:text-slate-200 transition-colors">
                   <span class="w-8 h-8 rounded-lg border border-slate-700 group-hover:border-slate-500 flex items-center justify-center transition-colors">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/>
@@ -1423,14 +1423,14 @@
             </div>
 
             <!-- Voltar ao dashboard -->
-            <a href="/app.html" class="text-xs text-slate-600 hover:text-slate-400 transition-colors">Dashboard</a>
+            <a href="./app.html" class="text-xs text-slate-600 hover:text-slate-400 transition-colors">Dashboard</a>
 
             <!-- Próximo módulo: ativo só após concluir todos os exercícios -->
             <div class="flex-1 flex justify-end">
               <template x-if="proximoId">
                 <template x-if="moduloConcluido">
                   <!-- Concluído: link clicável -->
-                  <a :href="'/module.html?id=' + proximoId" class="group flex items-center gap-3 text-slate-400 hover:text-slate-200 transition-colors text-right">
+                  <a :href="'./module.html?id=' + proximoId" class="group flex items-center gap-3 text-slate-400 hover:text-slate-200 transition-colors text-right">
                     <div>
                       <p class="text-xs text-slate-600">Próximo</p>
                       <p class="text-sm font-medium" x-text="'Módulo ' + proximoId"></p>
