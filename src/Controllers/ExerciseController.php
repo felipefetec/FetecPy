@@ -123,6 +123,40 @@ class ExerciseController
     }
 
     // ----------------------------------------------------------------
+    // GET /api/modules/:moduloId/exercises/:exId/solution
+    // Retorna a solução apenas se o aluno já concluiu o exercício.
+    // ----------------------------------------------------------------
+
+    public function solution(Request $request): void
+    {
+        AuthMiddleware::exigir($request);
+
+        $moduloId = $request->params['moduloId'] ?? '';
+        $exId     = $request->params['exId']     ?? '';
+        $userId   = (int) $request->user['id'];
+
+        $exercicio = $this->carregarExercicio($moduloId, $exId);
+        if ($exercicio === null) {
+            JsonResponse::erro("Exercício '{$moduloId}/{$exId}' não encontrado.", 404);
+        }
+
+        // Só entrega a solução se o aluno já concluiu — nunca antes
+        $pdo  = \FetecPy\Database::getConnection();
+        $stmt = $pdo->prepare(
+            'SELECT 1 FROM progress
+             WHERE user_id = ? AND modulo = ? AND item_tipo = "exercicio" AND item_id = ?
+               AND status IN ("concluido", "concluido_com_ajuda")'
+        );
+        $stmt->execute([$userId, $moduloId, $exId]);
+
+        if (!$stmt->fetch()) {
+            JsonResponse::erro('Resolva o exercício primeiro para ver a solução.', 403);
+        }
+
+        JsonResponse::enviar(['solucao' => $exercicio['solucao'] ?? '']);
+    }
+
+    // ----------------------------------------------------------------
     // Helpers
     // ----------------------------------------------------------------
 

@@ -688,6 +688,43 @@
         },
 
         /**
+         * Abre o exercício já na fase de editor e mostra a solução imediatamente.
+         * Busca a solução da API se ainda não estiver em memória — o endpoint
+         * /solution só retorna se o aluno já tiver concluído o exercício.
+         */
+        async verSolucao(ex) {
+          // Usa solução em cache (definida em enviarSubmissao quando backend retorna)
+          if (ex.solucao) {
+            this.abrirExercicio(ex)
+            await this.$nextTick()
+            this.exFase = 'editor'
+            this.solucaoVisivel = true
+            return
+          }
+
+          // Busca da API e guarda em cache no array local para não repetir
+          try {
+            const exId = ex.id.split('-').pop()
+            const resp = await apiFetch(`/modules/${this.moduloId}/exercises/${exId}/solution`)
+            const idx  = this.modulo.exercicios.findIndex(e => e.id === ex.id)
+            const comSolucao = { ...ex, solucao: resp.solucao }
+            if (idx !== -1) this.modulo.exercicios.splice(idx, 1, comSolucao)
+            this.abrirExercicio(comSolucao)
+          } catch {
+            // Se falhar (403 ou rede), abre sem solução mesmo
+            this.abrirExercicio(ex)
+          }
+          await this.$nextTick()
+          this.exFase = 'editor'
+          this.solucaoVisivel = true
+        },
+
+        /** Reabre o exercício do zero — o aluno pode tentar de novo sem penalidade. */
+        refazerExercicio(ex) {
+          this.abrirExercicio(ex)
+        },
+
+        /**
          * Atualiza o status_aluno no array local de exercícios para a medalha
          * aparecer imediatamente no card sem precisar recarregar a página.
          *
@@ -1223,6 +1260,37 @@
                       <span x-text="ex.xp + ' XP'"></span>
                     </div>
                   </button>
+
+                  <!-- Botões pós-conclusão: Ver solução (só código) e Refazer -->
+                  <template x-if="ex.status_aluno === 'concluido' || ex.status_aluno === 'concluido_com_ajuda'">
+                    <div class="flex gap-2 mt-2">
+                      <!-- "Ver solução" só existe para exercícios com código (não texto_livre) -->
+                      <template x-if="ex.validacao?.tipo !== 'texto_livre'">
+                        <button
+                          @click.stop="verSolucao(ex)"
+                          title="Ver gabarito do exercício"
+                          class="flex-1 flex items-center justify-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg py-2 transition-colors"
+                        >
+                          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.641 0-8.573-3.007-9.964-7.178z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                          </svg>
+                          Ver solução
+                        </button>
+                      </template>
+                      <button
+                        @click.stop="refazerExercicio(ex)"
+                        title="Tentar o exercício novamente"
+                        class="flex-1 flex items-center justify-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg py-2 transition-colors"
+                      >
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+                        </svg>
+                        Refazer
+                      </button>
+                    </div>
+                  </template>
+
                   </div><!-- fim wrapper relativo -->
                 </template>
               </div>
