@@ -518,7 +518,9 @@
                 body: JSON.stringify({
                   codigo,
                   status,
-                  tentativas: this.tentativas,
+                  // tentativas começa em 0 e só incrementa nas falhas;
+                  // o backend exige >= 1 (a tentativa atual conta como 1)
+                  tentativas: Math.max(1, this.tentativas),
                   hora_local: new Date().toTimeString().slice(0, 5),
                 }),
               }
