@@ -47,15 +47,15 @@
     },
     {
       "id": "q5",
-      "pergunta": "O que é polimorfismo em POO?",
+      "pergunta": "Você escreveu uma função que percorre uma lista de animais e chama animal.falar() para cada um. Cachorro imprime 'Au!', Gato imprime 'Miau!'. A função não sabe o tipo exato — só chama falar(). Que conceito de POO permite isso?",
       "opcoes": [
-        "A capacidade de uma classe ter múltiplos construtores",
-        "Objetos de classes diferentes respondendo ao mesmo método de formas diferentes",
-        "Herdar de múltiplas classes ao mesmo tempo",
-        "Esconder atributos internos com __"
+        "Encapsulamento",
+        "Herança simples",
+        "Polimorfismo",
+        "Composição"
       ],
-      "resposta_correta": 1,
-      "explicacao": "Polimorfismo: Cachorro.falar() retorna 'Au au!', Gato.falar() retorna 'Miau!'. O mesmo 'nome de método' (falar) produz comportamentos diferentes dependendo do tipo do objeto. Isso permite tratar objetos de tipos diferentes de forma uniforme."
+      "resposta_correta": 2,
+      "explicacao": "Polimorfismo: o mesmo nome de método (falar) produz comportamentos diferentes dependendo do tipo real do objeto. Isso permite escrever código genérico que funciona com qualquer classe que implemente o método esperado — sem if/elif por tipo."
     }
   ]
 }

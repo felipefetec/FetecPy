@@ -19,19 +19,19 @@
       "pergunta": "Qual é o resultado de 10 // 3 em Python?",
       "opcoes": ["3.33", "3", "1", "0.33"],
       "resposta_correta": 1,
-      "explicacao": "O operador // é divisão inteira e descarta o decimal. 10 // 3 = 3 (o quociente inteiro)."
+      "explicacao": "O operador // é divisão inteira e descarta o decimal. 10 // 3 = 3 (o quociente inteiro). Para o resto, use o operador %: 10 % 3 = 1."
     },
     {
       "id": "q3",
-      "pergunta": "Como você escreve um texto que inclui o valor de uma variável de forma elegante?",
+      "pergunta": "O código abaixo funciona, mas como se escreve a mesma coisa de forma mais legível?\n\nsaida = 'Olá ' + nome + '! Você tem ' + str(idade) + ' anos.'",
       "opcoes": [
-        "print('Olá ' + nome + '!')",
-        "print(f'Olá {nome}!')",
-        "print('Olá', nome, '!')",
-        "Todas as formas estão corretas"
+        "saida = f'Olá {nome}! Você tem {idade} anos.'",
+        "saida = 'Olá' + nome + '!' + str(idade)",
+        "saida = print('Olá', nome, 'Você tem', idade, 'anos.')",
+        "saida = format(nome, idade)"
       ],
-      "resposta_correta": 1,
-      "explicacao": "f-string (opção B) é a forma mais moderna e legível. As outras funcionam, mas a f-string é preferida pela clareza."
+      "resposta_correta": 0,
+      "explicacao": "f-string coloca as variáveis direto no texto entre {}. Sem concatenação, sem str() manual. O resultado é mais curto e muito mais fácil de ler — especialmente quando há várias variáveis."
     },
     {
       "id": "q4",

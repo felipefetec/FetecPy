@@ -4,15 +4,15 @@
   "perguntas": [
     {
       "id": "q1",
-      "pergunta": "O que é um algoritmo?",
+      "pergunta": "Todo dia você segue os mesmos passos para fazer café: encher a água, ligar a máquina, esperar, colocar o pó. O que esses passos têm em comum com um algoritmo?",
       "opcoes": [
-        "Um tipo de linguagem de programação",
-        "Uma sequência finita de passos bem definidos que resolve um problema",
-        "Um erro de programação",
-        "O nome do criador do Python"
+        "Nada — algoritmo é exclusivo de computadores",
+        "São passos finitos, em ordem definida e atingem um resultado concreto",
+        "Ambos precisam de eletricidade para funcionar",
+        "São escritos em pseudocódigo"
       ],
       "resposta_correta": 1,
-      "explicacao": "Algoritmo é uma receita precisa: tem começo, fim e cada passo é bem definido. Linguagens de programação são ferramentas para *escrever* algoritmos, não o algoritmo em si."
+      "explicacao": "Isso já é um algoritmo — antes mesmo de virar código. Algoritmo é qualquer sequência precisa, finita e eficaz de passos para resolver um problema. O computador só executa de forma mais rigorosa o que já fazemos naturalmente."
     },
     {
       "id": "q2",
@@ -28,15 +28,15 @@
     },
     {
       "id": "q3",
-      "pergunta": "O que é uma variável?",
+      "pergunta": "Um programa de IMC precisa guardar o peso e a altura digitados pelo usuário para calcular depois. Esses espaços na memória com nome e valor são chamados de:",
       "opcoes": [
-        "Um erro no programa",
-        "Um tipo de loop",
-        "Um espaço na memória com nome e valor que pode mudar",
-        "Uma função matemática"
+        "Algoritmos",
+        "Pseudocódigos",
+        "Variáveis",
+        "Condicionais"
       ],
       "resposta_correta": 2,
-      "explicacao": "Variável = caixinha com nome. Você pode guardar um valor nela e trocar esse valor quando quiser. O nome é fixo; o conteúdo pode mudar."
+      "explicacao": "Variável = caixinha com etiqueta. peso = 70 reserva um espaço, nomeia como 'peso' e guarda o valor 70. Você pode ler e trocar esse valor quantas vezes quiser durante o programa."
     },
     {
       "id": "q4",
@@ -60,7 +60,7 @@
         "Para substituir completamente o código real"
       ],
       "resposta_correta": 1,
-      "explicacao": "Pseudocódigo é uma rascunho em linguagem natural. Permite pensar na solução sem travar em vírgulas e parênteses. Depois que a lógica está clara, traduzir para Python (ou outra linguagem) é simples."
+      "explicacao": "Pseudocódigo é um rascunho em linguagem natural. Permite pensar na solução sem travar em vírgulas e parênteses. Depois que a lógica está clara, traduzir para Python (ou outra linguagem) é simples."
     }
   ]
 }
