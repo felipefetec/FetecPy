@@ -77,8 +77,12 @@ class ModuleController
         $exercicios  = $this->listarExercicios($id);
         $concluidos  = $this->statusExercicios($userId, $id);
         foreach ($exercicios as &$ex) {
-            $exKey          = explode('-', $ex['id'], 2)[1] ?? ''; // "01-ex03" → "ex03"
-            $ex['status_aluno'] = $concluidos[$exKey] ?? null;
+            $exKey   = explode('-', $ex['id'], 2)[1] ?? ''; // "01-ex03" → "ex03"
+            $prog    = $concluidos[$exKey] ?? null;
+            // status_aluno: usado para a medalha e para saber se pode "Refazer"
+            $ex['status_aluno']  = $prog ? $prog['status']       : null;
+            // codigo_salvo: carregado no editor ao clicar em "Refazer" ou reabrir
+            $ex['codigo_salvo']  = $prog ? $prog['codigo_salvo'] : null;
         }
         unset($ex);
 
@@ -344,19 +348,28 @@ class ModuleController
      *
      * @return array<string, string>  ['ex01' => 'concluido', 'ex03' => 'concluido_com_ajuda', ...]
      */
+    /**
+     * Retorna status e código salvo de todos os exercícios com progresso do aluno.
+     * Inclui também exercícios "tentados" para que o frontend possa carregar
+     * o código que o aluno escreveu ao clicar em "Refazer".
+     *
+     * @return array<string, array{status: string, codigo_salvo: string|null}>
+     */
     private function statusExercicios(int $userId, string $moduloId): array
     {
         $pdo  = \FetecPy\Database::getConnection();
         $stmt = $pdo->prepare(
-            'SELECT item_id, status FROM progress
-             WHERE user_id = ? AND modulo = ? AND item_tipo = "exercicio"
-               AND status IN ("concluido", "concluido_com_ajuda")'
+            'SELECT item_id, status, codigo_salvo FROM progress
+             WHERE user_id = ? AND modulo = ? AND item_tipo = "exercicio"'
         );
         $stmt->execute([$userId, $moduloId]);
 
         $resultado = [];
         foreach ($stmt->fetchAll() as $row) {
-            $resultado[$row['item_id']] = $row['status'];
+            $resultado[$row['item_id']] = [
+                'status'       => $row['status'],
+                'codigo_salvo' => $row['codigo_salvo'],
+            ];
         }
         return $resultado;
     }

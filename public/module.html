@@ -312,7 +312,9 @@
           this.exAtual           = ex
           this.exFase            = 'reflexao'
           this.respostasAntes    = new Array(ex.antes_de_codar?.length ?? 0).fill('')
-          this.codigoAluno       = ex.codigo_inicial ?? ''
+          // Carrega o código salvo do aluno se existir, senão usa o template inicial.
+          // Cobre tanto a abertura normal quanto o fluxo "Refazer".
+          this.codigoAluno       = ex.codigo_salvo ?? ex.codigo_inicial ?? ''
           this.textoAluno        = ''
           this.tentativas        = 0
           this.resultadoValidacao = null
@@ -352,20 +354,46 @@
 
         /** Monta (ou re-monta) o editor CodeMirror no slot do modal */
         async _montarEditorModal() {
-          if (this.ehTextoLivre) return // texto_livre usa textarea comum
+          if (this.ehTextoLivre) return
 
           const slot = document.getElementById('modal-editor-slot')
           if (!slot) return
 
-          // Limpa editor anterior se houver
           slot.innerHTML = ''
           window._editorModal = null
 
+          // Token de cancelamento: se _montarEditorModal for chamado novamente
+          // antes deste await resolver, o token muda e esta chamada descarta o resultado,
+          // evitando dois CodeMirror no mesmo slot.
+          const token = Symbol()
+          this._editorToken = token
+
           const { criarEditor } = await import('./assets/js/editor.js')
+
+          if (this._editorToken !== token) return  // chamada mais recente já tomou conta
+
+          const LIMITE_CHARS = 5000
+
+          // Atualiza o contador de caracteres a cada keystroke
+          const atualizarContador = (conteudo) => {
+            const el  = document.getElementById('modal-char-count')
+            if (!el) return
+            const len = conteudo.length
+            el.textContent = `${len} / ${LIMITE_CHARS}`
+            // Verde (padrão) → amarelo (>90%) → vermelho (ultrapassou o limite)
+            el.className = 'text-[10px] font-mono tabular-nums ' + (
+              len > LIMITE_CHARS       ? 'text-red-400'
+              : len > LIMITE_CHARS * 0.9 ? 'text-amber-400'
+              : 'text-slate-600'
+            )
+          }
+
           window._editorModal = criarEditor(slot, this.codigoAluno, () => {
-            // Ctrl+Enter dispara "Testar"
             document.getElementById('btn-modal-testar')?.click()
-          })
+          }, atualizarContador)
+
+          // Inicializa o contador com o código já carregado no editor
+          atualizarContador(this.codigoAluno)
         },
 
         /** Roda o código sem testar (apenas mostra saída) */
@@ -502,8 +530,8 @@
               const t = Math.min(passo / totalPassos, 1)
               this.progressoValidacao = Math.round(100 * (1 - (1 - t) * (1 - t)))
 
-              // Revela os casos de teste na metade da animação
-              if (!revelado && this.progressoValidacao >= 50) {
+              // Revela o resultado quando a barra atinge 10% (era 50%)
+              if (!revelado && this.progressoValidacao >= 10) {
                 revelado = true
                 this.resultadoValidacao = resultado
               }
@@ -533,6 +561,12 @@
 
         /** Pula sem ver solução — registra como "tentado" sem XP */
         async pularExercicio() {
+          // Se o exercício já foi resolvido (fluxo "Refazer → Pular"),
+          // apenas fecha sem rebaixar o status de volta para 'tentado'
+          if (this.exAtual?.status_aluno === 'resolvido') {
+            this.fecharModal()
+            return
+          }
           const codigo = window._editorModal?.getValue() ?? this.codigoAluno
           await this.enviarSubmissao('tentado', codigo)
           this.fecharModal()
@@ -716,12 +750,19 @@
           this.codigoAluno = exComSolucao.solucao ?? ''
           await this.$nextTick()
           this.exFase = 'editor'
-          this.solucaoVisivel = true
+          // Não ativa solucaoVisivel aqui — a solução já está visível no editor
+          // (codigoAluno = solucao). Ativar causaria um <pre> duplicado abaixo do editor.
+          // solucaoVisivel = true é reservado para usarSolucao() (pedido dentro do modal).
+
           if (!this.ehTextoLivre) {
-            // _montarEditorModal não foi chamado por abrirExercicio (que foi para reflexao)
-            // — precisa ser chamado manualmente agora que exFase = 'editor'
             await this.$nextTick()
-            this._montarEditorModal()
+            if (window._editorModal) {
+              // Editor já montado por abrirExercicio (módulo 6+) — só atualiza conteúdo
+              window._editorModal.setValue(this.codigoAluno)
+            } else {
+              // Módulos 1-5: reflexao não montou o editor
+              this._montarEditorModal()
+            }
           }
         },
 
@@ -1065,6 +1106,14 @@
 
       <!-- Título do módulo -->
       <h1 class="text-sm font-semibold text-slate-200 truncate flex-1" x-text="tituloCompleto"></h1>
+
+      <!-- Botão ranking Top 10 -->
+      <button
+        id="btn-ranking"
+        title="Ver ranking Top 10"
+        aria-label="Ranking Top 10"
+        class="flex items-center gap-1 text-xs text-slate-400 hover:text-python-400 transition-colors px-2 py-1 rounded hover:bg-slate-800"
+      >🏆 <span class="hidden sm:inline">Top 10</span></button>
 
       <!-- Botão TOC no mobile -->
       <button
@@ -1596,6 +1645,11 @@
               </div>
               <!-- Slot onde o CodeMirror é montado dinamicamente -->
               <div id="modal-editor-slot" class="border border-slate-700 rounded-lg overflow-hidden min-h-[160px]"></div>
+
+              <!-- Contador de caracteres — avisa quando próximo do limite -->
+              <div class="flex justify-end mt-1">
+                <span id="modal-char-count" class="text-[10px] text-slate-600 font-mono tabular-nums">0 / 5000</span>
+              </div>
             </div>
           </template>
 
@@ -1899,6 +1953,16 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'))
     }
+  </script>
+
+  <script type="module">
+    import { iniciarRanking } from './assets/js/ranking.js'
+    window.addEventListener('load', () => {
+      const btn = document.getElementById('btn-ranking')
+      // window._usuarioNome é definido pelo app.html — em module.html lê do localStorage
+      const getNome = () => window._usuarioNome ?? sessionStorage.getItem('fetecpy_nome') ?? ''
+      iniciarRanking('./api/leaderboard', getNome, btn)
+    })
   </script>
 
 </body>

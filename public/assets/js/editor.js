@@ -19,14 +19,20 @@ import { oneDark } from 'https://esm.sh/@codemirror/theme-one-dark@6.0.0'
  * @param {HTMLElement} elemento      Elemento onde o editor será montado
  * @param {string}      codigoInicial Código pré-carregado no editor
  * @param {function}    onRun         Callback chamado com Ctrl+Enter (opcional)
+ * @param {function}    onUpdate      Callback chamado com (novoConteudo: string) a cada mudança (opcional)
  * @returns {{ getValue(): string, setValue(code: string): void, foco(): void }}
  */
-export function criarEditor(elemento, codigoInicial = '', onRun = null) {
+export function criarEditor(elemento, codigoInicial = '', onRun = null, onUpdate = null) {
   const extensoes = [
     basicSetup,          // números de linha, highlight, undo/redo, etc.
     python(),            // syntax highlighting Python
     oneDark,             // tema dark consistente com a plataforma
     EditorView.lineWrapping,
+
+    // Notifica a cada mudança de conteúdo — usado para contador de chars, autosave etc.
+    ...(onUpdate ? [EditorView.updateListener.of(upd => {
+      if (upd.docChanged) onUpdate(upd.view.state.doc.toString())
+    })] : []),
 
     // Tab insere 4 espaços (padrão Python) e Ctrl+Enter executa o código
     // Usamos domEventHandlers para não depender de @codemirror/commands extra

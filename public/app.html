@@ -45,6 +45,45 @@
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+    /* === Rodapé com ticker de alunos === */
+    .ticker-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: #0f172a;
+      border-top: 1px solid #1e293b;
+      padding: 6px 0 4px;
+      overflow: hidden;
+    }
+    .ticker-count {
+      text-align: center;
+      font-size: 0.65rem;
+      color: #64748b;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .ticker-count strong { color: #4ade80; }
+    .ticker-track-wrap { overflow: hidden; white-space: nowrap; }
+    /* transform aplicado via JS (requestAnimationFrame), sem CSS animation */
+    .ticker-track {
+      display: inline-flex;
+      gap: 0;
+      will-change: transform;
+    }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 28px;
+      font-size: 0.7rem;
+      color: #94a3b8;
+    }
+    .ticker-item .t-nome { color: #cbd5e1; font-weight: 500; }
+    .ticker-item .t-xp  { color: #4ade80; font-size: 0.65rem; }
+    .ticker-item .t-sep { color: #334155; }
   </style>
 
   <script type="module">
@@ -88,6 +127,29 @@
         get continuarModulo(){ return this.progresso.find(m => m.status === 'em_andamento') ?? null },
         get titulosModulos() { return TITULOS_MODULOS },
 
+        // Sistema de níveis por XP.
+        // corBarra usa hex direto porque Tailwind CDN não gera classes CSS a partir
+        // de strings montadas dinamicamente em JS (só varre o HTML estático).
+        get nivel() {
+          const xp = this.usuario?.xp_total ?? 0
+          if (xp >= 1000) return { nome: 'Especialista', icone: '🏆', cor: 'text-yellow-400', corBarra: '#facc15', proximo: null,           xpProximo: null }
+          if (xp >= 600)  return { nome: 'Avançado',     icone: '💎', cor: 'text-cyan-400',   corBarra: '#22d3ee', proximo: 'Especialista', xpProximo: 1000 }
+          if (xp >= 300)  return { nome: 'Praticante',   icone: '🥇', cor: 'text-amber-400',  corBarra: '#fbbf24', proximo: 'Avançado',    xpProximo: 600 }
+          if (xp >= 100)  return { nome: 'Aprendiz',     icone: '🥈', cor: 'text-slate-300',  corBarra: '#cbd5e1', proximo: 'Praticante',  xpProximo: 300 }
+          return           { nome: 'Iniciante',           icone: '🥉', cor: 'text-orange-400', corBarra: '#fb923c', proximo: 'Aprendiz',    xpProximo: 100 }
+        },
+        // Percentual de progresso dentro do nível atual (0-100)
+        get nivelProgresso() {
+          const xp = this.usuario?.xp_total ?? 0
+          const limites = [0, 100, 300, 600, 1000]
+          for (let i = 0; i < limites.length - 1; i++) {
+            if (xp < limites[i + 1]) {
+              return Math.round((xp - limites[i]) / (limites[i + 1] - limites[i]) * 100)
+            }
+          }
+          return 100
+        },
+
         async init() {
           try {
             // Carrega usuário e progresso em paralelo para reduzir tempo de espera
@@ -99,6 +161,11 @@
             this.usuario   = usuario
             this.progresso = progresso
             this.badges    = mesclarBadges(usuario.badges)
+
+            // Expõe nome completo para ranking.js (app.html) e persiste para module.html
+            const nomeCompleto = `${usuario.nome} ${usuario.sobrenome}`
+            window._usuarioNome = nomeCompleto
+            sessionStorage.setItem('fetecpy_nome', nomeCompleto)
 
           } catch (e) {
             // Token expirado → volta para o login
@@ -207,12 +274,26 @@
               <span class="text-base" aria-hidden="true">🔥</span>
               <span x-text="streakTexto" class="font-medium tabular-nums"></span>
             </div>
+
+            <!-- Nível atual — ícone + nome com a cor do nível -->
+            <div class="flex items-center gap-1.5" :class="nivel.cor">
+              <span x-text="nivel.icone" class="text-base leading-none" aria-hidden="true"></span>
+              <span x-text="nivel.nome" class="font-medium hidden lg:inline"></span>
+            </div>
           </>
         </template>
         <template x-if="!usuario && carregando">
           <div class="h-4 w-24 bg-slate-800 rounded animate-pulse"></div>
         </template>
       </div>
+
+      <!-- Botão ranking Top 10 -->
+      <button
+        id="btn-ranking"
+        title="Ver ranking Top 10"
+        aria-label="Ranking Top 10"
+        class="flex items-center gap-1.5 text-xs text-slate-400 hover:text-python-400 transition-colors px-2 py-1 rounded hover:bg-slate-800"
+      >🏆 <span class="hidden sm:inline">Top 10</span></button>
 
       <!-- Lado direito: nome + sair (com confirmação de 2 passos) -->
       <div class="flex items-center gap-2 ml-auto">
@@ -359,7 +440,44 @@
           <!-- ============================================================
                Sidebar de badges (desktop: fixa; mobile: drawer)
                ============================================================ -->
-          <aside class="hidden sm:block w-56 shrink-0 sticky top-20">
+          <aside class="hidden sm:block w-56 shrink-0 sticky top-20 space-y-3">
+
+            <!-- Card de nível — mostra nível atual e progresso até o próximo -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+              <!-- Ícone e nome do nível -->
+              <div class="flex items-center gap-2.5 mb-3">
+                <span x-text="nivel.icone" class="text-2xl leading-none shrink-0"></span>
+                <div>
+                  <p class="text-[10px] text-slate-500 uppercase tracking-wider leading-none mb-0.5">Nível</p>
+                  <p class="font-semibold text-sm leading-none" :class="nivel.cor" x-text="nivel.nome"></p>
+                </div>
+                <div class="ml-auto text-right">
+                  <p class="text-[10px] text-slate-500 leading-none mb-0.5">XP total</p>
+                  <p class="font-mono text-xs text-python-400 font-semibold" x-text="xpFormatado"></p>
+                </div>
+              </div>
+              <!-- Barra de progresso dentro do nível (oculta no nível máximo) -->
+              <template x-if="nivel.proximo">
+                <div>
+                  <div class="flex justify-between text-[10px] text-slate-500 mb-1">
+                    <span x-text="(usuario?.xp_total ?? 0) + ' XP'"></span>
+                    <span x-text="nivel.xpProximo + ' XP'"></span>
+                  </div>
+                  <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div
+                      class="h-full rounded-full transition-all duration-700"
+                      :style="'width: ' + nivelProgresso + '%; background-color: ' + nivel.corBarra"
+                    ></div>
+                  </div>
+                  <p class="text-[10px] text-slate-600 mt-1 text-right" x-text="'próximo: ' + nivel.proximo"></p>
+                </div>
+              </template>
+              <template x-if="!nivel.proximo">
+                <p class="text-[10px] text-yellow-400 text-center font-medium">🎉 Nível máximo!</p>
+              </template>
+            </div>
+
+            <!-- Conquistas (badges) -->
             <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
               <div class="flex items-center justify-between mb-3">
                 <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Conquistas</h2>
@@ -478,10 +596,35 @@
 
 </div><!-- /x-data dashboard -->
 
+<!-- ===== Ticker de alunos (rodapé fixo) ===== -->
+<div class="ticker-bar" id="ticker-bar" style="display:none">
+  <p class="ticker-count">
+    já somos <strong id="ticker-count-num">…</strong> alunos aprendendo Python
+  </p>
+  <div class="ticker-track-wrap">
+    <div class="ticker-track" id="ticker-track"></div>
+  </div>
+</div>
+
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'))
   }
+</script>
+
+<!-- Ticker e Ranking -->
+<script type="module">
+  import { iniciarTicker }  from './assets/js/ticker.js'
+  import { iniciarRanking } from './assets/js/ranking.js'
+
+  window.addEventListener('load', () => {
+    iniciarTicker('./api/leaderboard', 'ticker-bar', 'ticker-count-num', 'ticker-track')
+
+    // Ranking: window._usuarioNome é definido pelo Alpine após carregar /me
+    // O botão passa o nome no momento do clique (lazy), não no init
+    const btn = document.getElementById('btn-ranking')
+    iniciarRanking('./api/leaderboard', () => window._usuarioNome ?? '', btn)
+  })
 </script>
 </body>
 </html>

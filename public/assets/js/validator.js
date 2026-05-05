@@ -159,8 +159,13 @@ _passou   = False
 try:
     _ret    = ${nomeFuncao}(*_args)
     _obtido = _ret
-    # Compara via JSON para tratar None/True/False/int vs float igualmente
-    _passou = _json.dumps(_ret, ensure_ascii=False) == _json.dumps(_esperado, ensure_ascii=False)
+    # Compara numericamente quando ambos são números (evita falha em int vs float:
+    # json.dumps(5.0) = "5.0" != "5" = json.dumps(5), mas 5.0 == 5 em Python).
+    # Para outros tipos, usa JSON para tratar None/True/False/listas/dicts.
+    if isinstance(_ret, (int, float)) and isinstance(_esperado, (int, float)):
+        _passou = _ret == _esperado
+    else:
+        _passou = _json.dumps(_ret, ensure_ascii=False) == _json.dumps(_esperado, ensure_ascii=False)
 except Exception as _e:
     _erro_msg = str(_e)
 
@@ -431,8 +436,26 @@ export async function validateHibrido(codigo, validacoes) {
  * @param {string} [texto]    Para tipo texto_livre — passa o texto aqui
  * @returns {Promise<ResultadoValidacao>}
  */
+// Limite máximo de caracteres para evitar execuções excessivamente longas.
+// Exercícios pedagógicos raramente passam de 1000 chars; 5000 dá margem confortável.
+const LIMITE_CHARS = 5000
+
 export async function validar(exercicio, codigo, texto = '') {
   const v = exercicio.validacao ?? {}
+
+  // Rejeita antes de qualquer execução — protege o navegador de código gigante
+  if (v.tipo !== 'texto_livre' && codigo && codigo.length > LIMITE_CHARS) {
+    return {
+      passou: false,
+      casos:  [{
+        passou:   false,
+        input:    '',
+        esperado: `Máximo ${LIMITE_CHARS} caracteres`,
+        obtido:   `${codigo.length} caracteres`,
+      }],
+      erro: `Código muito longo (${codigo.length} caracteres). O limite é ${LIMITE_CHARS} caracteres.`,
+    }
+  }
 
   switch (v.tipo) {
     case 'texto_livre':
