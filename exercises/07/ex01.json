@@ -5,7 +5,11 @@
   "titulo": "Ler e contar linhas",
   "dificuldade": "facil",
   "xp": 10,
-  "conceitos": ["open", "readlines", "with"],
+  "conceitos": [
+    "open",
+    "readlines",
+    "with"
+  ],
   "antes_de_codar": [
     "O que o bloco 'with' garante ao abrir um arquivo?",
     "Qual método retorna uma lista com todas as linhas?",
@@ -13,16 +17,22 @@
   ],
   "enunciado": "Dado o texto abaixo como string, escreva uma função analisar_texto(texto) que retorna um dicionário com 'linhas', 'palavras' e 'caracteres' (excluindo espaços).",
   "dica": "texto.split('\\n') divide em linhas. texto.split() divide em palavras. texto.replace(' ','') remove espaços antes de contar.",
-  "codigo_inicial": "def analisar_texto(texto):\n    # retorna {'linhas': N, 'palavras': N, 'caracteres': N}\n    pass",
+  "codigo_inicial": "def analisar_texto(texto):\n    # retorna {'linhas': N, 'palavras': N, 'caracteres': N}\n    pass\n# Exemplo:\nprint(analisar_texto('Olá mundo\\nPython é incrível'))",
   "validacao": {
     "tipo": "funcao",
     "nome_funcao": "analisar_texto",
     "casos": [
       {
-        "args": ["Olá mundo\nPython é incrível\nFetecPy"],
-        "esperado": {"linhas": 3, "palavras": 6, "caracteres": 30}
+        "args": [
+          "Olá mundo\nPython é incrível\nFetecPy"
+        ],
+        "esperado": {
+          "linhas": 3,
+          "palavras": 6,
+          "caracteres": 30
+        }
       }
     ]
   },
-  "solucao": "def analisar_texto(texto):\n    linhas = len(texto.split('\\n'))\n    palavras = len(texto.split())\n    caracteres = len(texto.replace(' ', '').replace('\\n', ''))\n    return {'linhas': linhas, 'palavras': palavras, 'caracteres': caracteres}"
+  "solucao": "def analisar_texto(texto):\n    linhas = len(texto.split('\\n'))\n    palavras = len(texto.split())\n    caracteres = len(texto.replace(' ', '').replace('\\n', ''))\n    return {'linhas': linhas, 'palavras': palavras, 'caracteres': caracteres}\n\n# Exemplo:\nprint(analisar_texto('Olá mundo\\nPython é incrível'))"
 }

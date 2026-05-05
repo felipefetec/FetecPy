@@ -105,6 +105,18 @@ sys.stdout = _out
 sys.stderr = _err
 sys.stdin  = StringIO(_fetecpy_stdin)
 
+# Intercepta input() para descartar o prompt — em ambiente de testes o stdin é
+# simulado via StringIO e não há terminal interativo. O prompt não deve ir para
+# nenhum buffer capturado (stdout ou stderr), pois quebraria a comparação do validador.
+# O aluno ainda pode escrever input('Digite: ') livremente no código.
+import builtins as _builtins
+_orig_input = _builtins.input
+
+def _input_wrapper(prompt=''):
+    return _orig_input('')  # descarta o prompt, lê do sys.stdin simulado
+
+_builtins.input = _input_wrapper
+
 try:
     exec(_fetecpy_code, {})
 except SystemExit:
@@ -113,6 +125,7 @@ except BaseException:
     # Imprime o traceback completo no stderr para ajudar o aluno a debugar
     traceback.print_exc()
 finally:
+    _builtins.input = _orig_input  # restaura o input original
     sys.stdout = _old_stdout
     sys.stderr = _old_stderr
     sys.stdin  = _old_stdin

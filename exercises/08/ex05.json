@@ -15,9 +15,9 @@
     "Como validar tipos e valores obrigatórios?",
     "Como retornar erros estruturados?"
   ],
-  "enunciado": "Implemente validar_produto(dados) que valida um dicionário de produto para FastAPI:\n- Campos obrigatórios: 'nome' (str), 'preco' (float > 0), 'estoque' (int >= 0)\n- Retorna {'valido': True, 'produto': dados_limpos} ou {'valido': False, 'erros': [lista de erros]}",
+  "enunciado": "Em APIs com FastAPI, os dados recebidos precisam ser validados antes de processar. Implemente `validar_produto(dados)` que valida um dicionário de produto e retorna um relatório de validação.\n\n**Regras de validação:**\n- `\"nome\"` — obrigatório, não pode ser string vazia\n- `\"preco\"` — obrigatório, deve ser número (`int` ou `float`) e maior que zero\n- `\"estoque\"` — obrigatório, deve ser `int` e maior ou igual a zero\n\n**Retorno quando válido:**\n```python\n{'valido': True, 'produto': dados}\n```\n\n**Retorno quando inválido:**\n```python\n{'valido': False, 'erros': ['mensagem1', 'mensagem2']}\n```\n\n**Mensagens de erro exatas** (use essas strings):\n- `'nome obrigatorio'`\n- `'preco deve ser numero positivo'`\n- `'estoque deve ser inteiro nao negativo'`\n\n```python\nvalidar_produto({'nome': 'Camiseta', 'preco': 59.9, 'estoque': 10})\n# → {'valido': True, 'produto': {'nome': 'Camiseta', 'preco': 59.9, 'estoque': 10}}\n\nvalidar_produto({'nome': '', 'preco': -5, 'estoque': 2})\n# → {'valido': False, 'erros': ['nome obrigatorio', 'preco deve ser numero positivo']}\n```\n\n> 💡 Use `isinstance(valor, (int, float))` para verificar se é número. Para estoque, use só `isinstance(valor, int)`.",
   "dica": "Colete todos os erros antes de retornar. Use isinstance() para verificar tipos.",
-  "codigo_inicial": "def validar_produto(dados):\n    erros = []\n    # valide cada campo\n    # retorne {'valido': True/False, ...}\n    pass",
+  "codigo_inicial": "def validar_produto(dados):\n    erros = []\n    # valide 'nome', 'preco' e 'estoque'\n    # retorne {'valido': True, 'produto': dados} ou {'valido': False, 'erros': erros}\n    pass\n\n# Exemplo:\nprint(validar_produto({'nome': 'Camiseta', 'preco': 59.9, 'estoque': 10}))\nprint(validar_produto({'nome': '', 'preco': -5, 'estoque': 2}))",
   "validacao": {
     "tipo": "funcao",
     "nome_funcao": "validar_produto",
@@ -38,8 +38,69 @@
             "estoque": 10
           }
         }
+      },
+      {
+        "args": [
+          {
+            "nome": "",
+            "preco": 59.9,
+            "estoque": 10
+          }
+        ],
+        "esperado": {
+          "valido": false,
+          "erros": [
+            "nome obrigatorio"
+          ]
+        }
+      },
+      {
+        "args": [
+          {
+            "nome": "Tênis",
+            "preco": -10,
+            "estoque": 5
+          }
+        ],
+        "esperado": {
+          "valido": false,
+          "erros": [
+            "preco deve ser numero positivo"
+          ]
+        }
+      },
+      {
+        "args": [
+          {
+            "nome": "Boné",
+            "preco": 35.0,
+            "estoque": -1
+          }
+        ],
+        "esperado": {
+          "valido": false,
+          "erros": [
+            "estoque deve ser inteiro nao negativo"
+          ]
+        }
+      },
+      {
+        "args": [
+          {
+            "nome": "",
+            "preco": -5,
+            "estoque": 2
+          }
+        ],
+        "esperado": {
+          "valido": false,
+          "erros": [
+            "nome obrigatorio",
+            "preco deve ser numero positivo"
+          ]
+        }
       }
     ]
   },
-  "solucao": "def validar_produto(dados):\n    erros = []\n    if not dados.get('nome'):\n        erros.append('nome obrigatorio')\n    preco = dados.get('preco')\n    if preco is None or not isinstance(preco, (int, float)) or preco <= 0:\n        erros.append('preco deve ser numero positivo')\n    estoque = dados.get('estoque')\n    if estoque is None or not isinstance(estoque, int) or estoque < 0:\n        erros.append('estoque deve ser inteiro nao negativo')\n    if erros:\n        return {'valido': False, 'erros': erros}\n    return {'valido': True, 'produto': dados}"
+  "solucao": "def validar_produto(dados):\n    erros = []\n    if not dados.get('nome'):\n        erros.append('nome obrigatorio')\n    preco = dados.get('preco')\n    if preco is None or not isinstance(preco, (int, float)) or preco <= 0:\n        erros.append('preco deve ser numero positivo')\n    estoque = dados.get('estoque')\n    if estoque is None or not isinstance(estoque, int) or estoque < 0:\n        erros.append('estoque deve ser inteiro nao negativo')\n    if erros:\n        return {'valido': False, 'erros': erros}\n    return {'valido': True, 'produto': dados}\n\n# Exemplo:\nprint(validar_produto({'nome': 'Camiseta', 'preco': 59.9, 'estoque': 10}))\nprint(validar_produto({'nome': '', 'preco': -5, 'estoque': 2}))"
 }

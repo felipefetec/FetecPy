@@ -55,6 +55,63 @@
       -webkit-text-fill-color: #f1f5f9 !important;
       caret-color: #f1f5f9;
     }
+
+    /* === Rodapé com ticker de alunos === */
+
+    /* Barra fixa no fundo da tela */
+    .ticker-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: #0f172a;
+      border-top: 1px solid #1e293b;
+      padding: 6px 0 4px;
+      overflow: hidden;
+    }
+
+    /* Frase "já somos X alunos" centralizada acima da faixa de nomes */
+    .ticker-count {
+      text-align: center;
+      font-size: 0.65rem;
+      color: #64748b;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .ticker-count strong {
+      color: #4ade80;
+    }
+
+    /* Faixa deslizante — overflow escondido para o efeito de marquee */
+    .ticker-track-wrap {
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    /* A faixa em si — transform aplicado via JS (rAF), sem CSS animation */
+    .ticker-track {
+      display: inline-flex;
+      gap: 0;
+      will-change: transform;
+    }
+
+    /* Cada item: nome · XP */
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 28px;
+      font-size: 0.7rem;
+      color: #94a3b8;
+    }
+
+    .ticker-item .t-nome { color: #cbd5e1; font-weight: 500; }
+    .ticker-item .t-xp  { color: #4ade80; font-size: 0.65rem; }
+    .ticker-item .t-sep { color: #334155; }
+
+    /* keyframes do ticker gerados dinamicamente em JS (offset real do viewport) */
   </style>
 
   <!--
@@ -219,7 +276,7 @@
             <label for="nome" class="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wider">
               Nome
             </label>
-            <input id="nome" type="text" x-model="nome" autocomplete="given-name" autocapitalize="words" placeholder="Felipe" :disabled="carregando" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 placeholder-slate-600 text-sm focus:outline-none focus:ring-2 focus:ring-python-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150">
+            <input id="nome" type="text" x-model="nome" autocomplete="given-name" autocapitalize="words" placeholder="Nome" :disabled="carregando" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 placeholder-slate-600 text-sm focus:outline-none focus:ring-2 focus:ring-python-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150">
           </div>
 
           <!-- Sobrenome -->
@@ -227,7 +284,7 @@
             <label for="sobrenome" class="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wider">
               Sobrenome
             </label>
-            <input id="sobrenome" type="text" x-model="sobrenome" autocomplete="family-name" autocapitalize="words" placeholder="Tavares" :disabled="carregando" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 placeholder-slate-600 text-sm focus:outline-none focus:ring-2 focus:ring-python-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150">
+            <input id="sobrenome" type="text" x-model="sobrenome" autocomplete="family-name" autocapitalize="words" placeholder="Sobrenome" :disabled="carregando" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 placeholder-slate-600 text-sm focus:outline-none focus:ring-2 focus:ring-python-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150">
           </div>
 
           <!-- PIN -->
@@ -296,8 +353,8 @@
 
       </div><!-- /card -->
 
-      <!-- Rodapé discreto -->
-      <p class="mt-6 text-center text-xs text-slate-600">
+      <!-- Rodapé discreto — empurra o conteúdo acima do ticker fixo -->
+      <p class="mt-6 mb-16 text-center text-xs text-slate-600">
         FetecPy · Licença
         <a
           href="https://creativecommons.org/licenses/by-nc/4.0/"
@@ -310,10 +367,29 @@
 
   </div><!-- /x-data -->
 
+  <!-- ===== Ticker de alunos (rodapé fixo) ===== -->
+  <div class="ticker-bar" id="ticker-bar" style="display:none">
+    <p class="ticker-count">
+      já somos <strong id="ticker-count-num">…</strong> alunos aprendendo Python
+    </p>
+    <div class="ticker-track-wrap">
+      <!-- A faixa é duplicada via JS para criar o loop contínuo -->
+      <div class="ticker-track" id="ticker-track"></div>
+    </div>
+  </div>
+
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'))
     }
+  </script>
+
+  <!-- Ticker iniciado como módulo ES para importar ticker.js -->
+  <script type="module">
+    import { iniciarTicker } from './assets/js/ticker.js'
+    window.addEventListener('load', () =>
+      iniciarTicker('./api/leaderboard', 'ticker-bar', 'ticker-count-num', 'ticker-track')
+    )
   </script>
 </body>
 </html>

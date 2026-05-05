@@ -5,24 +5,75 @@
   "titulo": "Maior e menor da lista",
   "dificuldade": "medio",
   "xp": 20,
-  "conceitos": ["funcao", "parametros", "retorno multiplo"],
+  "conceitos": [
+    "funcao",
+    "parametros",
+    "retorno multiplo"
+  ],
   "antes_de_codar": [
     "Como uma função pode retornar mais de um valor em Python?",
     "Como percorrer uma lista para encontrar o maior valor sem usar max()?",
     "Como tratar o caso de lista vazia?"
   ],
-  "enunciado": "Escreva uma função extremos(lista) que retorna uma tupla (menor, maior).\nSe a lista estiver vazia, retorne (None, None).",
+  "enunciado": "Crie uma função `extremos(lista)` que percorre a lista **sem usar `min()` ou `max()`** e retorna uma tupla com o menor e o maior valor encontrados.\n\n```python\nextremos([3, 1, 4, 1, 5, 9])  # → (1, 9)\nextremos([7])                  # → (7, 7)\nextremos([])                   # → (None, None)\n```\n\n**Requisitos:**\n- Implemente a busca manualmente com `for` — não use `min()`, `max()` nem `sorted()`\n- Lista vazia deve retornar `(None, None)` — sem lançar exceção\n- Lista com um único elemento: o menor e o maior são o mesmo valor",
   "dica": "Inicialize menor e maior com o primeiro elemento (lista[0]). Depois percorra o resto comparando.",
-  "codigo_inicial": "def extremos(lista):\n    # seu código aqui\n    pass",
+  "codigo_inicial": "def extremos(lista):\n    # seu código aqui\n    pass\n# Exemplo:\nprint(extremos([3, 1, 4, 1, 5, 9]))",
   "validacao": {
     "tipo": "funcao",
     "nome_funcao": "extremos",
     "casos": [
-      { "args": [[3, 1, 4, 1, 5, 9, 2, 6]], "esperado": [1, 9] },
-      { "args": [[42]], "esperado": [42, 42] },
-      { "args": [[-5, -1, -3]], "esperado": [-5, -1] },
-      { "args": [[]], "esperado": [null, null] }
+      {
+        "args": [
+          [
+            3,
+            1,
+            4,
+            1,
+            5,
+            9,
+            2,
+            6
+          ]
+        ],
+        "esperado": [
+          1,
+          9
+        ]
+      },
+      {
+        "args": [
+          [
+            42
+          ]
+        ],
+        "esperado": [
+          42,
+          42
+        ]
+      },
+      {
+        "args": [
+          [
+            -5,
+            -1,
+            -3
+          ]
+        ],
+        "esperado": [
+          -5,
+          -1
+        ]
+      },
+      {
+        "args": [
+          []
+        ],
+        "esperado": [
+          null,
+          null
+        ]
+      }
     ]
   },
-  "solucao": "def extremos(lista):\n    if not lista:\n        return (None, None)\n    menor = maior = lista[0]\n    for item in lista[1:]:\n        if item < menor:\n            menor = item\n        if item > maior:\n            maior = item\n    return (menor, maior)"
+  "solucao": "def extremos(lista):\n    if not lista:\n        return (None, None)\n    menor = maior = lista[0]\n    for item in lista[1:]:\n        if item < menor:\n            menor = item\n        if item > maior:\n            maior = item\n    return (menor, maior)\n# Exemplo:\nprint(extremos([3, 1, 4, 1, 5, 9]))"
 }

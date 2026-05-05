@@ -5,7 +5,11 @@
   "titulo": "8.1 — Analisar resposta de API simulada",
   "dificuldade": "medio",
   "xp": 20,
-  "conceitos": ["json", "dict", "requests simulado"],
+  "conceitos": [
+    "json",
+    "dict",
+    "requests simulado"
+  ],
   "antes_de_codar": [
     "Como você acessa campos aninhados em um dicionário?",
     "Como iterar sobre uma lista de objetos JSON?",
@@ -13,20 +17,32 @@
   ],
   "enunciado": "A função abaixo simula uma resposta de API de clima. Escreva processar_clima(resposta_json) que retorna:\n- 'cidade': nome da cidade\n- 'temperatura': temperatura atual em °C\n- 'descricao': descrição do clima (lowercase)\n\nSe algum campo estiver ausente, use 'desconhecido'.",
   "dica": "Use .get('campo', 'desconhecido') para acessar campos de forma segura.",
-  "codigo_inicial": "import json\n\ndef processar_clima(resposta_json):\n    dados = json.loads(resposta_json)\n    # extraia cidade, temperatura e descricao\n    pass",
+  "codigo_inicial": "import json\n\ndef processar_clima(resposta_json):\n    dados = json.loads(resposta_json)\n    # extraia cidade, temperatura e descricao\n    pass\n# Exemplo:\nprint(processar_clima('{\"name\":\"SP\",\"main\":{\"temp\":25},\"weather\":[{\"description\":\"Limpo\"}]}'))",
   "validacao": {
     "tipo": "funcao",
     "nome_funcao": "processar_clima",
     "casos": [
       {
-        "args": ["{\"name\":\"São Paulo\",\"main\":{\"temp\":25.3},\"weather\":[{\"description\":\"Céu Limpo\"}]}"],
-        "esperado": {"cidade": "São Paulo", "temperatura": 25.3, "descricao": "céu limpo"}
+        "args": [
+          "{\"name\":\"São Paulo\",\"main\":{\"temp\":25.3},\"weather\":[{\"description\":\"Céu Limpo\"}]}"
+        ],
+        "esperado": {
+          "cidade": "São Paulo",
+          "temperatura": 25.3,
+          "descricao": "céu limpo"
+        }
       },
       {
-        "args": ["{}"],
-        "esperado": {"cidade": "desconhecido", "temperatura": "desconhecido", "descricao": "desconhecido"}
+        "args": [
+          "{}"
+        ],
+        "esperado": {
+          "cidade": "desconhecido",
+          "temperatura": "desconhecido",
+          "descricao": "desconhecido"
+        }
       }
     ]
   },
-  "solucao": "import json\n\ndef processar_clima(resposta_json):\n    dados = json.loads(resposta_json)\n    cidade = dados.get('name', 'desconhecido')\n    temp = dados.get('main', {}).get('temp', 'desconhecido')\n    weather = dados.get('weather', [{}])\n    desc = weather[0].get('description', 'desconhecido') if weather else 'desconhecido'\n    return {'cidade': cidade, 'temperatura': temp, 'descricao': desc.lower()}"
+  "solucao": "import json\n\ndef processar_clima(resposta_json):\n    dados = json.loads(resposta_json)\n    cidade = dados.get('name', 'desconhecido')\n    temp = dados.get('main', {}).get('temp', 'desconhecido')\n    weather = dados.get('weather', [{}])\n    desc = weather[0].get('description', 'desconhecido') if weather else 'desconhecido'\n    return {'cidade': cidade, 'temperatura': temp, 'descricao': desc.lower()}\n# Exemplo:\nprint(processar_clima('{\"name\":\"SP\",\"main\":{\"temp\":25},\"weather\":[{\"description\":\"Limpo\"}]}'))"
 }

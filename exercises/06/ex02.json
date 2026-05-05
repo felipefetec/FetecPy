@@ -15,7 +15,7 @@
     "Como garantir que o saldo nunca fique negativo?",
     "O que é 'encapsulamento' e por que é útil aqui?"
   ],
-  "enunciado": "Crie uma classe ContaBancaria com:\n- __init__(self, titular, saldo_inicial=0.0)\n- depositar(self, valor) → soma ao saldo (levanta ValueError se valor <= 0)\n- sacar(self, valor) → subtrai do saldo (levanta ValueError se insuficiente ou valor <= 0)\n- saldo (property) → retorna o saldo atual\n- __str__ → 'Conta de TITULAR: R$ SALDO'",
+  "enunciado": "Crie uma classe `ContaBancaria` com os seguintes membros:\n\n- `__init__(self, titular, saldo_inicial=0.0)` — inicializa a conta\n- `depositar(self, valor)` — soma ao saldo; levanta `ValueError` se `valor <= 0`\n- `sacar(self, valor)` — subtrai do saldo; levanta `ValueError` se saldo insuficiente ou `valor <= 0`\n- `saldo` (**property**) — retorna o saldo atual como atributo de leitura\n- `__str__` — retorna `'Conta de TITULAR: R$ SALDO'`\n\n> 💡 **Sobre `@property`:** defina `saldo` com `@property` para que seja acessado como `conta.saldo` (sem parênteses) e não como `conta.saldo()`. Isso expõe o valor interno de forma controlada — quem usa a classe não precisa saber que existe um `_saldo` por baixo.",
   "dica": "Use try/raise ValueError para validar os valores. O saldo deve ser um atributo privado (convenção: _saldo).",
   "codigo_inicial": "class ContaBancaria:\n    def __init__(self, titular, saldo_inicial=0.0):\n        self.titular = titular\n        self._saldo  = saldo_inicial\n\n    def depositar(self, valor):\n        pass\n\n    def sacar(self, valor):\n        pass\n\n    @property\n    def saldo(self):\n        return self._saldo\n\n    def __str__(self):\n        pass",
   "validacao": {

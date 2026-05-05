@@ -5,7 +5,11 @@
   "titulo": "8.2 — Estrutura de dados para Streamlit",
   "dificuldade": "facil",
   "xp": 10,
-  "conceitos": ["dict", "list", "preparacao de dados"],
+  "conceitos": [
+    "dict",
+    "list",
+    "preparacao de dados"
+  ],
   "antes_de_codar": [
     "O Streamlit usa dicionários ou listas para criar gráficos?",
     "Como você prepararia notas de alunos para um gráfico de barras?",
@@ -13,16 +17,43 @@
   ],
   "enunciado": "Escreva preparar_dados_grafico(alunos) que recebe uma lista de dicionários {nome, nota} e retorna um dicionário {'nomes': [...], 'notas': [...], 'media': float} pronto para uso em st.bar_chart() do Streamlit.",
   "dica": "Use list comprehension para extrair os nomes e as notas separadamente.",
-  "codigo_inicial": "def preparar_dados_grafico(alunos):\n    # retorna {'nomes': [...], 'notas': [...], 'media': float}\n    pass",
+  "codigo_inicial": "def preparar_dados_grafico(alunos):\n    # retorna {'nomes': [...], 'notas': [...], 'media': float}\n    pass\n# Exemplo:\nprint(preparar_dados_grafico([{'nome':'Ana','nota':9.0}]))",
   "validacao": {
     "tipo": "funcao",
     "nome_funcao": "preparar_dados_grafico",
     "casos": [
       {
-        "args": [[{"nome": "Ana", "nota": 9.0}, {"nome": "Bruno", "nota": 7.5}, {"nome": "Carlos", "nota": 8.5}]],
-        "esperado": {"nomes": ["Ana", "Bruno", "Carlos"], "notas": [9.0, 7.5, 8.5], "media": 8.333333333333334}
+        "args": [
+          [
+            {
+              "nome": "Ana",
+              "nota": 9.0
+            },
+            {
+              "nome": "Bruno",
+              "nota": 7.5
+            },
+            {
+              "nome": "Carlos",
+              "nota": 8.5
+            }
+          ]
+        ],
+        "esperado": {
+          "nomes": [
+            "Ana",
+            "Bruno",
+            "Carlos"
+          ],
+          "notas": [
+            9.0,
+            7.5,
+            8.5
+          ],
+          "media": 8.333333333333334
+        }
       }
     ]
   },
-  "solucao": "def preparar_dados_grafico(alunos):\n    nomes = [a['nome'] for a in alunos]\n    notas = [a['nota'] for a in alunos]\n    media = sum(notas) / len(notas) if notas else 0.0\n    return {'nomes': nomes, 'notas': notas, 'media': media}"
+  "solucao": "def preparar_dados_grafico(alunos):\n    nomes = [a['nome'] for a in alunos]\n    notas = [a['nota'] for a in alunos]\n    media = sum(notas) / len(notas) if notas else 0.0\n    return {'nomes': nomes, 'notas': notas, 'media': media}\n# Exemplo:\nprint(preparar_dados_grafico([{'nome':'Ana','nota':9.0}]))"
 }

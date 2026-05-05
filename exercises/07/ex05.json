@@ -16,9 +16,9 @@
     "Por que é útil criar exceções específicas em vez de usar ValueError genérico?",
     "Como capturar sua exceção customizada no try/except?"
   ],
-  "enunciado": "Crie uma exceção Nota Invalida (NotaInvalida) e uma função validar_nota(nota) que:\n- Levanta NotaInvalida se nota < 0 ou nota > 10\n- Retorna a nota se válida\n\nA exceção deve ter uma mensagem descritiva com o valor inválido.",
+  "enunciado": "Crie uma exceção personalizada `NotaInvalida` (que herda de `ValueError`) e implemente a função `validar_nota(nota)`:\n\n- Se `nota < 0` ou `nota > 10` → levanta `NotaInvalida` com mensagem descritiva\n- Caso contrário → retorna a nota sem alteração\n\nO bloco de testes abaixo já está no editor — **não o remova**. Ele é o que o validador executa para verificar sua solução:\n\n```python\nprint(validar_nota(7.5))   # → 7.5\nprint(validar_nota(0.0))   # → 0.0\nprint(validar_nota(10.0))  # → 10.0\ntry:\n    validar_nota(-1)        # deve levantar NotaInvalida\nexcept NotaInvalida:\n    print('NotaInvalida')\ntry:\n    validar_nota(11)        # deve levantar NotaInvalida\nexcept NotaInvalida:\n    print('NotaInvalida')\n```\n\n**Sua tarefa:** escrever apenas o corpo de `validar_nota()`. O restante já está pronto.",
   "dica": "class NotaInvalida(ValueError): pass. Use raise NotaInvalida(f'Nota {nota} fora do intervalo 0-10')",
-  "codigo_inicial": "class NotaInvalida(ValueError):\n    pass\n\ndef validar_nota(nota):\n    # seu código aqui\n    pass",
+  "codigo_inicial": "class NotaInvalida(ValueError):\n    pass\n\ndef validar_nota(nota):\n    # Levante NotaInvalida se nota < 0 ou nota > 10\n    # Retorne a nota se válida\n    pass\n\n# --- Não altere o código abaixo — ele é usado pelo teste ---\nprint(validar_nota(7.5))\nprint(validar_nota(0.0))\nprint(validar_nota(10.0))\ntry:\n    validar_nota(-1)\nexcept NotaInvalida:\n    print('NotaInvalida')\ntry:\n    validar_nota(11)\nexcept NotaInvalida:\n    print('NotaInvalida')",
   "validacao": {
     "tipo": "saida_exata",
     "casos": [

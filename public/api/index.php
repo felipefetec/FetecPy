@@ -26,6 +26,7 @@ use FetecPy\Controllers\ProgressController;
 use FetecPy\Controllers\ModuleController;
 use FetecPy\Controllers\ExerciseController;
 use FetecPy\Controllers\QuizController;
+use FetecPy\Controllers\LeaderboardController;
 
 // Captura qualquer exceção não tratada e retorna JSON em vez de HTML de erro
 set_exception_handler(function (Throwable $e): void {
@@ -49,7 +50,10 @@ $router  = new Router();
 // ----------------------------------------------------------------
 
 // -- Saúde da API (sem autenticação) --
-$router->get('health', [HealthController::class, 'index']);
+$router->get('health',      [HealthController::class,      'index']);
+
+// -- Leaderboard público (sem autenticação — só nome + XP) --
+$router->get('leaderboard', [LeaderboardController::class, 'index']);
 
 // -- Autenticação --
 $router->post('auth/login',  [AuthController::class, 'login']);

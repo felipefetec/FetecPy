@@ -5,7 +5,11 @@
   "titulo": "8.3 — Rota Flask: validar e formatar resposta",
   "dificuldade": "medio",
   "xp": 20,
-  "conceitos": ["dict", "validacao", "json response"],
+  "conceitos": [
+    "dict",
+    "validacao",
+    "json response"
+  ],
   "antes_de_codar": [
     "O que uma rota Flask deve retornar para sucesso e para erro?",
     "Como validar se campos obrigatórios estão presentes?",
@@ -13,24 +17,47 @@
   ],
   "enunciado": "Escreva processar_cadastro(dados) que simula o que uma rota Flask faria:\n- Verifica se 'nome' e 'email' estão presentes\n- Se faltam campos: retorna {'ok': False, 'erro': 'campos obrigatorios ausentes'}\n- Se ok: retorna {'ok': True, 'usuario': {'nome': nome, 'email': email.lower()}}",
   "dica": "Verifique a presença das chaves antes de acessar. Use .get() ou 'in'.",
-  "codigo_inicial": "def processar_cadastro(dados):\n    # valida e formata\n    pass",
+  "codigo_inicial": "def processar_cadastro(dados):\n    # valida e formata\n    pass\n# Exemplo:\nprint(processar_cadastro({'nome':'Felipe','email':'f@mail.com'}))",
   "validacao": {
     "tipo": "funcao",
     "nome_funcao": "processar_cadastro",
     "casos": [
       {
-        "args": [{"nome": "Felipe", "email": "Felipe@mail.com"}],
-        "esperado": {"ok": true, "usuario": {"nome": "Felipe", "email": "felipe@mail.com"}}
+        "args": [
+          {
+            "nome": "Felipe",
+            "email": "Felipe@mail.com"
+          }
+        ],
+        "esperado": {
+          "ok": true,
+          "usuario": {
+            "nome": "Felipe",
+            "email": "felipe@mail.com"
+          }
+        }
       },
       {
-        "args": [{"nome": "Ana"}],
-        "esperado": {"ok": false, "erro": "campos obrigatorios ausentes"}
+        "args": [
+          {
+            "nome": "Ana"
+          }
+        ],
+        "esperado": {
+          "ok": false,
+          "erro": "campos obrigatorios ausentes"
+        }
       },
       {
-        "args": [{}],
-        "esperado": {"ok": false, "erro": "campos obrigatorios ausentes"}
+        "args": [
+          {}
+        ],
+        "esperado": {
+          "ok": false,
+          "erro": "campos obrigatorios ausentes"
+        }
       }
     ]
   },
-  "solucao": "def processar_cadastro(dados):\n    if 'nome' not in dados or 'email' not in dados:\n        return {'ok': False, 'erro': 'campos obrigatorios ausentes'}\n    return {'ok': True, 'usuario': {'nome': dados['nome'], 'email': dados['email'].lower()}}"
+  "solucao": "def processar_cadastro(dados):\n    if 'nome' not in dados or 'email' not in dados:\n        return {'ok': False, 'erro': 'campos obrigatorios ausentes'}\n    return {'ok': True, 'usuario': {'nome': dados['nome'], 'email': dados['email'].lower()}}\n# Exemplo:\nprint(processar_cadastro({'nome':'Felipe','email':'f@mail.com'}))"
 }

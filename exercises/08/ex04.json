@@ -15,17 +15,62 @@
     "Como você filtraria uma lista de tarefas por status?",
     "Como contar itens por categoria?"
   ],
-  "enunciado": "Usando dataclass, implemente Tarefa(titulo, concluida=False) e uma função resumo_tarefas(tarefas) que retorna {'total': N, 'concluidas': N, 'pendentes': N}.",
+  "enunciado": "Você está construindo o modelo de dados de um app de tarefas. Cada tarefa é um dicionário com os campos `\"titulo\"` (string) e `\"concluida\"` (bool).\n\nImplemente `resumo_tarefas(tarefas)` que recebe uma lista de tarefas e retorna um dicionário com:\n- `\"total\"` — número total de tarefas\n- `\"concluidas\"` — quantas têm `\"concluida\": True`\n- `\"pendentes\"` — quantas têm `\"concluida\": False`\n\n```python\ntarefas = [\n    {'titulo': 'Estudar Python', 'concluida': True},\n    {'titulo': 'Fazer exercício', 'concluida': False},\n    {'titulo': 'Ler livro',       'concluida': True},\n]\nresumo_tarefas(tarefas)\n# → {'total': 3, 'concluidas': 2, 'pendentes': 1}\n```\n\n**Requisitos:**\n- Liste vazia deve retornar `{'total': 0, 'concluidas': 0, 'pendentes': 0}`\n- Use `t.get('concluida', False)` para acessar o campo com segurança",
   "dica": "from dataclasses import dataclass. @dataclass define automaticamente __init__ e __repr__.",
-  "codigo_inicial": "from dataclasses import dataclass\n\n@dataclass\nclass Tarefa:\n    titulo: str\n    concluida: bool = False\n\ndef resumo_tarefas(tarefas):\n    # retorna dict com total, concluidas, pendentes\n    pass",
+  "codigo_inicial": "def resumo_tarefas(tarefas):\n    # retorna dict com 'total', 'concluidas', 'pendentes'\n    pass\n\n# Exemplo:\nprint(resumo_tarefas([\n    {'titulo': 'Estudar Python', 'concluida': True},\n    {'titulo': 'Fazer exercício', 'concluida': False},\n    {'titulo': 'Ler livro',       'concluida': True},\n]))",
   "validacao": {
-    "tipo": "saida_exata",
+    "tipo": "funcao",
+    "nome_funcao": "resumo_tarefas",
     "casos": [
       {
-        "input": "",
-        "esperado": "3\n2\n1\n"
+        "args": [
+          [
+            {
+              "titulo": "A",
+              "concluida": true
+            },
+            {
+              "titulo": "B",
+              "concluida": false
+            },
+            {
+              "titulo": "C",
+              "concluida": true
+            }
+          ]
+        ],
+        "esperado": {
+          "total": 3,
+          "concluidas": 2,
+          "pendentes": 1
+        }
+      },
+      {
+        "args": [
+          [
+            {
+              "titulo": "X",
+              "concluida": false
+            }
+          ]
+        ],
+        "esperado": {
+          "total": 1,
+          "concluidas": 0,
+          "pendentes": 1
+        }
+      },
+      {
+        "args": [
+          []
+        ],
+        "esperado": {
+          "total": 0,
+          "concluidas": 0,
+          "pendentes": 0
+        }
       }
     ]
   },
-  "solucao": "def resumo_tarefas(tarefas):\n    concluidas = sum(1 for t in tarefas if t.get('concluida', False))\n    return {'total': len(tarefas), 'concluidas': concluidas, 'pendentes': len(tarefas) - concluidas}\n\ntarefas = [{'titulo': 'A', 'concluida': True}, {'titulo': 'B', 'concluida': False}, {'titulo': 'C', 'concluida': True}]\nr = resumo_tarefas(tarefas)\nprint(r['total'])\nprint(r['concluidas'])\nprint(r['pendentes'])"
+  "solucao": "def resumo_tarefas(tarefas):\n    concluidas = sum(1 for t in tarefas if t.get('concluida', False))\n    return {'total': len(tarefas), 'concluidas': concluidas, 'pendentes': len(tarefas) - concluidas}\n\n# Exemplo:\nprint(resumo_tarefas([\n    {'titulo': 'Estudar Python', 'concluida': True},\n    {'titulo': 'Fazer exercício', 'concluida': False},\n    {'titulo': 'Ler livro',       'concluida': True},\n]))"
 }

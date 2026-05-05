@@ -5,20 +5,27 @@
   "titulo": "Lista de produtos com classe",
   "dificuldade": "medio",
   "xp": 20,
-  "conceitos": ["class", "lista de objetos", "__repr__"],
+  "conceitos": [
+    "class",
+    "lista de objetos",
+    "__repr__"
+  ],
   "antes_de_codar": [
     "Que atributos um Produto precisa ter?",
     "Como você vai armazenar uma coleção de produtos?",
     "Como filtrar os produtos abaixo de um preço?"
   ],
-  "enunciado": "Crie uma classe Produto(nome, preco) e uma função mais_baratos(produtos, limite) que retorna uma lista de nomes de produtos com preco <= limite, em ordem alfabética.",
+  "enunciado": "Crie uma classe `Produto(nome, preco)` e uma função `mais_baratos(produtos, limite)` que retorna uma lista de nomes de produtos com `preco <= limite`, em ordem alfabética.\n\nO teste usará exatamente estes produtos e limite:\n\n```python\nprodutos = [\n    Produto('camiseta', 50),\n    Produto('tenis',   200),\n    Produto('meia',     15),\n    Produto('boné',     45),\n]\nmais_baratos(produtos, 50)  # → ['boné', 'camiseta', 'meia']\n```\n\n**Requisitos:**\n- A classe `Produto` deve receber `nome` e `preco` no `__init__`\n- A função deve retornar uma **lista de nomes** (strings), não objetos\n- A lista deve estar em **ordem alfabética**\n- Produtos com preço exatamente igual ao limite **devem ser incluídos**",
   "dica": "Crie uma lista de objetos Produto e use list comprehension para filtrar.",
   "codigo_inicial": "class Produto:\n    def __init__(self, nome, preco):\n        # seu código aqui\n        pass\n\ndef mais_baratos(produtos, limite):\n    # retorna lista de nomes com preco <= limite, ordenada\n    pass",
   "validacao": {
     "tipo": "saida_exata",
     "codigo_teste": "produtos = [Produto('camiseta',50), Produto('tenis',200), Produto('meia',15), Produto('boné',45)]\nresult = mais_baratos(produtos, 50)\nfor nome in result:\n    print(nome)",
     "casos": [
-      { "input": "", "esperado": "boné\ncamiseta\nmeia\n" }
+      {
+        "input": "",
+        "esperado": "boné\ncamiseta\nmeia\n"
+      }
     ]
   },
   "solucao": "class Produto:\n    def __init__(self, nome, preco):\n        self.nome  = nome\n        self.preco = preco\n\ndef mais_baratos(produtos, limite):\n    return sorted([p.nome for p in produtos if p.preco <= limite])\n\nprodutos = [Produto('camiseta',50), Produto('tenis',200), Produto('meia',15), Produto('boné',45)]\nresult = mais_baratos(produtos, 50)\nfor nome in result:\n    print(nome)"

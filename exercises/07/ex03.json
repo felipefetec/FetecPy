@@ -5,7 +5,12 @@
   "titulo": "Tratamento de exceções",
   "dificuldade": "medio",
   "xp": 20,
-  "conceitos": ["try", "except", "ValueError", "ZeroDivisionError"],
+  "conceitos": [
+    "try",
+    "except",
+    "ValueError",
+    "ZeroDivisionError"
+  ],
   "antes_de_codar": [
     "Quais erros podem acontecer ao dividir dois números lidos do usuário?",
     "Como você captura erros específicos vs erros genéricos?",
@@ -13,15 +18,33 @@
   ],
   "enunciado": "Escreva uma função dividir_seguro(a, b) que:\n- Retorna a/b como float\n- Retorna 'erro: divisao por zero' se b == 0\n- Retorna 'erro: tipo invalido' se a ou b não são números",
   "dica": "Use try/except ZeroDivisionError e TypeError separadamente para mensagens específicas.",
-  "codigo_inicial": "def dividir_seguro(a, b):\n    # seu código aqui\n    pass",
+  "codigo_inicial": "def dividir_seguro(a, b):\n    # seu código aqui\n    pass\n# Exemplo:\nprint(dividir_seguro(10, 2))\nprint(dividir_seguro(5, 0))",
   "validacao": {
     "tipo": "funcao",
     "nome_funcao": "dividir_seguro",
     "casos": [
-      { "args": [10, 2], "esperado": 5.0 },
-      { "args": [7, 0], "esperado": "erro: divisao por zero" },
-      { "args": ["abc", 2], "esperado": "erro: tipo invalido" }
+      {
+        "args": [
+          10,
+          2
+        ],
+        "esperado": 5.0
+      },
+      {
+        "args": [
+          7,
+          0
+        ],
+        "esperado": "erro: divisao por zero"
+      },
+      {
+        "args": [
+          "abc",
+          2
+        ],
+        "esperado": "erro: tipo invalido"
+      }
     ]
   },
-  "solucao": "def dividir_seguro(a, b):\n    try:\n        return a / b\n    except ZeroDivisionError:\n        return 'erro: divisao por zero'\n    except TypeError:\n        return 'erro: tipo invalido'"
+  "solucao": "def dividir_seguro(a, b):\n    try:\n        return a / b\n    except ZeroDivisionError:\n        return 'erro: divisao por zero'\n    except TypeError:\n        return 'erro: tipo invalido'\n\n# Exemplo:\nprint(dividir_seguro(10, 2))\nprint(dividir_seguro(5, 0))"
 }

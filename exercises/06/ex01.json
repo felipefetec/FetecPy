@@ -18,7 +18,7 @@
   ],
   "enunciado": "Crie uma classe Retangulo com:\n- __init__(self, largura, altura)\n- area(self) → retorna largura * altura\n- perimetro(self) → retorna 2*(largura+altura)\n- __str__(self) → 'Retangulo(largura=X, altura=Y)'",
   "dica": "Guarde largura e altura como self.largura e self.altura no __init__.",
-  "codigo_inicial": "class Retangulo:\n    def __init__(self, largura, altura):\n        # seu código aqui\n        pass\n\n    def area(self):\n        pass\n\n    def perimetro(self):\n        pass\n\n    def __str__(self):\n        pass",
+  "codigo_inicial": "class Retangulo:\n    def __init__(self, largura, altura):\n        # seu código aqui\n        pass\n\n    def area(self):\n        pass\n\n    def perimetro(self):\n        pass\n\n    def __str__(self):\n        pass\n\n# Exemplos (remova ou altere para testar):\nr = Retangulo(4, 3)\nprint(r.area())\nprint(r.perimetro())\nr2 = Retangulo(5, 2)\nprint(str(r2))",
   "validacao": {
     "tipo": "saida_exata",
     "casos": [

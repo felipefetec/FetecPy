@@ -5,7 +5,11 @@
   "titulo": "Verificador de palíndromo",
   "dificuldade": "medio",
   "xp": 20,
-  "conceitos": ["funcao", "string", "slice reverso"],
+  "conceitos": [
+    "funcao",
+    "string",
+    "slice reverso"
+  ],
   "antes_de_codar": [
     "O que é um palíndromo? Dê 2 exemplos.",
     "Como você inverte uma string em Python?",
@@ -13,17 +17,42 @@
   ],
   "enunciado": "Escreva uma função eh_palindromo(texto) que retorna True se o texto é palíndromo (igual ao contrário), False caso contrário.\n\nIgnore maiúsculas/minúsculas e espaços.",
   "dica": "Para inverter uma string: texto[::-1]. Para normalizar: texto.lower().replace(' ', '')",
-  "codigo_inicial": "def eh_palindromo(texto):\n    # seu código aqui\n    pass",
+  "codigo_inicial": "def eh_palindromo(texto):\n    # seu código aqui\n    pass\n# Exemplo:\nprint(eh_palindromo('radar'))\nprint(eh_palindromo('Python'))",
   "validacao": {
     "tipo": "funcao",
     "nome_funcao": "eh_palindromo",
     "casos": [
-      { "args": ["radar"], "esperado": true },
-      { "args": ["Python"], "esperado": false },
-      { "args": ["Socorram me subi no onibus em marrocos"], "esperado": true },
-      { "args": ["Ame a ideia"], "esperado": false },
-      { "args": [""], "esperado": true }
+      {
+        "args": [
+          "radar"
+        ],
+        "esperado": true
+      },
+      {
+        "args": [
+          "Python"
+        ],
+        "esperado": false
+      },
+      {
+        "args": [
+          "Socorram me subi no onibus em marrocos"
+        ],
+        "esperado": true
+      },
+      {
+        "args": [
+          "Ame a ideia"
+        ],
+        "esperado": false
+      },
+      {
+        "args": [
+          ""
+        ],
+        "esperado": true
+      }
     ]
   },
-  "solucao": "def eh_palindromo(texto):\n    normalizado = texto.lower().replace(' ', '')\n    return normalizado == normalizado[::-1]"
+  "solucao": "def eh_palindromo(texto):\n    normalizado = texto.lower().replace(' ', '')\n    return normalizado == normalizado[::-1]\n# Exemplo:\nprint(eh_palindromo('radar'))\nprint(eh_palindromo('Python'))"
 }

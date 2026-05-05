@@ -9,11 +9,9 @@ pre_requisito: ""
 
 ## Por que isso importa?
 
-Antes de aprender qualquer linguagem de programação, você precisa aprender a **pensar como um programador**. E isso não tem nada a ver com computadores.
+Antes de aprender qualquer linguagem de programação, você precisa aprender a **pensar como um programador**. E isso não tem nada a ver com computadores. Quando você segue uma receita de bolo, está executando um algoritmo. Quando resolve um labirinto, está fazendo planejamento lógico. Quando organiza uma playlist por ordem de preferência, está aplicando critérios de ordenação. Programar é escrever essas instruções de uma forma que o computador entenda — mas a parte difícil, pensar na solução, é 100% humana.
 
-Pense assim: quando você segue uma receita de bolo, está executando um algoritmo. Quando você resolve um labirinto, está fazendo planejamento lógico. Quando você organiza uma playlist por ordem de preferência, está fazendo uma ordenação.
-
-Programar é escrever essas instruções de uma forma que um computador consiga entender. Mas a parte difícil — pensar na solução — é 100% humana.
+Programar é também uma das poucas profissões onde estudar não tem fim: toda semana surgem novas ferramentas, novas linguagens, novos padrões. Quem trabalha com tecnologia há 20 anos ainda aprende toda semana — não porque ficou para trás, mas porque é assim que funciona. Isso não é um fardo; é o que torna a área interessante. Uma coisa importante sobre ferramentas de IA: use-as para entender conceitos, pedir exemplos e tirar dúvidas — não para escrever o código por você. Você aprende quando erra, quando tenta uma lógica que não funciona, quando escreve a solução com as próprias mãos. Código copiado não fica na memória; raciocínio exercitado sim.
 
 :::aviso
 Neste módulo você **não vai escrever nenhuma linha de Python**. O objetivo é desenvolver o raciocínio. A sintaxe vem depois.

@@ -15,64 +15,111 @@ Decisões e repetições são o coração de qualquer programa real. Sem elas, o
 
 ## O que você vai aprender
 
+- Operadores de comparação e lógicos
+- Valores truthy e falsy — o que Python considera verdadeiro
 - Tomar decisões com `if`, `elif` e `else`
+- Expressão ternária — `if` em uma linha
 - Repetir ações com `for` e `while`
-- Usar operadores de comparação e lógicos
-- Controlar loops com `break` e `continue`
+- Loops aninhados
+- Controlar loops com `break`, `continue` e `else`
+- `match/case` — o switch do Python moderno
 
 ---
 
 ## 3.1 Operadores de comparação e lógicos
 
-Antes de aprender `if`, você precisa saber como Python avalia condições. Todas as comparações retornam `True` ou `False`:
+Todas as comparações retornam `True` ou `False`:
 
 ```python
 print(5 > 3)    # True
-print(5 == 5)   # True  (igual — dois sinais de =)
-print(5 != 3)   # True  (diferente)
+print(5 == 5)   # True  — igual (dois sinais de =)
+print(5 != 3)   # True  — diferente
 print(5 >= 10)  # False
 print(5 < 10)   # True
+
+# Python suporta encadeamento de comparações
+x = 15
+print(10 < x < 20)   # True — mais limpo que x > 10 and x < 20
+print(1 == 1 == 1)   # True
 ```
 
 :::aviso
 **`=` é atribuição, `==` é comparação!**
-`x = 5` guarda 5 em x. `x == 5` verifica se x vale 5. Confundir os dois é um erro muito comum.
+`x = 5` guarda 5 em x. `x == 5` verifica se x vale 5. Confundir os dois é um dos erros mais comuns.
 :::
 
-Para combinar condições, use os operadores lógicos:
+Para combinar condições:
 
 ```python
-idade = 20
+idade   = 20
 tem_cnh = True
 
-# and: ambas precisam ser True
-if idade >= 18 and tem_cnh:
+if idade >= 18 and tem_cnh:     # and: ambas precisam ser True
     print("Pode dirigir")
 
-# or: basta uma ser True
-if idade < 12 or idade >= 65:
+if idade < 12 or idade >= 65:   # or: basta uma ser True
     print("Meia-entrada")
 
-# not: inverte
-if not tem_cnh:
+if not tem_cnh:                 # not: inverte
     print("Sem habilitação")
+```
+
+---
+
+## 3.2 Valores truthy e falsy
+
+Em Python, qualquer valor pode ser usado como condição. São **falsy** (equivalem a `False`):
+
+| Valor | Tipo |
+|-------|------|
+| `0` | int |
+| `0.0` | float |
+| `""` | str vazia |
+| `[]` | lista vazia |
+| `{}` | dict/set vazio |
+| `None` | NoneType |
+| `False` | bool |
+
+Todo o resto é **truthy** (equivale a `True`).
+
+```python
+nome  = ""
+lista = [1, 2, 3]
+zero  = 0
+
+if not nome:
+    print("Nome vazio!")      # imprime
+
+if lista:
+    print("Lista tem itens")  # imprime
+
+if zero:
+    print("não imprime")      # não imprime — 0 é falsy
+```
+
+Isso permite escrever condições mais limpas:
+
+```python
+# Em vez de: if len(nome) > 0:
+if nome:
+    print(f"Olá, {nome}!")
+
+# Em vez de: if lista != []:
+if lista:
+    processar(lista)
 ```
 
 :::tente
 ```python
-# Teste os operadores lógicos
-x = 15
-print(x > 10 and x < 20)  # True
-print(x < 5 or x > 10)    # True
-print(not (x == 15))       # False
+valores = [0, 1, "", "texto", None, [], [1]]
+for v in valores:
+    print(f"{repr(v):15} → {'truthy' if v else 'falsy'}")
 ```
 :::
 
 ---
 
-## 3.2 Decisões com if / elif / else
-
-A estrutura básica de decisão em Python:
+## 3.3 Decisões com `if` / `elif` / `else`
 
 ```python
 if condição:
@@ -83,7 +130,7 @@ else:
     # executa se todas as condições acima forem False
 ```
 
-**Exemplo real: classificar IMC**
+**Exemplo — classificar IMC:**
 
 ```python
 imc = float(input("Seu IMC: "))
@@ -99,142 +146,207 @@ else:
 ```
 
 :::dica
-**A indentação é obrigatória em Python.**
-O bloco dentro do `if` precisa ter 4 espaços de recuo. Sem indentação, o Python não sabe onde o `if` termina e o código seguinte começa. Se usar TAB, configure o editor para converter TAB em 4 espaços.
+**A indentação é obrigatória em Python.** O bloco dentro do `if` precisa ter 4 espaços. Sem indentação, Python não sabe onde o `if` termina.
 :::
 
-:::reflexao
-Antes de fazer o próximo exercício, pense: se você tivesse que verificar se um número está entre 10 e 20 (inclusive), como escreveria a condição?
+### Expressão ternária — `if` em uma linha
 
----resposta
-numero >= 10 and numero <= 20
+Quando você precisa atribuir um valor com base em uma condição, a expressão ternária é mais concisa:
 
-Ou de forma mais pitônica: 10 <= numero <= 20 (Python suporta encadeamento de comparações!)
+```python
+# Forma longa
+if nota >= 7:
+    situacao = "aprovado"
+else:
+    situacao = "reprovado"
+
+# Forma ternária — equivalente
+situacao = "aprovado" if nota >= 7 else "reprovado"
+
+# Funciona em qualquer expressão
+print("par" if numero % 2 == 0 else "ímpar")
+abs_valor = x if x >= 0 else -x
+```
+
+---
+
+## 3.4 `match/case` — Python 3.10+
+
+Para comparar um valor com múltiplos casos fixos, `match/case` é mais legível que uma cadeia de `if/elif`:
+
+```python
+comando = input("Comando: ").lower()
+
+match comando:
+    case "iniciar":
+        print("Iniciando...")
+    case "parar" | "sair":          # múltiplos valores com |
+        print("Encerrando.")
+    case "ajuda":
+        print("Comandos: iniciar, parar, ajuda")
+    case _:                          # _ é o caso padrão (como else)
+        print(f"Comando desconhecido: {comando}")
+```
+
+:::dica
+`match/case` não substitui todos os `if/elif` — use quando você está comparando **um único valor contra constantes fixas**. Para condições mais complexas (ranges, combinações), `if/elif` continua sendo a escolha certa.
 :::
 
 ---
 
-## 3.3 Loop for — repetição com contador
+## 3.5 Loop `for` — repetição controlada
 
-Use `for` quando você sabe de antemão quantas vezes quer repetir (ou está iterando sobre uma coleção):
+Use `for` quando sabe de antemão quantas vezes repetir, ou está iterando sobre uma coleção:
 
 ```python
 # range(início, fim, passo) — fim é exclusivo
-for i in range(5):          # 0, 1, 2, 3, 4
+for i in range(5):           # 0, 1, 2, 3, 4
     print(i)
 
-for i in range(1, 6):       # 1, 2, 3, 4, 5
+for i in range(1, 6):        # 1, 2, 3, 4, 5
     print(i)
 
-for i in range(0, 10, 2):   # 0, 2, 4, 6, 8 (passo 2)
+for i in range(0, 10, 2):   # 0, 2, 4, 6, 8
     print(i)
 
-for i in range(10, 0, -1):  # 10, 9, 8, ..., 1 (contagem regressiva)
+for i in range(10, 0, -1):  # 10, 9, 8, ..., 1
     print(i)
 ```
 
-**Iterando sobre texto:**
+**Iterando sobre coleções:**
 
 ```python
 for letra in "Python":
-    print(letra)   # P, y, t, h, o, n (um por linha)
+    print(letra)              # P, y, t, h, o, n
+
+frutas = ["banana", "manga", "uva"]
+for fruta in frutas:
+    print(fruta.upper())
 ```
 
 :::tente
 ```python
-# Somar os números de 1 a 100
 total = 0
 for i in range(1, 101):
     total += i
-print(f"Soma de 1 a 100: {total}")
+print(f"Soma de 1 a 100: {total}")   # 5050
 ```
 :::
 
 ---
 
-## 3.4 Loop while — repetição com condição
+## 3.6 Loop `while` — repetição com condição
 
-Use `while` quando você não sabe de antemão quantas vezes vai repetir. O loop continua **enquanto** a condição for True:
+Use `while` quando não sabe de antemão quantas vezes repetir:
 
 ```python
-# Conta até o usuário digitar um número positivo
 numero = -1
 while numero <= 0:
     numero = int(input("Digite um número positivo: "))
-
 print(f"Você digitou: {numero}")
 ```
 
 :::aviso
-**Loop infinito!**
-Se a condição do `while` nunca se tornar False, o programa trava. Sempre garanta que o corpo do loop modifique algo que a condição verifica.
-```python
-# PERIGO: loop infinito
-while True:
-    print("Isso nunca para!")  # Evite isso sem um break controlado
-```
+**Loop infinito!** Se a condição nunca ficar False, o programa trava. Sempre garanta que o corpo do loop modifique algo que a condição verifica.
 :::
 
 ---
 
-## 3.5 break e continue
-
-Duas instruções especiais para controlar o fluxo dentro de loops:
+## 3.7 `break`, `continue` e `else` em loops
 
 ```python
 # break — sai do loop imediatamente
 for i in range(10):
     if i == 5:
-        break           # para quando i chega em 5
-    print(i)            # imprime 0, 1, 2, 3, 4
+        break
+    print(i)   # 0, 1, 2, 3, 4
 
 # continue — pula para a próxima iteração
 for i in range(10):
     if i % 2 == 0:
-        continue        # pula números pares
-    print(i)            # imprime 1, 3, 5, 7, 9
+        continue
+    print(i)   # 1, 3, 5, 7, 9
 ```
 
-:::dica
-**Quando usar `break` vs `while`?**
-Prefira `while condicao:` quando a condição é clara desde o início. Use `break` quando você só descobre a condição de parada dentro do loop — por exemplo, ao validar entrada do usuário com menu interativo.
-:::
+### `else` em loops — executado quando o loop termina sem `break`
 
-:::tente
 ```python
-# Jogo simples: adivinhe o número (versão simplificada)
-secreto = 7
-while True:
-    chute = int(input("Chute: "))
-    if chute == secreto:
-        print("Acertou!")
+# Procurar um número em uma lista
+numeros = [2, 4, 6, 8, 10]
+busca   = 7
+
+for n in numeros:
+    if n == busca:
+        print(f"Encontrado: {busca}")
         break
-    elif chute < secreto:
-        print("Maior!")
-    else:
-        print("Menor!")
+else:
+    # Só executa se o for terminou sem break
+    print(f"{busca} não está na lista")
+
+# Com while — mesmo comportamento
+tentativas = 3
+while tentativas > 0:
+    senha = input("Senha: ")
+    if senha == "1234":
+        print("Acesso liberado")
+        break
+    tentativas -= 1
+else:
+    print("Conta bloqueada")
 ```
+
+---
+
+## 3.8 Loops aninhados
+
+Um loop dentro de outro — o loop interno executa completamente para cada iteração do externo:
+
+```python
+# Tabuada de multiplicação 1 a 3
+for i in range(1, 4):
+    for j in range(1, 11):
+        print(f"{i} x {j:2} = {i*j:2}", end="   ")
+    print()   # quebra de linha após cada linha da tabuada
+```
+
+```python
+# Matriz — lista de listas
+matriz = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9],
+]
+
+for linha in matriz:
+    for elemento in linha:
+        print(elemento, end=" ")
+    print()
+# 1 2 3
+# 4 5 6
+# 7 8 9
+```
+
+:::aviso
+**`break` em loop aninhado só sai do loop mais interno.** Para sair de múltiplos loops, use uma variável de controle ou encapsule o loop interno em uma função.
 :::
 
 ---
 
 ## Exercícios
 
-Estes exercícios cobrem `if/elif/else`, `for` e `while`. Pense nos casos extremos: o que acontece com 0? Com número negativo? Com o valor exato no limite da condição?
+Pense nos casos extremos antes de codar: o que acontece com 0? Com número negativo? Com o valor exato no limite da condição?
 
 ---
 
 ## Mini-projeto: Jogo de Adivinhação
 
-Escreva um jogo de adivinhação completo:
+Escreva um jogo completo:
 
-1. O programa "sorteia" um número de 1 a 100 (use `numero = 42` por enquanto — o `random` vem no próximo módulo)
+1. O programa define um número secreto (use `secreto = 42`)
 2. O usuário tem **8 tentativas** para adivinhar
-3. A cada tentativa, informe se o chute foi maior ou menor
-4. Ao fim, mostre se ganhou ou perdeu e qual era o número secreto
-5. Mostre o número de tentativas usadas
-
-**Desafio bônus:** adapte para dar dicas de "muito longe" (diferença > 30), "quente" (diferença < 10) e "acertou".
+3. A cada tentativa: informe se o chute foi maior, menor ou correto
+4. Mostre se ganhou ou perdeu e quantas tentativas usou
+5. **Bônus:** dê dicas de "muito longe" (diferença > 30) e "quente" (diferença < 10)
 
 ---
 
@@ -246,11 +358,14 @@ Teste seus conhecimentos sobre estruturas de controle.
 
 ## Resumo
 
-✔ `if/elif/else` — decisões com base em condições  
-✔ `==` compara, `=` atribui — não confunda!  
-✔ `for range(n)` — repete n vezes contando  
-✔ `while condicao` — repete enquanto a condição for True  
-✔ `break` sai do loop, `continue` pula para a próxima iteração  
+✔ `==` compara, `=` atribui — não confunda  
+✔ `0`, `""`, `[]`, `None` são falsy — `if lista:` funciona  
+✔ `10 < x < 20` — encadeamento de comparações  
+✔ Expressão ternária: `valor = a if cond else b`  
+✔ `match/case` — comparação de valor contra constantes  
+✔ `for range(n)` — repete n vezes; `while cond` — enquanto for True  
+✔ Loops aninhados: interno executa completo a cada iteração do externo  
+✔ `break` sai do loop; `continue` pula iteração; `else` roda se não houve `break`  
 
 ## Próximos passos
 
