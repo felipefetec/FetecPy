@@ -239,3 +239,28 @@ Pré-requisitos — todos atendidos:
 ### Prompt 7.5.3 — Exercícios e quizzes (a fazer)
 ### Prompt 7.5.4 — Mini-projeto final (a fazer)
 ### Prompt 7.5.5 — Badges, XP e ajustes finais (a fazer)
+
+---
+
+## Sessão 2026-05-05 — Melhorias e polimento (pós-Fase 8)
+
+### Features implementadas ✅
+- [x] Ticker de alunos (rodapé infinito) com shuffle sem adjacentes — index.html + app.html
+- [x] Ranking Top 10 — modal com pódio, LeaderboardController.php, ranking.js
+- [x] Revisão completa módulos 1–8 (profundidade, tom humano, novos exemplos)
+- [x] Correções exercícios 5–8 (input() prompt no stdout, comparação int/float, enunciados)
+- [x] Refazer carrega código salvo do aluno (ModuleController + module.html)
+- [x] Sistema de níveis (Iniciante/Aprendiz/Praticante/Avançado/Especialista) — sidebar + header
+- [x] Contador de caracteres em tempo real no editor de exercícios
+- [x] Limite de 5000 caracteres no código (validator.js)
+- [x] Deploy na VPS: https://fetec.cloud/py/ ✓
+
+### Backlog (próximas sessões)
+- [ ] Cache do service worker — revisar estratégia (atualmente pode travar atualização de JS)
+- [ ] Módulo 9 — Boas Práticas (ver PLANO_ESTUDOS_M9.md e PROMPTS_M9.md)
+- [ ] Refatoração visual (ver VISUAL_REFAC.md)
+- [ ] Caixa de Dúvidas (Opção A — sistema Q&A simples)
+- [ ] Dashboard do professor (ver progresso de todos os alunos)
+- [ ] Avisos/comunicados para alunos
+- [ ] Links diretos para exercícios nos cards da dashboard
+- [ ] Revisão dos quizzes (reescrever perguntas com tom menos genérico de IA)
